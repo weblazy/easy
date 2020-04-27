@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"go-invoice/utils/stringx"
+	"github.com/weblazy/easy/utils/stringx"
 )
 
 // @desc 编译http参数
