@@ -1,0 +1,1053 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">github.com/weblazy/easy/pkg/alipay/alipay.go (0.0%)</option>
+				
+				<option value="file1">github.com/weblazy/easy/pkg/wx/wx.go (0.0%)</option>
+				
+				<option value="file2">github.com/weblazy/easy/utils/filex/filex.go (76.5%)</option>
+				
+				<option value="file3">github.com/weblazy/easy/utils/httpx/httpx.go (0.0%)</option>
+				
+				<option value="file4">github.com/weblazy/easy/utils/logx/logx.go (0.0%)</option>
+				
+				<option value="file5">github.com/weblazy/easy/utils/mapx/mapx.go (0.0%)</option>
+				
+				<option value="file6">github.com/weblazy/easy/utils/sqlx/sqlx.go (0.0%)</option>
+				
+				<option value="file7">github.com/weblazy/easy/utils/stringx/stringx.go (0.0%)</option>
+				
+				<option value="file8">github.com/weblazy/easy/utils/timex/timex.go (0.0%)</option>
+				
+				<option value="file9">github.com/weblazy/easy/utils/timex/utils.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package alipay
+
+import (
+        "encoding/json"
+        "fmt"
+        "time"
+
+        "github.com/weblazy/easy/utils/httpx"
+
+        "github.com/weblazy/gocore/httplib"
+        "gopkg.in/redis.v5"
+)
+
+type (
+        Alipay struct {
+                appId              string
+                rsaPrivateKey      string
+                alipayrsaPublicKey string
+                signType           string
+                format             string
+                postCharset        string
+                apiVersion         string
+                getRedis           func() *redis.Client
+        }
+
+        GetUserInfoResponse struct {
+                Scene     string `json:"scene"`
+                Page      string `json:"page"`
+                AutoColor bool   `json:"auto_color"`
+                IsHyaline bool   `json:"is_hyaline"`
+                Width     int64  `json:"width"`
+        }
+)
+
+const (
+        //网关
+        gatewayUrl = "https://openapi.alipay.com/gateway.do"
+        TimeLayout = "2006-01-02 15:04:05"
+)
+
+// @desc 初始化
+// @auth liuguoqiang 2020-02-25
+// @param
+// @return
+func NewAlipay(appId, rsaPrivateKey, alipayrsaPublicKey, signType string, getRedis func() *redis.Client) *Alipay <span class="cov0" title="0">{
+        return &amp;Alipay{
+                appId:              appId,
+                rsaPrivateKey:      rsaPrivateKey,
+                alipayrsaPublicKey: alipayrsaPublicKey,
+                signType:           signType,
+                format:             "json",
+                postCharset:        "UTF-8",
+                apiVersion:         "1.0",
+                getRedis:           getRedis,
+        }
+}</span>
+
+// @desc
+// @auth liuguoqiang 2020-04-09
+// @param
+// @return
+func (s *Alipay) GetUserInfo(code string) {<span class="cov0" title="0">
+
+}</span>
+
+// @desc
+// @auth liuguoqiang 2020-04-09
+// @param
+// @return
+func (s *Alipay) Request(url, apiParams map[string]interface{}, authToken string, appInfoAuthtoken string) error <span class="cov0" title="0">{
+        //组装系统参数
+        params := make(map[string]interface{})
+        params["app_id"] = s.appId
+        params["version"] = s.apiVersion
+        params["format"] = s.format
+        params["sign_type"] = s.signType
+        params["method"] = url
+        params["timestamp"] = time.Now().Format(TimeLayout)
+        params["auth_token"] = authToken
+        params["alipay_sdk"] = "alipay-sdk-php-20180705"
+        params["terminal_type"] = nil
+        params["terminal_info"] = nil
+        params["prod_code"] = nil
+        params["notify_url"] = nil
+        params["charset"] = s.postCharset
+        params["app_auth_token"] = appInfoAuthtoken
+        //签名
+        params["sign"] = s.generateSign()
+        //系统参数放入GET请求串
+
+        requestUrl, err := httpx.MapToQuery(params)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">requestUrl = gatewayUrl + "?" + requestUrl
+        req := httplib.Post(requestUrl)
+        req, err = req.JSONBody(apiParams)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">dataByte, err := req.Bytes()
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">data := make(map[string]interface{})
+        err = json.Unmarshal(dataByte, &amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov0" title="0">fmt.Printf("%#v", data)
+        return nil</span>
+}
+
+// @desc
+// @auth liuguoqiang 2020-04-09
+// @param
+// @return
+func (s *Alipay) generateSign() string <span class="cov0" title="0">{
+        return ""
+}</span>
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package wx
+
+import (
+        "bytes"
+        "crypto/aes"
+        "crypto/cipher"
+        "encoding/base64"
+        "encoding/json"
+        "errors"
+        "fmt"
+        "io/ioutil"
+        "mime/multipart"
+        "net/http"
+        "strconv"
+        "time"
+
+        "github.com/sunmi-OS/gocore/httplib"
+        "gopkg.in/redis.v5"
+)
+
+type (
+        Wx struct {
+                appId       string
+                secret      string
+                grantType   string
+                accessToken string
+                getRedis    func() *redis.Client
+        }
+
+        GetUnLimitQRCodeRequest struct {
+                Scene     string `json:"scene"`
+                Page      string `json:"page"`
+                AutoColor bool   `json:"auto_color"`
+                IsHyaline bool   `json:"is_hyaline"`
+                Width     int64  `json:"width"`
+        }
+        SendRequest struct {
+                Openid          string `json:"touser"`
+                TemplateId      string `json:"template_id"`
+                Page            string `json:"page"`
+                FormId          string `json:"form_id"`
+                Data            string `json:"data"`
+                EmphasisKeyword string `json:"emphasis_keyword"`
+        }
+        DecryptDataRequest struct {
+                SessionKey string
+                Iv         string
+                Data       string
+        }
+        CheckLoginResponse struct {
+                OpenId     string `json:"openId"`
+                SessionKey string `json:"session_key"`
+        }
+)
+
+const (
+        // access_token 地址
+        AccessTokenUrl = "https://api.weixin.qq.com/cgi-bin/token"
+        //获取无限制小程序二维码
+        CreateUqrcodeUrl = "https://api.weixin.qq.com/wxa/getwxacodeunlimit"
+        //授权$code 访问地址
+        CodeAccessUrl    = "https://api.weixin.qq.com/sns/jscode2session"
+        TemplatedSendUrl = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send"
+        //获取授权页ticket
+        GetticketUrl = "https://api.weixin.qq.com/cgi-bin/ticket/getticket"
+        //获取授权页链接
+        AuthUrl = "https://api.weixin.qq.com/card/invoice/getauthurl"
+        //上传电子发票PDF文件
+        SetpdfUrl = "https://api.weixin.qq.com/card/invoice/platform/setpdf"
+        //将电子发票卡券插入用户卡包
+        InvoiceInsertUrl = "https://api.weixin.qq.com/card/invoice/insert"
+)
+
+// @desc 初始化
+// @auth liuguoqiang 2020-02-25
+// @param
+// @return
+func NewWx(appId, secret, grantType string, getRedis func() *redis.Client) *Wx <span class="cov0" title="0">{
+        return &amp;Wx{
+                appId:     appId,
+                secret:    secret,
+                grantType: grantType,
+                getRedis:  getRedis,
+        }
+}</span>
+
+// @desc 根据access_token值进行授权
+// @auth liuguoqiang 2020-02-25
+// @param $isFresh 是否刷新access_token
+// @return
+func (s *Wx) InitAuthToken(isFresh bool) (string, error) <span class="cov0" title="0">{
+        //查询缓存
+        tokenKey := "tob_wechat:applet:token:" + s.appId
+        accessToken := s.getRedis().Get(tokenKey).Val()
+
+        if accessToken != "" &amp;&amp; !isFresh </span><span class="cov0" title="0">{
+                s.accessToken = accessToken
+                return s.accessToken, nil
+        }</span>
+
+        // 获取token
+        <span class="cov0" title="0">req := httplib.Get(AccessTokenUrl + "?grant_type=client_credential&amp;appid=" + s.appId + "&amp;secret=" + s.secret)
+        data := make(map[string]interface{})
+        err := req.ToJSON(&amp;data)
+        if err != nil </span><span class="cov0" title="0">{
+                return "", err
+        }</span>
+        <span class="cov0" title="0">if accessToken, ok := data["access_token"]; !ok </span><span class="cov0" title="0">{
+                return "", errors.New(strconv.FormatFloat(data["errcode"].(float64), 'f', -1, 64) + ":" + data["errmsg"].(string))
+        }</span> else<span class="cov0" title="0"> {
+                err := s.getRedis().Set(tokenKey, accessToken, 7000*time.Second).Err()
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", err
+                }</span>
+                <span class="cov0" title="0">s.accessToken = accessToken.(string)
+                return s.accessToken, nil</span>
+        }
+}
+
+// @desc 获取二维码
+// @auth liuguoqiang 2020-02-25
+// @param
+// @return
+func (s *Wx) GetUnLimitQRCode(params *GetUnLimitQRCodeRequest, isFresh bool) ([]byte, error) <span class="cov0" title="0">{
+        return s.Request(nil, params, CreateUqrcodeUrl, isFresh, true)
+}</span>
+
+// @desc 发送模板
+// @auth liuguoqiang 2020-04-17
+// @param
+// @return
+func (s *Wx) Send(params *SendRequest, isFresh bool) ([]byte, error) <span class="cov0" title="0">{
+        return s.Request(nil, params, TemplatedSendUrl, isFresh, true)
+}</span>
+
+// @desc 获取授权页面ticket
+// @auth liuguoqiang 2020-02-25
+// @param
+// @return
+func (s *Wx) GetTicket(ticketType string, isFresh bool) ([]byte, error) <span class="cov0" title="0">{
+        urlParam := make(map[string]string)
+        urlParam["type"] = "wx_card"
+        return s.Request(urlParam, nil, GetticketUrl, isFresh, false)
+}</span>
+
+// @desc 获取微信授权页链接
+// @auth liuguoqiang 2020-02-25
+// @param
+// @return
+func (s *Wx) GetAuthUrl(params map[string]interface{}, isFresh bool) ([]byte, error) <span class="cov0" title="0">{
+        return s.Request(nil, params, AuthUrl, isFresh, true)
+}</span>
+
+// @desc 通用请求
+// @auth liuguoqiang 2020-02-25
+// @param
+// @return
+func (s *Wx) Request(urlParam map[string]string, bodyParams interface{}, paramUrl string, isFresh bool, isPost bool) ([]byte, error) <span class="cov0" title="0">{
+        if s.accessToken == "" || isFresh </span><span class="cov0" title="0">{
+                _, err := s.InitAuthToken(isFresh)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+        <span class="cov0" title="0">var req *httplib.BeegoHTTPRequest
+        url := paramUrl + "?access_token=" + s.accessToken
+        if isPost </span><span class="cov0" title="0">{
+                req = httplib.Post(url)
+        }</span> else<span class="cov0" title="0"> {
+                req = httplib.Get(url)
+        }</span>
+        <span class="cov0" title="0">if urlParam != nil </span><span class="cov0" title="0">{
+                for key, value := range urlParam </span><span class="cov0" title="0">{
+                        req = req.Param(key, value)
+                }</span>
+        }
+        <span class="cov0" title="0">req, err := req.JSONBody(bodyParams)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">dataByte, err := req.Bytes()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">data := make(map[string]interface{})
+        err = json.Unmarshal(dataByte, &amp;data)
+        if err == nil </span><span class="cov0" title="0">{
+                if _, ok := data["errcode"]; ok &amp;&amp; data["errcode"].(float64) != 0 </span><span class="cov0" title="0">{
+                        if !isFresh </span><span class="cov0" title="0">{
+                                dataByte, err = s.Request(urlParam, bodyParams, paramUrl, true, isPost)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        return nil, err
+                                }</span>
+                        } else<span class="cov0" title="0"> {
+                                return nil, errors.New(strconv.FormatFloat(data["errcode"].(float64), 'f', -1, 64) + ":" + data["errmsg"].(string))
+                        }</span>
+                }
+        }
+        <span class="cov0" title="0">return dataByte, nil</span>
+}
+
+// @desc 根据微信code获取授权信息
+// @auth liuguoqiang 2020-04-08
+// @param
+// @return
+func (s *Wx) CheckLogin(code string) (*CheckLoginResponse, error) <span class="cov0" title="0">{
+        params := make(map[string]interface{})
+        params["appid"] = s.appId
+        params["secret"] = s.secret
+        params["js_code"] = code
+        params["grant_type"] = s.grantType
+        req := httplib.Post(CodeAccessUrl)
+        req, err := req.JSONBody(params)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">dataByte, err := req.Bytes()
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">data := make(map[string]interface{})
+        err = json.Unmarshal(dataByte, &amp;data)
+        if err == nil </span><span class="cov0" title="0">{
+                if _, ok := data["errcode"]; ok </span><span class="cov0" title="0">{
+                        return nil, errors.New(strconv.FormatFloat(data["errcode"].(float64), 'f', -1, 64) + ":" + data["errmsg"].(string))
+                }</span>
+        }
+        <span class="cov0" title="0">return &amp;CheckLoginResponse{
+                OpenId:     data["openid"].(string),
+                SessionKey: data["session_key"].(string),
+        }, nil</span>
+}
+
+// @desc 检验数据的真实性，并且获取解密后的明文.
+// @auth liuguoqiang 2020-04-08
+// @param
+// @return
+func DecryptData(req *DecryptDataRequest) ([]byte, error) <span class="cov0" title="0">{
+        if len(req.SessionKey) != 24 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("错误的SessionKey")
+        }</span>
+        <span class="cov0" title="0">if len(req.Iv) != 24 </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("错误的Iv")
+        }</span>
+        <span class="cov0" title="0">aesKey, err := base64.StdEncoding.DecodeString(req.SessionKey)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">iv, err := base64.StdEncoding.DecodeString(req.Iv)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">data, err := base64.StdEncoding.DecodeString(req.Data)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">resp := AesDecrypt(data, aesKey, iv)
+        return resp, nil</span>
+}
+
+// @desc aes加密
+// @auth liuguoqiang 2020-04-21
+// @param
+// @return
+func AesEncrypt(origData []byte, k []byte, iv []byte) string <span class="cov0" title="0">{
+        // 分组秘钥
+        // NewCipher该函数限制了输入k的长度必须为16, 24或者32
+        block, _ := aes.NewCipher(k)
+        // 获取秘钥块的长度
+        blockSize := block.BlockSize()
+        // 补全码
+        origData = PKCS7Padding(origData, blockSize)
+        // 加密模式
+        blockMode := cipher.NewCBCEncrypter(block, iv)
+        // 创建数组
+        cryted := make([]byte, len(origData))
+        // 加密
+        blockMode.CryptBlocks(cryted, origData)
+        return base64.StdEncoding.EncodeToString(cryted)
+}</span>
+
+// @desc aes解密
+// @auth liuguoqiang 2020-04-21
+// @param
+// @return
+func AesDecrypt(crytedByte []byte, key []byte, iv []byte) []byte <span class="cov0" title="0">{
+        // 分组秘钥
+        block, _ := aes.NewCipher(key)
+        // 加密模式
+        blockMode := cipher.NewCBCDecrypter(block, iv)
+        // 创建数组
+        orig := make([]byte, len(crytedByte))
+        // 解密
+        blockMode.CryptBlocks(orig, crytedByte)
+        // 去补全码
+        orig = PKCS7UnPadding(orig)
+        return orig
+}</span>
+
+//补码
+//AES加密数据块分组长度必须为128bit(byte[16])，密钥长度可以是128bit(byte[16])、192bit(byte[24])、256bit(byte[32])中的任意一个。
+// @desc
+// @auth liuguoqiang 2020-04-21
+// @param
+// @return
+func PKCS7Padding(ciphertext []byte, blocksize int) []byte <span class="cov0" title="0">{
+        padding := blocksize - len(ciphertext)%blocksize
+        padtext := bytes.Repeat([]byte{byte(padding)}, padding)
+        return append(ciphertext, padtext...)
+}</span>
+
+// @desc 去码
+// @auth liuguoqiang 2020-04-21
+// @param
+// @return
+func PKCS7UnPadding(origData []byte) []byte <span class="cov0" title="0">{
+        length := len(origData)
+        unpadding := int(origData[length-1])
+        return origData[:(length - unpadding)]
+}</span>
+
+// @desc 电子发票插入微信卡包
+// @auth liuguoqiang 2020-04-24
+// @param
+// @return
+func (s *Wx) InvoiceInsert(params map[string]interface{}, isFresh bool) ([]byte, error) <span class="cov0" title="0">{
+        params["appid"] = s.appId
+        return s.Request(nil, params, InvoiceInsertUrl, isFresh, true)
+}</span>
+
+// @desc 上传pdf文件
+// @auth liuguoqiang 2020-02-25
+// @param
+// @return
+func (s *Wx) SetPdf(pdfPath string, isFresh bool) ([]byte, error) <span class="cov0" title="0">{
+        if s.accessToken == "" || isFresh </span><span class="cov0" title="0">{
+                _, err := s.InitAuthToken(isFresh)
+                if err != nil </span><span class="cov0" title="0">{
+                        return nil, err
+                }</span>
+        }
+        <span class="cov0" title="0">if pdfPath == "" </span><span class="cov0" title="0">{
+                return nil, fmt.Errorf("pdfPath is empty")
+        }</span>
+        <span class="cov0" title="0">resp, err := http.Get(pdfPath)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer resp.Body.Close()
+
+        if resp.StatusCode != 200 </span><span class="cov0" title="0">{
+                return nil, errors.New("resp status:" + fmt.Sprint(resp.StatusCode))
+        }</span>
+        <span class="cov0" title="0">bin, err := ioutil.ReadAll(resp.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">buf := new(bytes.Buffer)
+        bodyWriter := multipart.NewWriter(buf)
+        fileName := fmt.Sprintf("%d.pdf", time.Now().UnixNano()/1000)
+        fileWriter, err := bodyWriter.CreateFormFile("pdf", fileName)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">_, err = fileWriter.Write(bin)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">bodyWriter.Close()
+        req1, err := http.NewRequest("POST", SetpdfUrl+"?access_token="+s.accessToken, buf)
+        req1.Header.Set("Content-Type", bodyWriter.FormDataContentType())
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">client := http.Client{}
+        resp1, err := client.Do(req1)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">defer resp1.Body.Close()
+
+        dataByte, err := ioutil.ReadAll(resp1.Body)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">data := make(map[string]interface{})
+        err = json.Unmarshal(dataByte, &amp;data)
+        if err == nil </span><span class="cov0" title="0">{
+                if _, ok := data["errcode"]; ok &amp;&amp; data["errcode"].(float64) != 0 </span><span class="cov0" title="0">{
+                        if !isFresh </span><span class="cov0" title="0">{
+                                dataByte, err = s.SetPdf(pdfPath, true)
+                                if err != nil </span><span class="cov0" title="0">{
+                                        return nil, err
+                                }</span>
+                        } else<span class="cov0" title="0"> {
+                                return nil, errors.New(strconv.FormatFloat(data["errcode"].(float64), 'f', -1, 64) + ":" + data["errmsg"].(string))
+                        }</span>
+                }
+        }
+        <span class="cov0" title="0">return dataByte, nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">package filex
+
+import (
+        "io/ioutil"
+        "os"
+)
+
+func Read(path string) ([]byte, error) <span class="cov8" title="1">{
+        fi, err := os.Open(path)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">defer fi.Close()
+        fd, err := ioutil.ReadAll(fi)
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">return fd, nil</span>
+}
+
+func Write(path string, b []byte, isAppend bool) error <span class="cov8" title="1">{
+        flag := os.O_WRONLY | os.O_TRUNC | os.O_CREATE
+        if isAppend </span><span class="cov0" title="0">{
+                flag = os.O_WRONLY | os.O_APPEND | os.O_CREATE
+        }</span>
+        <span class="cov8" title="1">fd, err := os.OpenFile(path, flag, os.ModePerm)
+        if err != nil </span><span class="cov0" title="0">{
+                return err
+        }</span>
+        <span class="cov8" title="1">defer fd.Close()
+        fd.Write(b)
+        return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">package httpx
+
+import (
+        "fmt"
+        "net/url"
+
+        "github.com/weblazy/easy/utils/stringx"
+)
+
+// @desc 编译http参数
+// @auth liuguoqiang 2020-03-20
+// @param
+// @return
+func MapToQuery(params map[string]interface{}, urlEncode ...bool) (string, error) <span class="cov0" title="0">{
+        if params == nil </span><span class="cov0" title="0">{
+                return "", fmt.Errorf("param is nil")
+        }</span>
+        <span class="cov0" title="0">v := make(url.Values)
+        for key := range params </span><span class="cov0" title="0">{
+                value, err := stringx.ToString(params[key])
+                if err != nil </span><span class="cov0" title="0">{
+                        return "", nil
+                }</span>
+                <span class="cov0" title="0">v.Add(key, value)</span>
+        }
+        <span class="cov0" title="0">encodeStr := v.Encode()
+        if len(urlEncode) &gt; 0 &amp;&amp; urlEncode[0] </span><span class="cov0" title="0">{
+                return encodeStr, nil
+        }</span>
+        <span class="cov0" title="0">decodeStr, _ := url.QueryUnescape(encodeStr)
+        return decodeStr, nil</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file4" style="display: none">package logx
+
+import (
+        "encoding/json"
+        "fmt"
+        "runtime"
+        "time"
+)
+
+type (
+        Param struct {
+                Time string      `json:"time"`
+                File string      `json:"file"`
+                Data interface{} `json:"data"`
+        }
+)
+
+func Info(args ...interface{}) <span class="cov0" title="0">{
+        _, file, line, ok := runtime.Caller(1)
+        if ok </span><span class="cov0" title="0">{
+                data, _ := json.Marshal(&amp;Param{
+                        Time: time.Now().Format("2006-01-02 15:04:05"),
+                        File: fmt.Sprintf("%s:%d", file, line),
+                        Data: args,
+                })
+                fmt.Printf("%s\n", string(data))
+        }</span>
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package mapx
+
+import (
+        "encoding/xml"
+        "io"
+)
+
+type Map map[string]string
+
+type xmlMapEntry struct {
+        XMLName xml.Name
+        Value   string `xml:",chardata"`
+}
+
+func (m Map) MarshalXML(e *xml.Encoder, start xml.StartElement) error <span class="cov0" title="0">{
+        //构建xml 输出头部
+        var err error
+        for key, value := range m </span><span class="cov0" title="0">{
+                name := xml.Name{Space: "", Local: key}
+                err = e.EncodeToken(xml.StartElement{Name: name})
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">err = e.EncodeToken(xml.CharData(value))
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+                <span class="cov0" title="0">err = e.EncodeToken(xml.EndElement{Name: name})
+                if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+func (m *Map) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error <span class="cov0" title="0">{
+        *m = Map{}
+        for </span><span class="cov0" title="0">{
+                var e xmlMapEntry
+
+                err := d.Decode(&amp;e)
+                if err == io.EOF </span><span class="cov0" title="0">{
+                        break</span>
+                } else<span class="cov0" title="0"> if err != nil </span><span class="cov0" title="0">{
+                        return err
+                }</span>
+
+                <span class="cov0" title="0">(*m)[e.XMLName.Local] = e.Value</span>
+        }
+        <span class="cov0" title="0">return nil</span>
+}
+
+/**
+ * @desc 校验
+ */
+func IsExist(data map[string]interface{}, name string) bool <span class="cov0" title="0">{
+        _, ok := data[name]
+        return ok
+}</span>
+</pre>
+		
+		<pre class="file" id="file6" style="display: none">package sqlx
+
+import (
+        "fmt"
+        "reflect"
+        "strings"
+
+        gorm "github.com/jinzhu/gorm"
+)
+
+// sql = INSERT INTO `users` VALUES (?,?,?),(?,?,?)
+func BulkInsert(db *gorm.DB, table string, fields []string, params []map[string]interface{}) error <span class="cov0" title="0">{
+        sql := "INSERT INTO `" + table + "` (" + strings.Join(fields, ",") + ") VALUES "
+        args := make([]interface{}, 0)
+        valueArr := make([]string, 0)
+        varArr := make([]string, 0)
+        for _, obj := range params </span><span class="cov0" title="0">{
+                varArr = varArr[:0]
+                varStr := "("
+                for _, value := range fields </span><span class="cov0" title="0">{
+                        varArr = append(varArr, "?")
+                        args = append(args, obj[value])
+                }</span>
+                <span class="cov0" title="0">varStr += strings.Join(varArr, ",") + ")"
+                valueArr = append(valueArr, varStr)</span>
+        }
+        <span class="cov0" title="0">sql += strings.Join(valueArr, ",")
+        fmt.Println(sql)
+        fmt.Println(args)
+        err := db.Exec(sql, args...).Error
+        return err</span>
+}
+
+func BulkSave(db *gorm.DB, table string, fields []string, params []map[string]interface{}) error <span class="cov0" title="0">{
+        sql := "INSERT INTO `" + table + "` (" + strings.Join(fields, ",") + ") VALUES "
+        updateArr := make([]string, 0)
+        args := make([]interface{}, 0)
+        valueArr := make([]string, 0)
+        varArr := make([]string, 0)
+        for _, value := range fields </span><span class="cov0" title="0">{
+                updateArr = append(updateArr, value+"=VALUES("+value+")")
+        }</span>
+        <span class="cov0" title="0">for _, obj := range params </span><span class="cov0" title="0">{
+                varArr = varArr[:0]
+                varStr := "("
+                for _, value := range fields </span><span class="cov0" title="0">{
+                        varArr = append(varArr, "?")
+                        args = append(args, obj[value])
+                }</span>
+                <span class="cov0" title="0">varStr += strings.Join(varArr, ",") + ")"
+                valueArr = append(valueArr, varStr)</span>
+        }
+        <span class="cov0" title="0">sql += strings.Join(valueArr, ",")
+        sql += " ON DUPLICATE KEY UPDATE " + strings.Join(updateArr, ",")
+        fmt.Println(sql)
+        fmt.Println(args)
+        err := db.Exec(sql, args...).Error
+        return err</span>
+}
+
+// @desc
+// @auth liuguoqiang 2020-04-08
+// @param
+// @return
+func Validate(data, model interface{}) bool <span class="cov0" title="0">{
+        if _, ok := data.(map[string]interface{}); ok </span><span class="cov0" title="0">{
+                return true
+        }</span>
+        <span class="cov0" title="0">if reflect.TypeOf(data).Kind() == reflect.TypeOf(model).Kind() </span><span class="cov0" title="0">{
+                return true
+        }</span>
+        <span class="cov0" title="0">return false</span>
+}
+</pre>
+		
+		<pre class="file" id="file7" style="display: none">package stringx
+
+import (
+        "fmt"
+        "math/rand"
+        "strconv"
+        "time"
+)
+
+var (
+        TimeLayout = "2006-01-02 15:04:05"
+        ByteSeed   = []byte("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
+)
+
+func ToString(param interface{}) (string, error) <span class="cov0" title="0">{
+        resp := ""
+        switch param.(type) </span>{
+        case int64:<span class="cov0" title="0">
+                resp = strconv.FormatInt(param.(int64), 10)</span>
+        case int32:<span class="cov0" title="0">
+                resp = strconv.FormatInt(param.(int64), 10)</span>
+        case int:<span class="cov0" title="0">
+                resp = strconv.Itoa(param.(int))</span>
+        case float64:<span class="cov0" title="0">
+                resp = strconv.FormatFloat(param.(float64), 'f', -1, 64)</span>
+        case float32:<span class="cov0" title="0">
+                resp = strconv.FormatFloat(param.(float64), 'f', -1, 64)</span>
+        case string:<span class="cov0" title="0">
+                resp = param.(string)</span>
+        case []byte:<span class="cov0" title="0">
+                resp = string(param.([]byte))</span>
+        case time.Time:<span class="cov0" title="0">
+                resp = param.(time.Time).Format(TimeLayout)</span>
+        case *time.Time:<span class="cov0" title="0">
+                resp = param.(*time.Time).Format(TimeLayout)</span>
+        default:<span class="cov0" title="0">
+                return resp, fmt.Errorf("%v is not base type", param)</span>
+        }
+        <span class="cov0" title="0">return resp, nil</span>
+}
+
+func SplitN(s string, n int) []string <span class="cov0" title="0">{
+        len := len(s)
+        var resp []string
+        var index, next int
+
+        for len &gt; index </span><span class="cov0" title="0">{
+                next += n
+                if len &gt;= next </span><span class="cov0" title="0">{
+                        resp = append(resp, s[index:next])
+                }</span> else<span class="cov0" title="0"> {
+                        resp = append(resp, s[index:len])
+                }</span>
+                <span class="cov0" title="0">index = next</span>
+        }
+        <span class="cov0" title="0">return resp</span>
+}
+
+func ToStr(param interface{}) string <span class="cov0" title="0">{
+        resp := ""
+        switch param.(type) </span>{
+        case int64:<span class="cov0" title="0">
+                resp = strconv.FormatInt(param.(int64), 10)</span>
+        case int32:<span class="cov0" title="0">
+                resp = strconv.FormatInt(param.(int64), 10)</span>
+        case int:<span class="cov0" title="0">
+                resp = strconv.Itoa(param.(int))</span>
+        case float64:<span class="cov0" title="0">
+                resp = strconv.FormatFloat(param.(float64), 'f', -1, 64)</span>
+        case float32:<span class="cov0" title="0">
+                resp = strconv.FormatFloat(param.(float64), 'f', -1, 64)</span>
+        case string:<span class="cov0" title="0">
+                resp = param.(string)</span>
+        case []byte:<span class="cov0" title="0">
+                resp = string(param.([]byte))</span>
+        case time.Time:<span class="cov0" title="0">
+                resp = param.(time.Time).Format(TimeLayout)</span>
+        case *time.Time:<span class="cov0" title="0">
+                resp = param.(*time.Time).Format(TimeLayout)</span>
+        default:<span class="cov0" title="0">
+                return resp</span>
+        }
+        <span class="cov0" title="0">return resp</span>
+}
+
+func RandomString(len int) string <span class="cov0" title="0">{
+        rand.Seed(time.Now().UnixNano())
+        resp := make([]byte, len)
+        for i := 0; i &lt; len; i++ </span><span class="cov0" title="0">{
+                resp[i] = ByteSeed[rand.Intn(62)]
+        }</span>
+        <span class="cov0" title="0">return string(resp)</span>
+}
+</pre>
+		
+		<pre class="file" id="file8" style="display: none">package timex
+
+import (
+        "database/sql/driver"
+        "time"
+)
+
+type Time time.Time
+
+const (
+        timeFormart = "2006-01-02 15:04:05"
+)
+
+func (t *Time) UnmarshalJSON(data []byte) (err error) <span class="cov0" title="0">{
+        now, err := time.ParseInLocation(`"`+timeFormart+`"`, string(data), time.Local)
+        *t = Time(now)
+        return
+}</span>
+
+func (t Time) MarshalJSON() ([]byte, error) <span class="cov0" title="0">{
+        b := make([]byte, 0, len(timeFormart)+2)
+        b = append(b, '"')
+        if !time.Time(t).IsZero() </span><span class="cov0" title="0">{
+                b = time.Time(t).AppendFormat(b, timeFormart)
+        }</span>
+        <span class="cov0" title="0">b = append(b, '"')
+        return b, nil</span>
+}
+
+func (t Time) String() string <span class="cov0" title="0">{
+        return time.Time(t).Format(timeFormart)
+}</span>
+
+func (t Time) Value() (driver.Value, error) <span class="cov0" title="0">{
+        if time.Time(t).IsZero() </span><span class="cov0" title="0">{
+                return nil, nil
+        }</span>
+        <span class="cov0" title="0">return time.Time(t), nil</span>
+}
+
+func (t *Time) Scan(v interface{}) error <span class="cov0" title="0">{
+        value, ok := v.(time.Time)
+        if ok </span><span class="cov0" title="0">{
+                *t = Time(value)
+                return nil
+        }</span>
+        <span class="cov0" title="0">return nil</span>
+}
+</pre>
+		
+		<pre class="file" id="file9" style="display: none">package timex
+
+import "time"
+
+const (
+        TimeLayout = "2006-01-02 15:04:05"
+)
+
+// @desc 获取某一天的0点时间
+// @auth liuguoqiang 2020-04-27
+// @param
+// @return
+func ZeroTime(d time.Time) time.Time <span class="cov0" title="0">{
+        return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, time.Local)
+}</span>
+
+// @desc 返回一个月的开始时间和结束时间
+// @auth liuguoqiang 2020-04-27
+// @param
+// @return
+func MonthRange(timeStamp int64) (int64, int64) <span class="cov0" title="0">{
+        d := time.Unix(timeStamp, 0)
+        d = d.AddDate(0, 0, -d.Day()+1)
+        start := ZeroTime(d)
+        end := start.AddDate(0, 1, 0)
+        return start.Unix(), end.Unix()
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>
