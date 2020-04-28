@@ -26,3 +26,24 @@ func Info(args ...interface{}) {
 		fmt.Printf("%s\n", string(data))
 	}
 }
+
+func Stack(args ...interface{}) {
+	param := &Param{
+		Time: time.Now().Format("2006-01-02 15:04:05"),
+		File: "",
+		Data: args,
+	}
+
+	for i := 1; ; i++ {
+		pc, file, line, ok := runtime.Caller(i)
+		if !ok {
+			data, _ := json.Marshal(param)
+			fmt.Printf("%s\n", string(data))
+			break
+		}
+		f := runtime.FuncForPC(pc)
+		if f.Name() != "runtime.main" && f.Name() != "runtime.goexit" {
+			param.File += fmt.Sprintf("%s:%d|------|", file, line)
+		}
+	}
+}
