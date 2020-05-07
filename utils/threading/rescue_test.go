@@ -7,8 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-
-
 func TestRescue(t *testing.T) {
 	var count int32
 	assert.NotPanics(t, func() {
