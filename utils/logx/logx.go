@@ -27,6 +27,18 @@ func Info(args ...interface{}) {
 	}
 }
 
+func Infof(format string, a ...interface{}) {
+	_, file, line, ok := runtime.Caller(1)
+	if ok {
+		data, _ := json.Marshal(&Param{
+			Time: time.Now().Format("2006-01-02 15:04:05"),
+			File: fmt.Sprintf("%s:%d", file, line),
+			Data: fmt.Sprintf(format, a...),
+		})
+		fmt.Printf("%s\n", string(data))
+	}
+}
+
 func Stack(args ...interface{}) {
 	param := &Param{
 		Time: time.Now().Format("2006-01-02 15:04:05"),
