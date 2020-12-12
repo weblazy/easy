@@ -8,8 +8,14 @@ import (
 	gorm "github.com/jinzhu/gorm"
 )
 
-// sql = INSERT INTO `users` VALUES (?,?,?),(?,?,?)
+// @desc
+// @auth liuguoqiang 2020-11-27
+// @param
+// @return
 func BulkInsert(db *gorm.DB, table string, fields []string, params []map[string]interface{}) error {
+	if len(params) == 0 {
+		return nil
+	}
 	sql := "INSERT INTO `" + table + "` (" + strings.Join(fields, ",") + ") VALUES "
 	args := make([]interface{}, 0)
 	valueArr := make([]string, 0)
@@ -18,6 +24,9 @@ func BulkInsert(db *gorm.DB, table string, fields []string, params []map[string]
 		varArr = varArr[:0]
 		varStr := "("
 		for _, value := range fields {
+			if _, ok := obj[value]; !ok {
+				return fmt.Errorf("%s:字段在map中不存在", value)
+			}
 			varArr = append(varArr, "?")
 			args = append(args, obj[value])
 		}
@@ -25,13 +34,18 @@ func BulkInsert(db *gorm.DB, table string, fields []string, params []map[string]
 		valueArr = append(valueArr, varStr)
 	}
 	sql += strings.Join(valueArr, ",")
-	fmt.Println(sql)
-	fmt.Println(args)
 	err := db.Exec(sql, args...).Error
 	return err
 }
 
+// @desc 批量插入
+// @auth liuguoqiang 2020-11-27
+// @param
+// @return
 func BulkSave(db *gorm.DB, table string, fields []string, params []map[string]interface{}) error {
+	if len(params) == 0 {
+		return nil
+	}
 	sql := "INSERT INTO `" + table + "` (" + strings.Join(fields, ",") + ") VALUES "
 	updateArr := make([]string, 0)
 	args := make([]interface{}, 0)
@@ -44,6 +58,9 @@ func BulkSave(db *gorm.DB, table string, fields []string, params []map[string]in
 		varArr = varArr[:0]
 		varStr := "("
 		for _, value := range fields {
+			if _, ok := obj[value]; !ok {
+				return fmt.Errorf("%s字段在map中不存在", value)
+			}
 			varArr = append(varArr, "?")
 			args = append(args, obj[value])
 		}
@@ -52,8 +69,6 @@ func BulkSave(db *gorm.DB, table string, fields []string, params []map[string]in
 	}
 	sql += strings.Join(valueArr, ",")
 	sql += " ON DUPLICATE KEY UPDATE " + strings.Join(updateArr, ",")
-	fmt.Println(sql)
-	fmt.Println(args)
 	err := db.Exec(sql, args...).Error
 	return err
 }
