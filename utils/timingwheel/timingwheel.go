@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	maxDeletCount = 10000
+	maxDeleteCount = 10000
 )
 
 type (
@@ -268,7 +268,7 @@ func (tw *TimingWheel) delete(key interface{}) {
 	if _, ok := tw.timers[key]; ok {
 		delete(tw.timers, key)
 		tw.deleteCount++
-		if tw.deleteCount > maxDeletCount {
+		if tw.deleteCount > maxDeleteCount {
 			timers := make(map[interface{}]*positionsEntry)
 			for k1 := range tw.timers {
 				timers[k1] = tw.timers[k1]
