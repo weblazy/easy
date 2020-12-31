@@ -8,5 +8,6 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/sunmi-OS/gocore v1.5.10
 	github.com/weblazy/gocore v1.7.2
+	github.com/weblazy/goutil v1.1.2
 	gopkg.in/redis.v5 v5.2.9
 )

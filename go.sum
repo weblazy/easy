@@ -335,6 +335,8 @@ github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+
 github.com/veandco/go-sdl2 v0.3.3/go.mod h1:FB+kTpX9YTE+urhYiClnRzpOXbiWgaU3+5F2AB78DPg=
 github.com/weblazy/gocore v1.7.2 h1:t8rXWoSGS68kwijiDZltktrU0BPq7k0H3IAGR6U46zQ=
 github.com/weblazy/gocore v1.7.2/go.mod h1:y12oFhWan2xPoEE+atclvXm8OqWm00oQmad0wEIOWjw=
+github.com/weblazy/goutil v1.1.2 h1:gwwnUuNep7yt1//PiAckAepqLUJ7q0NRbgb8zBOMXh8=
+github.com/weblazy/goutil v1.1.2/go.mod h1:Wh58gIA/CC57gRdpcRBpv/r/0Y9PsZnHJqJwtqza/DY=
 github.com/xdg/scram v0.0.0-20180814205039-7eeb5667e42c/go.mod h1:lB8K/P019DLNhemzwFU4jHLhdvlE6uDZjXFejJXr49I=
 github.com/xdg/stringprep v1.0.0/go.mod h1:Jhud4/sHMO4oL310DaZAKk9ZaJ08SJfe+sJh0HrGL1Y=
 github.com/xiang90/probing v0.0.0-20190116061207-43a291ad63a2/go.mod h1:UETIi67q53MR2AWcXfiuqkDkRtnGDLqkBTpCHuJHxtU=
