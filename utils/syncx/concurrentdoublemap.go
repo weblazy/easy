@@ -173,18 +173,6 @@ func (c *ConcurrentDoubleMap) Range(f func(key1, key2 string, value interface{})
 	return true
 }
 
-// func (c *ConcurrentDoubleMap) RangeShard(key1 string, f func(key2 string, value interface{}) bool) bool {
-// 	shard := c.GetShard(key1)
-// 	shard.RLock()
-// 	defer shard.RUnlock()
-// 	for k, v := range shard.items {
-// 		if !f(k, v) {
-// 			return false
-// 		}
-// 	}
-// 	return true
-// }
-
 func (c *ConcurrentDoubleMap) RangeNextMap(key1 string, f func(key1, key2 string, value interface{}) bool) bool {
 	shard := c.GetShard(key1)
 	shard.RLock()
