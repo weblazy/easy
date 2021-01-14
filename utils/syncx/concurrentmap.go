@@ -1,21 +1,23 @@
 package syncx
 
 import (
-	"github.com/weblazy/goutil"
 	"sync"
+
+	"github.com/weblazy/goutil"
 )
 
 type (
 	ConcurrentMap struct {
-		cMap       []goutil.Map //分段sync map
-		shareCount int
+		cMap       []goutil.Map // Add the len method to sync.Map to get the total number of elements
+		shareCount int          // Number of shards
 	}
 )
 
 const (
-	defaultShareCount = 32
+	defaultShareCount = 32 // Default number of shards
 )
 
+// NewConcurrentMap creates a new ConcurrentMap.
 func NewConcurrentMap(shareCount int) *ConcurrentMap {
 	if shareCount == 0 {
 		shareCount = defaultShareCount
@@ -31,11 +33,12 @@ func NewConcurrentMap(shareCount int) *ConcurrentMap {
 	return concurrentMap
 }
 
+// GetShard return a goutil.Map for a key
 func (c *ConcurrentMap) GetShard(key string) goutil.Map {
 	return c.cMap[uint(fnv32(key))%uint(c.shareCount)]
 }
 
-// FNV hash
+// fnv32 FNV hash algorithm
 func fnv32(key string) uint32 {
 	hash := uint32(2166136261)
 	const prime32 = uint32(16777619)
@@ -45,30 +48,39 @@ func fnv32(key string) uint32 {
 	}
 	return hash
 }
+
+// Load returns the value stored in the map for a key, or nil if no
+// value is present.
+// The ok result indicates whether value was found in the map.
 func (c *ConcurrentMap) Load(key string) (interface{}, bool) {
 	shard := c.GetShard(key)
 	value, ok := shard.Load(key)
 	return value, ok
 }
 
+// Store sets the value for a key.
 func (c *ConcurrentMap) Store(key string, value interface{}) {
-	shard := c.GetShard(key) // 段定位找到分片
+	shard := c.GetShard(key)
 	shard.Store(key, value)
 }
 
+// LoadOrStore returns the existing value for the key if present.
+// Otherwise, it stores and returns the given value.
+// The loaded result is true if the value was loaded, false if stored.
 func (c *ConcurrentMap) LoadOrStore(key string, value interface{}) (actual interface{}, loaded bool) {
 	shard := c.GetShard(key)
 	actual, loaded = shard.LoadOrStore(key, value)
 	return actual, loaded
 }
 
+// Clear clears all current data in the map.
 func (c *ConcurrentMap) Clear() {
 	for _, shard := range c.cMap {
 		shard.Clear()
 	}
 }
 
-// 统计当前分段map中item的个数
+// Len get the total number of elements
 func (c *ConcurrentMap) Len() int {
 	count := 0
 	for _, shard := range c.cMap {
@@ -78,11 +90,11 @@ func (c *ConcurrentMap) Len() int {
 	return count
 }
 
-// 获取所有的key
+// Keys Get all the keys
 func (c *ConcurrentMap) Keys() []interface{} {
 	count := c.Len()
 	ch := make(chan interface{}, count)
-	// 每一个分片启动一个协程 遍历key
+	// Each shard initiates a coroutine traverse elements
 	go func() {
 		wg := sync.WaitGroup{}
 		wg.Add(c.shareCount)
@@ -100,18 +112,18 @@ func (c *ConcurrentMap) Keys() []interface{} {
 	}()
 
 	keys := make([]interface{}, count)
-	// 统计各个协程并发读取Map分片的key
+	// Collects the key of the map shard from each shard
 	for k := range ch {
 		keys = append(keys, k)
 	}
 	return keys
 }
 
-// 获取所有的value
+// Values Get all the values
 func (c *ConcurrentMap) Values() []interface{} {
 	count := c.Len()
 	ch := make(chan interface{}, count)
-	// 每一个分片启动一个协程 遍历key
+	// Each shard initiates a coroutine traverse elements
 	go func() {
 		wg := sync.WaitGroup{}
 		wg.Add(c.shareCount)
@@ -127,18 +139,20 @@ func (c *ConcurrentMap) Values() []interface{} {
 	}()
 
 	values := make([]interface{}, count)
-	// 统计各个协程并发读取Map分片的key
+	// Collects the key of the map shard from each shard
 	for value := range ch {
 		values = append(values, value)
 	}
 	return values
 }
 
+// Delete deletes the value for a key.
 func (c *ConcurrentMap) Delete(key string) {
 	shard := c.GetShard(key)
 	shard.Delete(key)
 }
 
+// Range traverse elements
 func (c *ConcurrentMap) Range(f func(key, value interface{}) bool) {
 	for _, shard := range c.cMap {
 		if !shard.Range(f) {
