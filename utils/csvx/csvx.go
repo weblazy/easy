@@ -44,13 +44,21 @@ func NewCSV(path string, rowSeparator rune, lineSeparator string) (*CSV, error) 
 
 // Write truncate and write one line
 func (this *CSV) Write(str []string) error {
-	this.wfile.Truncate(0)
-	err := this.w.Write(str)
+	err := this.wfile.Truncate(0)
+	if err != nil {
+		return err
+	}
+	err = this.w.Write(str)
 	if err != nil {
 		return err
 	}
 	this.w.Flush()
 	return nil
+}
+
+// Truncate
+func (this *CSV) Truncate(str []string) error {
+	return this.wfile.Truncate(0)
 }
 
 // Append append one line
