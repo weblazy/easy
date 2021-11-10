@@ -1,61 +1,84 @@
-package csv
+package csvx
 
 import (
+	"bufio"
 	"encoding/csv"
-	"log"
 	"os"
+	"strings"
 )
 
 type CSV struct {
-	file   *os.File
-	wirter *csv.Writer
-	reader *csv.Reader
+	path         string
+	wfile        *os.File
+	rfile        *os.File
+	w            *csv.Writer
+	r            *bufio.Reader
+	rowSeparator string
 }
 
-func NewCSV(path string) *CSV {
-	//OpenFile读取文件，不存在时则创建，使用追加模式
-	file, err := os.OpenFile(path, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
+// NewCSV return a CSV
+func NewCSV(path string, rowSeparator rune, lineSeparator string) (*CSV, error) {
+	wfile, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
-		log.Println("文件打开失败！")
-		return nil
+		return nil, err
 	}
-	wirter := csv.NewWriter(file)
-	wirter.Comma = ';'
-	reader := csv.NewReader(file)
-	reader.Comma = ';'
-	reader.LazyQuotes = true
+	rfile, err := os.OpenFile(path, os.O_RDONLY, 0666)
+	if err != nil {
+		return nil, err
+	}
+	w := csv.NewWriter(wfile)
+	w.Comma = rowSeparator
+	if lineSeparator == `\r\n` {
+		w.UseCRLF = true
+	}
+	r := bufio.NewReader(rfile)
 	return &CSV{
-		file:   file,
-		wirter: wirter,
-		reader: reader,
-	}
+		path:         path,
+		wfile:        wfile,
+		rfile:        rfile,
+		w:            w,
+		r:            r,
+		rowSeparator: string(rowSeparator),
+	}, nil
 }
 
-func (this *CSV) Close() {
-	this.file.Close()
-}
-
-//按行写入csv
-func (this *CSV) WriterCSV(str []string) {
-	//写入一条数据，传入数据为切片(追加模式)
-	err := this.wirter.Write(str)
+// Write truncate and write one line
+func (this *CSV) Write(str []string) error {
+	this.wfile.Truncate(0)
+	err := this.w.Write(str)
 	if err != nil {
-		log.Println("WriterCsv写入文件失败")
+		return err
 	}
-	this.wirter.Flush() //刷新，不刷新是无法写入的
+	this.w.Flush()
+	return nil
 }
 
-//按行读取csv
-func (this *CSV) ReadRow() ([]string, error) {
-	return this.reader.Read()
+// Append append one line
+func (this *CSV) Append(str []string) error {
+	err := this.w.Write(str)
+	if err != nil {
+		return err
+	}
+	this.w.Flush()
+	return nil
 }
 
-//按行读取csv
-func (this *CSV) ReadAll() ([][]string, error) {
-	return this.reader.ReadAll()
+// Reset
+func (this *CSV) Reset() (int64, error) {
+	return this.rfile.Seek(0, 0)
 }
 
-//按行读取csv
-func (this *CSV) Reset() ([][]string, error) {
-	return this.reader.ReadAll()
+// ReadLine read one line
+func (this *CSV) ReadLine() ([]string, error) {
+	line, _, err := this.r.ReadLine() //以'\n'为结束符读入一行
+	return strings.Split(string(line), this.rowSeparator), err
+}
+
+// Close close file
+func (this *CSV) Close() error {
+	err := this.wfile.Close()
+	if err != nil {
+		return err
+	}
+	return this.rfile.Close()
 }
