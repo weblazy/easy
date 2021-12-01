@@ -52,9 +52,11 @@ func (g *GPool) Close() {
 func (g *GPool) worker() {
 	defer func() {
 		if p := recover(); p != nil {
+			go g.worker()
 			fmt.Printf("%#v\n", p)
+		} else {
+			g.waitGroup.Done()
 		}
-		g.waitGroup.Done()
 	}()
 	for j := range g.jobs {
 		if j == nil {
