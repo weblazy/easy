@@ -10,4 +10,4 @@
 go test -coverpkg=./... -coverprofile=coverage.data -timeout=5s ./...
 go tool cover -html=coverage.data -o coverage.html
 ````
-[![Go Report Card](https://goreportcard.com/badge/github.com/sunmi-OS/gocore v2.0.9s)](https://goreportcard.com/report/github.com/sunmi-OS/gocore v2.0.9)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sunmi-OS/gocore v2.0.9)](https://goreportcard.com/report/github.com/sunmi-OS/gocore v2.0.9)
