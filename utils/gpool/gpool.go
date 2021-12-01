@@ -14,6 +14,8 @@ type GPool struct {
 	fun       func(param interface{})
 }
 
+var NilErr = fmt.Errorf("param can not be nil")
+
 func NewGPool(maxCount int64, fun func(param interface{})) *GPool {
 	return &GPool{
 		maxCount: maxCount,
@@ -22,7 +24,10 @@ func NewGPool(maxCount int64, fun func(param interface{})) *GPool {
 	}
 }
 
-func (g *GPool) Run(param interface{}) {
+func (g *GPool) Run(param interface{}) error {
+	if param == nil {
+		return NilErr
+	}
 	if g.curCount < g.maxCount {
 		g.lock.Lock()
 		if g.curCount < g.maxCount {
@@ -33,6 +38,7 @@ func (g *GPool) Run(param interface{}) {
 		g.lock.Unlock()
 	}
 	g.jobs <- param
+	return nil
 }
 
 func (g *GPool) Clear() {
@@ -45,7 +51,12 @@ func (g *GPool) Clear() {
 }
 
 func (g *GPool) Close() {
-	close(g.jobs)
+	g.lock.Lock()
+	for g.curCount > 0 {
+		g.curCount--
+		g.jobs <- nil
+	}
+	g.lock.Unlock()
 	g.waitGroup.Wait()
 }
 
