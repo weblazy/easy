@@ -1,4 +1,4 @@
-package easy_sort
+package sortx
 
 //按照接口中的某个字段排序
 type Sort struct {
