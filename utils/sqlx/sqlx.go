@@ -8,6 +8,10 @@ import (
 	gorm "github.com/jinzhu/gorm"
 )
 
+var (
+	FieldsError = fmt.Errorf("fileds length is 0")
+)
+
 // @desc
 // @auth liuguoqiang 2020-11-27
 // @param
@@ -16,7 +20,10 @@ func BulkInsert(db *gorm.DB, table string, fields []string, params []map[string]
 	if len(params) == 0 {
 		return nil
 	}
-	sql := "INSERT INTO `" + table + "` (" + strings.Join(fields, ",") + ") VALUES "
+	if len(fields) == 0 {
+		return FieldsError
+	}
+	sql := "INSERT INTO `" + table + "` (`" + strings.Join(fields, "`,`") + "`) VALUES "
 	args := make([]interface{}, 0)
 	valueArr := make([]string, 0)
 	varArr := make([]string, 0)
@@ -25,7 +32,7 @@ func BulkInsert(db *gorm.DB, table string, fields []string, params []map[string]
 		varStr := "("
 		for _, value := range fields {
 			if _, ok := obj[value]; !ok {
-				return fmt.Errorf("%s:字段在map中不存在", value)
+				return fmt.Errorf("%s:not found in fields", value)
 			}
 			varArr = append(varArr, "?")
 			args = append(args, obj[value])
@@ -46,7 +53,10 @@ func BulkSave(db *gorm.DB, table string, fields []string, params []map[string]in
 	if len(params) == 0 {
 		return nil
 	}
-	sql := "INSERT INTO `" + table + "` (" + strings.Join(fields, ",") + ") VALUES "
+	if len(fields) == 0 {
+		return FieldsError
+	}
+	sql := "INSERT INTO `" + table + "` (`" + strings.Join(fields, "`,`") + "`) VALUES "
 	updateArr := make([]string, 0)
 	args := make([]interface{}, 0)
 	valueArr := make([]string, 0)
