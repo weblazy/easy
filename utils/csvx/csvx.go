@@ -56,11 +56,6 @@ func (this *CSV) Write(str []string) error {
 	return nil
 }
 
-// Truncate
-func (this *CSV) Truncate() error {
-	return this.wfile.Truncate(0)
-}
-
 // Append append one line
 func (this *CSV) Append(str []string) error {
 	err := this.w.Write(str)
@@ -69,6 +64,11 @@ func (this *CSV) Append(str []string) error {
 	}
 	this.w.Flush()
 	return nil
+}
+
+// Truncate
+func (this *CSV) Truncate() error {
+	return this.wfile.Truncate(0)
 }
 
 // Reset
