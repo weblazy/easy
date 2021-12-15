@@ -57,7 +57,7 @@ func (this *CSV) Write(str []string) error {
 }
 
 // Truncate
-func (this *CSV) Truncate(str []string) error {
+func (this *CSV) Truncate() error {
 	return this.wfile.Truncate(0)
 }
 
