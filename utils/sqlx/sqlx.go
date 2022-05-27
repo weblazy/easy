@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	gorm "github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 var (
