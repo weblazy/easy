@@ -40,12 +40,21 @@ func (g *GPool) Run(param interface{}) error {
 		if g.curCount < g.maxCount {
 			g.waitGroup.Add(1)
 			g.curCount++
-			go g.worker()
+			go func() {
+				defer func() {
+					if p := recover(); p != nil {
+						fmt.Printf("%#v\n", p)
+					}
+					g.waitGroup.Done()
+				}()
+				// consumer
+				g.worker()
+			}()
 		}
+		// producer
 		g.jobs <- param
 		return nil
 	}
-
 }
 
 func (g *GPool) Clear() {
@@ -74,14 +83,6 @@ func (g *GPool) Close() {
 }
 
 func (g *GPool) worker() {
-	defer func() {
-		if p := recover(); p != nil {
-			go g.worker()
-			fmt.Printf("%#v\n", p)
-		} else {
-			g.waitGroup.Done()
-		}
-	}()
 	for j := range g.jobs {
 		if j == nil {
 			break
