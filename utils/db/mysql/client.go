@@ -4,10 +4,10 @@ import "gorm.io/gorm"
 
 var MysqlClient Client
 
-type GetMysqlDB func() *gorm.DB
+type GetMysqlDB func(key string) *gorm.DB
 
 var GetDB GetMysqlDB
 
 type Client interface {
-	GetDB() *gorm.DB
+	GetDB(key string) *gorm.DB
 }
