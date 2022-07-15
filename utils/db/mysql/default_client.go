@@ -5,7 +5,11 @@ import (
 )
 
 func init() {
-	mysqlClient = &DefaultClient{}
+	MysqlClient = &DefaultClient{}
+	GetDB = func() *gorm.DB {
+		db := GetORM("conf.DBFreezonecoin")
+		return db
+	}
 }
 
 type DefaultClient struct {
