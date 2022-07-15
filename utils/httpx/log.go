@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
-	"github.com/sunmi-OS/gocore/v2/glog"
-	"github.com/sunmi-OS/gocore/v2/glog/sls"
+	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/glog/sls"
 )
 
 type Log interface {

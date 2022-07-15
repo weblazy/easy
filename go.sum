@@ -625,8 +625,6 @@ github.com/schollz/progressbar/v3 v3.8.3/go.mod h1:pWnVCjSBZsT2X3nx9HfRdnCDrpbev
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
 github.com/segmentio/kafka-go v0.4.2/go.mod h1:Inh7PqOsxmfgasV8InZYKVXWsdjcCq2d9tFV75GLbuM=
 github.com/segmentio/kafka-go v0.4.22/go.mod h1:XzMcoMjSzDGHcIwpWUI7GB43iKZ2fTVmryPSGLf/MPg=
-github.com/shopspring/decimal v1.3.1 h1:2Usl1nmF/WZucqkFZhnfFYxxxu8LG21F6nPQBE5gKV8=
-github.com/shopspring/decimal v1.3.1/go.mod h1:DKyhrW/HYNuLGql+MJL6WCR6knT2jwCFRcu2hWCYk4o=
 github.com/shurcooL/sanitized_anchor_name v1.0.0/go.mod h1:1NzhyTcUVG4SuEtjjoZeVRXNmyL/1OwPU0+IJeTBvfc=
 github.com/sigurn/crc8 v0.0.0-20160107002456-e55481d6f45c/go.mod h1:cyrWuItcOVIGX6fBZ/G00z4ykprWM7hH58fSavNkjRg=
 github.com/sigurn/utils v0.0.0-20190728110027-e1fefb11a144/go.mod h1:VRI4lXkrUH5Cygl6mbG1BRUfMMoT2o8BkrtBDUAm+GU=
@@ -681,8 +679,8 @@ github.com/subosito/gotenv v1.2.0 h1:Slr1R9HxAlEKefgq5jn9U+DnETlIUa6HfgEzj0g5d7s
 github.com/subosito/gotenv v1.2.0/go.mod h1:N0PQaV/YGNqwC0u51sEeR/aUtSLEXKX9iv69rRypqCw=
 github.com/sunmi-OS/gocore v1.5.10 h1:FEP6lNZZNl0JhfRiL6auMnJNRjZY0jW1K7Yg3RBqRDE=
 github.com/sunmi-OS/gocore v1.5.10/go.mod h1:fA1fkMJwX8UZ9pKwYdYdHUnWFlFAEvLsugUFr2z5K1w=
-github.com/sunmi-OS/gocore/v2 v2.0.9 h1:W4//rJbritAqJo+73ezB5fJgtA85TFxBv/vf0WoLQ90=
-github.com/sunmi-OS/gocore/v2 v2.0.9/go.mod h1:9wApqenq1HG4OCeNk3TGZpEtG4ZRgswo4oiHLFRozeo=
+github.com/sunmi-OS/gocore/v2 v2.0.10 h1:YkRuh4q8VTyUDCVBmhlV16H+UmmZufc894wVVdj/MAg=
+github.com/sunmi-OS/gocore/v2 v2.0.10/go.mod h1:9wApqenq1HG4OCeNk3TGZpEtG4ZRgswo4oiHLFRozeo=
 github.com/tal-tech/go-zero v1.2.2 h1:UAHUmkqRGEP3PnlMEF28Hak+ifCukMXG9/Mj1/05K2c=
 github.com/tal-tech/go-zero v1.2.2/go.mod h1:sdJWbtqMuY/2cz/Ag8o1pWeWW0xSvON4IRk12E8ZB1I=
 github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07/go.mod h1:kDXzergiv9cbyO7IOYJZWg1U88JhDg3PB6klq9Hg2pA=

@@ -8,9 +8,8 @@ import (
 	"time"
 
 	"github.com/sunmi-OS/gocore/v2/conf/viper"
-	"github.com/sunmi-OS/gocore/v2/glog"
-	"github.com/sunmi-OS/gocore/v2/utils"
-	"github.com/sunmi-OS/gocore/v2/utils/closes"
+	"github.com/weblazy/easy/utils/closes"
+	"github.com/weblazy/easy/utils/glog"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -66,14 +65,11 @@ func NewOrUpdateDB(dbname string) error {
 	// second: load gorm client
 	oldGorm, _ := _Gorm.gormMaps.Load(dbname)
 	// first: open new gorm client
-	err = utils.Retry(func() error {
-		orm, err = openORM(dbname)
-		if err != nil {
-			glog.ErrorF("UpdateDB(%s) error:%+v", dbname, err)
-			return err
-		}
-		return nil
-	}, 5, 3*time.Second)
+	orm, err = openORM(dbname)
+	if err != nil {
+		glog.ErrorF("UpdateDB(%s) error:%+v", dbname, err)
+		return err
+	}
 	// 如果NEW异常直接panic如果是Update返回error
 	if err != nil {
 		if oldGorm == nil {
