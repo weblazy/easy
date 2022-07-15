@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/go-resty/resty/v2 v2.6.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/spf13/cast v1.4.1
 	github.com/stretchr/testify v1.7.0
 	github.com/sunmi-OS/gocore v1.5.10
