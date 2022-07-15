@@ -1,0 +1,9 @@
+node_modules
+dist
+.idea
+vendor
+*.log*
+tmp
+*.yaml
+.DS_Store
+main
