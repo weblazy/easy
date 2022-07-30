@@ -12,8 +12,6 @@ import (
 	"github.com/sunmi-OS/gocore/v2/conf/viper"
 	"github.com/tidwall/gjson"
 	"github.com/weblazy/easy/utils/closes"
-	"github.com/weblazy/easy/utils/glog"
-	"github.com/weblazy/easy/utils/glog/logx"
 )
 
 // AliyunLog 阿里云日志配置结构体
@@ -25,7 +23,7 @@ type AliyunLog struct {
 	LogStore  string
 	HostName  string
 	Log       *producer.Producer
-	logx.GLog
+	// logx.GLog
 }
 
 // LogClient 对外原生实例
@@ -139,7 +137,7 @@ func checkConfig(conf AliyunLog) (err error) {
 
 // 将glog设置为输出到阿里云
 func SetGLog() {
-	glog.SetLogger("alilog", &LogClient)
+	// glog.SetLogger("alilog", &LogClient)
 }
 
 func (aLog *AliyunLog) Info(args ...interface{}) {

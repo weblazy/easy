@@ -34,7 +34,7 @@ func init() {
 	cfg = zap.NewProductionConfig()
 	cfg.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
 	cfg.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	l, err := cfg.Build(zap.AddCallerSkip(2))
+	l, err := cfg.Build(zap.AddCallerSkip(4))
 	if err != nil {
 		log.Printf("l.initZap(),err:%+v", err)
 		return
