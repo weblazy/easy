@@ -1,4 +1,4 @@
-package httpx
+package ehttp
 
 import "github.com/go-resty/resty/v2"
 

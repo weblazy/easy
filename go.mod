@@ -3,17 +3,19 @@ module github.com/weblazy/easy
 go 1.12
 
 require (
+	github.com/BurntSushi/toml v0.4.1
 	github.com/SkyAPM/go2sky v1.4.1
 	github.com/aliyun/aliyun-log-go-sdk v0.1.22
 	github.com/go-resty/resty/v2 v2.7.0
 	github.com/go-stack/stack v1.8.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/nacos-group/nacos-sdk-go v1.0.9
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/prometheus/client_golang v1.12.2
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/spf13/cast v1.5.0
-	github.com/spf13/viper v1.11.0 // indirect
+	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.8.0
 	github.com/sunmi-OS/gocore v1.5.10
 	github.com/sunmi-OS/gocore/v2 v2.0.10
