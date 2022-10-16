@@ -1,4 +1,4 @@
-package service_context
+package service
 
 type Response struct {
 	Code int64       `json:"code"`
