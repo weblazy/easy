@@ -16,15 +16,14 @@ type ServiceContext struct {
 }
 
 var (
-	ErrorBind      = errors.New("missing required parameters")
-	TraceHeaderKey struct{}
+	ErrorBind = errors.New("missing required parameters")
 )
 
 //const TraceHeaderKey = "TraceHeaderKey"
 
 // NewContext 初始化上下文包含context.Context
 // 对链路信息进行判断并且在Response时返回TraceId信息
-func NewServiceContext(ctx context.Context, g *gin.Context) ServiceContext {
+func NewServiceContext(g *gin.Context) ServiceContext {
 	c := ServiceContext{
 		Context: g,
 		R:       NewResponse(),
