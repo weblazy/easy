@@ -13,7 +13,7 @@ import (
 	"github.com/weblazy/easy/utils/timex"
 
 	"github.com/weblazy/easy/utils/http/http_server/config"
-	"github.com/weblazy/easy/utils/http/http_server/service_context"
+	"github.com/weblazy/easy/utils/http/http_server/service"
 
 	"github.com/weblazy/easy/utils/glog"
 
@@ -109,7 +109,7 @@ func Error(c *gin.Context, codeErr *code_err.CodeErr, err error) {
 	if ok {
 		glog.InfoCtx(c.Request.Context(), fmt.Sprintf("%s:%d %s", file, line, err.Error()))
 	}
-	resp := &service_context.Response{
+	resp := &service.Response{
 		Code: codeErr.Code,
 		Msg:  codeErr.Msg,
 	}
