@@ -1,4 +1,4 @@
-package ehttp
+package http_client
 
 import (
 	"fmt"
@@ -7,10 +7,7 @@ import (
 	"github.com/weblazy/easy/utils/stringx"
 )
 
-// @desc 编译http参数
-// @auth liuguoqiang 2020-03-20
-// @param
-// @return
+// 编译http参数
 func MapToQuery(params map[string]interface{}, urlEncode ...bool) (string, error) {
 	if params == nil {
 		return "", fmt.Errorf("param is nil")

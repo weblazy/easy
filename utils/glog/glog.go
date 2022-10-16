@@ -24,7 +24,26 @@ func GetContextLog(ctx context.Context) *LogConf {
 	}
 }
 
-func GetLabels(ctx context.Context, fields ...uzap.Field) []uzap.Field {
+func SetContextLog(ctx context.Context, log *LogConf) context.Context {
+	newCtx := context.WithValue(ctx, CtxKey, log)
+	return newCtx
+}
+
+func GetLabels(ctx context.Context) []uzap.Field {
+	logConf := GetContextLog(ctx)
+	llen := len(logConf.Labels)
+	newFields := make([]uzap.Field, llen)
+	copy(newFields, logConf.Labels)
+	return newFields
+}
+
+func SetLabels(ctx context.Context, fields ...uzap.Field) []uzap.Field {
+	logConf := GetContextLog(ctx)
+	logConf.Labels = append(logConf.Labels, fields...)
+	return logConf.Labels
+}
+
+func MergeLabels(ctx context.Context, fields ...uzap.Field) []uzap.Field {
 	logConf := GetContextLog(ctx)
 	llen := len(logConf.Labels)
 	flen := len(fields)
@@ -35,7 +54,7 @@ func GetLabels(ctx context.Context, fields ...uzap.Field) []uzap.Field {
 }
 
 func InfoCtx(ctx context.Context, msg string, fields ...uzap.Field) {
-	fields = GetLabels(ctx, fields...)
+	fields = MergeLabels(ctx, fields...)
 	Logger.Range(func(k, v interface{}) bool {
 		v.(logx.GLog).Info(msg, fields...)
 		return true
@@ -50,7 +69,7 @@ func InfoCtxF(ctx context.Context, format string, args ...interface{}) {
 }
 
 func DebugCtx(ctx context.Context, msg string, fields ...uzap.Field) {
-	fields = GetLabels(ctx, fields...)
+	fields = MergeLabels(ctx, fields...)
 	Logger.Range(func(k, v interface{}) bool {
 		v.(logx.GLog).Debug(msg, fields...)
 		return true
@@ -65,7 +84,7 @@ func DebugCtxF(ctx context.Context, format string, args ...interface{}) {
 }
 
 func WarnCtx(ctx context.Context, msg string, fields ...uzap.Field) {
-	fields = GetLabels(ctx, fields...)
+	fields = MergeLabels(ctx, fields...)
 	Logger.Range(func(k, v interface{}) bool {
 		v.(logx.GLog).Warn(msg, fields...)
 		return true
@@ -80,7 +99,7 @@ func WarnCtxF(ctx context.Context, format string, args ...interface{}) {
 }
 
 func ErrorCtx(ctx context.Context, msg string, fields ...uzap.Field) {
-	fields = GetLabels(ctx, fields...)
+	fields = MergeLabels(ctx, fields...)
 	Logger.Range(func(k, v interface{}) bool {
 		v.(logx.GLog).Error(msg, fields...)
 		return true

@@ -5,6 +5,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/weblazy/easy/utils/conf/viper"
 	"github.com/weblazy/easy/utils/glog"
+	"go.uber.org/zap"
 )
 
 type configParam struct {
@@ -61,7 +62,7 @@ func (vt *ViperToml) GetConfig() (string, error) {
 				OnChange: vt.callbackList[group+v],
 			})
 			if err != nil {
-				glog.Error(group+"\r\n"+v+"\r\n ListenConfig Error", err)
+				glog.Error(group+"\r\n"+v+"\r\n ListenConfig Error", zap.Error(err))
 			}
 		}
 	}

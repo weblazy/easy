@@ -4,6 +4,7 @@ import "time"
 
 const (
 	TimeLayout = "2006-01-02 15:04:05"
+	DateLayout = "2006-01-02"
 )
 
 // @desc 获取某一天的0点时间

@@ -1,4 +1,4 @@
-package ehttp
+package http_client
 
 import (
 	"encoding/json"

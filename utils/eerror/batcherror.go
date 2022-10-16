@@ -1,4 +1,4 @@
-package errorx
+package eerror
 
 import "bytes"
 
