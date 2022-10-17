@@ -31,18 +31,19 @@ func NewHttpServer(c *config.Config) (*HttpServer, error) {
 	r := gin.New()
 	r.Use(interceptor.SetStartTimeInterceptor())
 	r.Use(interceptor.HeaderCarrierInterceptor())
-	if server.Config.Timeout > 0 {
-		r.Use(interceptor.Timeout(server.Config.Timeout))
+	if server.Config.EnableTraceInterceptor {
+		r.Use(interceptor.Trace(ctx))
+	}
+	if server.Config.EnableLogInterceptor {
+		r.Use(interceptor.Log(ctx, c))
 	}
 	if server.Config.EnableMetricInterceptor {
 		r.Use(interceptor.MetricInterceptor(c))
 	}
-	// if server.Config.EnableLogInterceptor {
-	// 	r.Use(interceptor.Log(ctx, c))
-	// }
-	if server.Config.EnableTraceInterceptor {
-		r.Use(interceptor.Trace(ctx))
+	if server.Config.Timeout > 0 {
+		r.Use(interceptor.Timeout(server.Config.Timeout))
 	}
+	r.Use(gin.Recovery())
 	server.Engine = r
 	return server, nil
 }

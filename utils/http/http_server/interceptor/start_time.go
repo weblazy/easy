@@ -22,3 +22,14 @@ func GetStartTime(ctx context.Context) time.Time {
 	startTime, _ := ctx.Value(startTimeKey{}).(time.Time)
 	return startTime
 }
+
+func GetDuration(ctx context.Context) time.Duration {
+	startTime, _ := ctx.Value(startTimeKey{}).(time.Time)
+	return time.Since(startTime)
+}
+
+func GetDurationMilliseconds(ctx context.Context) float64 {
+	startTime, _ := ctx.Value(startTimeKey{}).(time.Time)
+	return float64(time.Since(startTime).Microseconds()) / 1000
+
+}

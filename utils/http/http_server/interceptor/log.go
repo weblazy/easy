@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"runtime"
 	"time"
 
@@ -52,56 +53,67 @@ func (w BodyLogWriter) WriteString(s string) (int, error) {
 // and handles the control to the centralized HTTPErrorHandler.
 func Log(ctx context.Context, cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		req := c.Request
-		logData := &LogData{}
-		blw := &BodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
-		c.Writer = blw
-		var bodyBytes []byte
-		bodyBytes, err := ioutil.ReadAll(c.Request.Body)
+		if c.Request.Method == http.MethodGet {
+
+		} else if c.ContentType() == gin.MIMEJSON {
+			LogJson(c, cfg)
+		} else if c.ContentType() == gin.MIMEMultipartPOSTForm {
+
+		}
+
+	}
+}
+
+func LogJson(c *gin.Context, cfg *config.Config) {
+	req := c.Request
+	logData := &LogData{}
+	blw := &BodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
+	c.Writer = blw
+	var bodyBytes []byte
+	bodyBytes, err := ioutil.ReadAll(c.Request.Body)
+	if err != nil {
+		Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
+		return
+	}
+	logData.RequestBody = string(bodyBytes)
+	defer func() {
+		duration := time.Since(GetStartTime(req.Context()))
+		fields := []zap.Field{
+			zap.String("url", req.URL.String()),
+			zap.String("host", c.GetHeader("Host")),
+			zap.String("path", req.URL.Path),
+			zap.String("method", c.GetHeader("Method")),
+			zap.Any("req_header", req.Header),
+			zap.String("req_body", logData.RequestBody),
+			zap.Any("res_header", c.Writer.Header()),
+			zap.String("res_body", blw.body.String()),
+			zap.String("client_ip", c.ClientIP()),
+			zap.String("start_time", GetStartTime(req.Context()).Format(timex.TimeLayout)),
+			zap.Float64("duration", float64(duration.Microseconds())/1000),
+		}
+		fields = append(fields, zap.Int("status_code", c.Writer.Status()))
+		if cfg.SlowLogThreshold > time.Duration(0) && duration > cfg.SlowLogThreshold {
+			fields = append(fields, zap.Bool("slow", true))
+		}
+		// 开启了链路，那么就记录链路id
+		if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
+			fields = append(fields, zap.String("trace_id", etrace.ExtractTraceID(req.Context())))
+		}
 		if err != nil {
-			Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
+			fields = append(fields, zap.String("event", "error"), zap.Error(err))
+			glog.WarnCtx(req.Context(), "access", fields...)
 			return
 		}
-		logData.RequestBody = string(bodyBytes)
-		defer func() {
-			duration := time.Since(GetStartTime(req.Context()))
-			fields := []zap.Field{
-				zap.String("url", req.URL.String()),
-				zap.String("host", c.GetHeader("Host")),
-				zap.String("path", req.URL.Path),
-				zap.String("method", c.GetHeader("Method")),
-				zap.Any("req_header", req.Header),
-				zap.String("req_body", logData.RequestBody),
-				zap.Any("res_header", c.Writer.Header()),
-				zap.String("res_body", blw.body.String()),
-				zap.String("client_ip", c.ClientIP()),
-				zap.String("start_time", GetStartTime(req.Context()).Format(timex.TimeLayout)),
-				zap.Float64("duration", float64(duration.Microseconds())/1000),
-			}
-			fields = append(fields, zap.Int("status_code", c.Writer.Status()))
-			if cfg.SlowLogThreshold > time.Duration(0) && duration > cfg.SlowLogThreshold {
-				fields = append(fields, zap.Bool("slow", true))
-			}
-			// 开启了链路，那么就记录链路id
-			if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-				fields = append(fields, zap.String("trace_id", etrace.ExtractTraceID(req.Context())))
-			}
-			if err != nil {
-				fields = append(fields, zap.String("event", "error"), zap.Error(err))
-				glog.WarnCtx(req.Context(), "access", fields...)
-				return
-			}
 
-			if cfg.EnableAccessInterceptor {
-				fields = append(fields, zap.String("event", "normal"))
-				glog.InfoCtx(req.Context(), "access", fields...)
-			}
-		}()
+		if cfg.EnableAccessInterceptor {
+			fields = append(fields, zap.String("event", "normal"))
+			glog.InfoCtx(req.Context(), "access", fields...)
+		}
+	}()
 
-		// 新建缓冲区并替换原有Request.body
-		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(logData.RequestBody)))
-		c.Next()
-	}
+	// 新建缓冲区并替换原有Request.body
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(logData.RequestBody)))
+	c.Next()
 }
 
 func Error(c *gin.Context, codeErr *code_err.CodeErr, err error) {

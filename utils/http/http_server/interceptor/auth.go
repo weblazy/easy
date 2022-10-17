@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"net/http"
 	"runtime"
 
 	"io/ioutil"
@@ -37,6 +38,16 @@ const (
 
 // Auth
 func Auth(c *gin.Context) {
+	if c.Request.Method == http.MethodGet {
+
+	} else if c.ContentType() == gin.MIMEJSON {
+		AuthJson(c)
+	} else if c.ContentType() == gin.MIMEMultipartPOSTForm {
+
+	}
+}
+
+func AuthJson(c *gin.Context) {
 	defer func() {
 		if err := recover(); err != nil {
 			GetCurrentGoroutineStack(err)
