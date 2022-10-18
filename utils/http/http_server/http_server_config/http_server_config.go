@@ -1,6 +1,10 @@
-package config
+package http_server_config
 
-import "time"
+import (
+	"time"
+
+	"github.com/spf13/viper"
+)
 
 type Config struct {
 	Name string
@@ -29,4 +33,13 @@ func DefaultConfig() *Config {
 		EnableLogInterceptor:    true,
 		EnableAccessInterceptor: true,
 	}
+}
+
+func GetViperConfig(key string, cfg *viper.Viper) (*Config, error) {
+	c := DefaultConfig()
+	err := cfg.UnmarshalKey(key, c)
+	if err != nil {
+		return nil, err
+	}
+	return c, nil
 }

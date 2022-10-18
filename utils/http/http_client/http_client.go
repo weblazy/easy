@@ -7,21 +7,21 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/weblazy/easy/utils/http/http_client/config"
+	"github.com/weblazy/easy/utils/http/http_client/http_client_config"
 	"github.com/weblazy/easy/utils/http/http_client/interceptor"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/publicsuffix"
 )
 
 type HttpClient struct {
-	config  *config.Config
+	config  *http_client_config.Config
 	Client  *resty.Client
 	Request *resty.Request
 }
 
-func New(c *config.Config) *HttpClient {
+func New(c *http_client_config.Config) *HttpClient {
 	if c == nil {
-		c = config.DefaultConfig()
+		c = http_client_config.DefaultConfig()
 	}
 	// resty的默认方法，无法设置长连接个数，和是否开启长连接，这里重新构造http client。
 	cookieJar, _ := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List}) // nolint
@@ -51,7 +51,7 @@ func New(c *config.Config) *HttpClient {
 	}
 }
 
-func createTransport(c *config.Config) http.RoundTripper {
+func createTransport(c *http_client_config.Config) http.RoundTripper {
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,

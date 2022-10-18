@@ -7,11 +7,11 @@ import (
 	"github.com/go-resty/resty/v2"
 	"github.com/weblazy/easy/utils/etrace"
 	"github.com/weblazy/easy/utils/glog"
-	"github.com/weblazy/easy/utils/http/http_client/config"
+	"github.com/weblazy/easy/utils/http/http_client/http_client_config"
 	"go.uber.org/zap"
 )
 
-func LogInterceptor(cfg *config.Config) (resty.RequestMiddleware, resty.ResponseMiddleware, resty.ErrorHook) {
+func LogInterceptor(cfg *http_client_config.Config) (resty.RequestMiddleware, resty.ResponseMiddleware, resty.ErrorHook) {
 	afterFn := func(cli *resty.Client, response *resty.Response) error {
 		logAccess(cfg, response.Request, response, nil)
 		return nil
@@ -26,7 +26,7 @@ func LogInterceptor(cfg *config.Config) (resty.RequestMiddleware, resty.Response
 	return nil, afterFn, errorFn
 }
 
-func logAccess(cfg *config.Config, req *resty.Request, res *resty.Response, err error) {
+func logAccess(cfg *http_client_config.Config, req *resty.Request, res *resty.Response, err error) {
 	rawRequest := req.RawRequest
 	var path, host string
 	// 修复err 不是 *resty.ResponseError错误的时候，可能为nil

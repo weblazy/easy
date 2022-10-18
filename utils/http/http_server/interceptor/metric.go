@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/weblazy/easy/utils/http/http_server/config"
+	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
 )
 
 var (
@@ -29,7 +29,7 @@ func init() {
 	prometheus.MustRegister(ServerHandleCounter)
 	prometheus.MustRegister(ServerHandleHistogram)
 }
-func MetricInterceptor(cfg *config.Config) gin.HandlerFunc {
+func MetricInterceptor(cfg *http_server_config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ServerHandleCounter.WithLabelValues(cfg.Name, c.Request.Method, c.Request.RequestURI, c.Request.URL.Host, strconv.Itoa(c.Writer.Status())).Inc()
 		ServerHandleHistogram.WithLabelValues(cfg.Name, c.Request.Method, c.Request.RequestURI, c.Request.URL.Host).Observe(time.Since(GetStartTime(c.Request.Context())).Seconds())

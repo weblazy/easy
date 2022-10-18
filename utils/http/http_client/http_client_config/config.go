@@ -1,4 +1,4 @@
-package config
+package http_client_config
 
 import (
 	"runtime"

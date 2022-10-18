@@ -18,6 +18,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/nacos-group/nacos-sdk-go v1.0.9
 	github.com/prometheus/client_golang v1.12.2
+	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.8.0

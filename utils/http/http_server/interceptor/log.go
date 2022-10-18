@@ -13,7 +13,7 @@ import (
 	"github.com/weblazy/easy/utils/etrace"
 	"github.com/weblazy/easy/utils/timex"
 
-	"github.com/weblazy/easy/utils/http/http_server/config"
+	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
 	"github.com/weblazy/easy/utils/http/http_server/service"
 
 	"github.com/weblazy/easy/utils/glog"
@@ -51,7 +51,7 @@ func (w BodyLogWriter) WriteString(s string) (int, error) {
 
 // Log returns a middleware
 // and handles the control to the centralized HTTPErrorHandler.
-func Log(ctx context.Context, cfg *config.Config) gin.HandlerFunc {
+func Log(ctx context.Context, cfg *http_server_config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		if c.Request.Method == http.MethodGet {
 
@@ -64,7 +64,7 @@ func Log(ctx context.Context, cfg *config.Config) gin.HandlerFunc {
 	}
 }
 
-func LogJson(c *gin.Context, cfg *config.Config) {
+func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 	req := c.Request
 	logData := &LogData{}
 	blw := &BodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
