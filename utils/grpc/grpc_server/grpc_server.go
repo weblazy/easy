@@ -8,6 +8,7 @@ import (
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/weblazy/easy/utils/grpc/grpc_server/grpc_server_config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -26,20 +27,20 @@ const (
 
 // Component ...
 type GrpcServer struct {
-	config  *Config
+	config  *grpc_server_config.Config
 	logConf *elog.LogConf
 	*grpc.Server
 	listener net.Listener
 	quit     chan struct{}
 }
 
-func NewGrpcServer(config *Config, logConf *elog.LogConf) *GrpcServer {
+func NewGrpcServer(config *grpc_server_config.Config, logConf *elog.LogConf) *GrpcServer {
 	if config == nil {
-		config = DefaultConfig()
+		config = grpc_server_config.DefaultConfig()
 	}
 	config.BuildServerOptions()
 
-	newServer := grpc.NewServer(config.serverOptions...)
+	newServer := grpc.NewServer(config.ServerOptions...)
 
 	if config.EnableServerReflection {
 		elog.InfoCtx(emptyCtx, "enable grpc server reflection")

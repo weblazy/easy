@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/utils/grpc/grpc_client_config"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -20,20 +21,20 @@ const PackageName = "client.fgrpc"
 const grpcServiceConfig = `{"loadBalancingPolicy":"%s"}`
 
 type GrpcClient struct {
-	config *Config
+	config *grpc_client_config.Config
 	*grpc.ClientConn
 	err error
 }
 
-func NewGrpcClient(config *Config) *GrpcClient {
+func NewGrpcClient(config *grpc_client_config.Config) *GrpcClient {
 	var ctx = context.Background()
 
 	if config == nil {
-		config = DefaultConfig()
+		config = grpc_client_config.DefaultConfig()
 	}
 	config.BuildDialOptions()
 
-	var dialOptions = config.dialOptions
+	var dialOptions = config.DialOptions
 	// 默认配置使用block
 	if config.EnableBlock {
 		if config.DialTimeout > time.Duration(0) {
@@ -49,8 +50,8 @@ func NewGrpcClient(config *Config) *GrpcClient {
 		dialOptions = append(dialOptions, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	}
 
-	if config.keepAlive != nil {
-		dialOptions = append(dialOptions, grpc.WithKeepaliveParams(*config.keepAlive))
+	if config.KeepAlive != nil {
+		dialOptions = append(dialOptions, grpc.WithKeepaliveParams(*config.KeepAlive))
 	}
 
 	//// 因为默认是开启这个配置

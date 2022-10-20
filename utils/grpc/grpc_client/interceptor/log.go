@@ -75,7 +75,7 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 		}
 
 		if config.SlowLogThreshold > time.Duration(0) && duration > config.SlowLogThreshold {
-			elog.WarnCtx(ctx, "slow", fields...)
+			fields = append(fields, zap.Bool("slow", true))
 		}
 
 		if err != nil {
@@ -83,17 +83,15 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 			// 只记录系统级别错误
 			if httpStatusCode >= http.StatusInternalServerError {
 				// 只记录系统级别错误
-				elog.ErrorCtx(ctx, "access", fields...)
+				elog.ErrorCtx(ctx, "grpc_client", fields...)
 				return err
 			}
 			// 业务报错只做warning
-			elog.WarnCtx(ctx, "access", fields...)
+			elog.WarnCtx(ctx, "grpc_client", fields...)
 			return err
-		}
-
-		if config.EnableAccessInterceptor {
+		} else if config.EnableAccessInterceptor {
 			fields = append(fields, elog.FieldEvent("normal"))
-			elog.InfoCtx(ctx, "access", fields...)
+			elog.InfoCtx(ctx, "grpc_client", fields...)
 		}
 		return nil
 	}

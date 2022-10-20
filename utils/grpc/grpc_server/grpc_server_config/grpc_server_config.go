@@ -1,23 +1,24 @@
-package grpc_server
+package grpc_server_config
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
 	"github.com/weblazy/easy/utils/grpc/grpc_server/interceptor"
 	"google.golang.org/grpc"
 )
 
 const (
-	DefaultPort = 9001
+	DefaultPort = 9090
 )
 
 // Config ...
 type Config struct {
 	Name                       string
 	Host                       string        // IP地址，默认0.0.0.0
-	Port                       int           // Port端口，默认9002
+	Port                       int           // Port端口，默认9090
 	Network                    string        // 网络类型，默认tcp4
 	EnableMetricInterceptor    bool          // 是否开启监控，默认开启
 	EnableTraceInterceptor     bool          // 是否开启链路追踪，默认开启
@@ -33,10 +34,10 @@ type Config struct {
 	// Deprecated: not affect anything
 	EnableSkyWalking bool // 是否额外开启 skywalking, 默认开启
 
-	serverOptions            []grpc.ServerOption
-	streamInterceptors       []grpc.StreamServerInterceptor
-	unaryInterceptors        []grpc.UnaryServerInterceptor
-	prependUnaryInterceptors []grpc.UnaryServerInterceptor
+	ServerOptions            []grpc.ServerOption
+	StreamInterceptors       []grpc.StreamServerInterceptor
+	UnaryInterceptors        []grpc.UnaryServerInterceptor
+	PrependUnaryInterceptors []grpc.UnaryServerInterceptor
 }
 
 // DefaultConfig represents default config
@@ -56,9 +57,9 @@ func DefaultConfig() *Config {
 		EnableServerReflection:     true,
 		EnableHealth:               true,
 		MinDeadlineDuration:        time.Second * 10,
-		serverOptions:              []grpc.ServerOption{},
-		streamInterceptors:         []grpc.StreamServerInterceptor{},
-		unaryInterceptors:          []grpc.UnaryServerInterceptor{},
+		ServerOptions:              []grpc.ServerOption{},
+		StreamInterceptors:         []grpc.StreamServerInterceptor{},
+		UnaryInterceptors:          []grpc.UnaryServerInterceptor{},
 	}
 }
 
@@ -76,7 +77,8 @@ func (config *Config) BuildServerOptions() {
 		unaryInterceptors = append(unaryInterceptors, etrace.UnaryServerInterceptor())
 	}
 
-	unaryInterceptors = append(unaryInterceptors, config.prependUnaryInterceptors...)
+	unaryInterceptors = append(unaryInterceptors, config.PrependUnaryInterceptors...)
+	unaryInterceptors = append(unaryInterceptors, interceptor.GrpcLogger(&elog.LogConf{}))
 
 	if config.EnableMetricInterceptor {
 		unaryInterceptors = append(unaryInterceptors, interceptor.MetricUnaryServerInterceptor(config.MetricSuccessCodes))
@@ -84,15 +86,15 @@ func (config *Config) BuildServerOptions() {
 
 	streamInterceptors = append(
 		streamInterceptors,
-		config.streamInterceptors...,
+		config.StreamInterceptors...,
 	)
 
 	unaryInterceptors = append(
 		unaryInterceptors,
-		config.unaryInterceptors...,
+		config.UnaryInterceptors...,
 	)
 
-	config.serverOptions = append(config.serverOptions,
+	config.ServerOptions = append(config.ServerOptions,
 		grpc.ChainStreamInterceptor(streamInterceptors...),
 		grpc.ChainUnaryInterceptor(unaryInterceptors...),
 	)

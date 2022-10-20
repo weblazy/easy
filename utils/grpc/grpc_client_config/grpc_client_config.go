@@ -1,4 +1,4 @@
-package grpc_client
+package grpc_client_config
 
 import (
 	"time"
@@ -14,7 +14,7 @@ import (
 type Config struct {
 	Name             string
 	Debug            bool          // 是否开启调试，默认不开启, 开启可以打印请求日志
-	Addr             string        // 连接地址，直连为 127.0.0.1:9001，服务发现为 nacos:///appname
+	Addr             string        // 连接地址，直连为 127.0.0.1:9090，服务发现为 nacos:///appname
 	BalancerName     string        // 负载均衡方式，默认 round_robin
 	DialTimeout      time.Duration // 连接超时，默认3s
 	ReadTimeout      time.Duration // 读超时，默认1s
@@ -33,8 +33,8 @@ type Config struct {
 	// Deprecated: not affect anything
 	EnableSkyWalking bool // 是否额外开启 skywalking, 默认不开启
 
-	keepAlive   *keepalive.ClientParameters
-	dialOptions []grpc.DialOption
+	KeepAlive   *keepalive.ClientParameters
+	DialOptions []grpc.DialOption
 }
 
 // DefaultConfig defines grpc client default configuration
@@ -58,6 +58,7 @@ func DefaultConfig() *Config {
 			EnableAccessInterceptorRes: true,
 		},
 		EnableServiceConfig: false,
+		Addr:                "127.0.0.1:9090",
 	}
 }
 
@@ -65,21 +66,21 @@ func (config *Config) BuildDialOptions() {
 	// 最先执行trace
 	if config.EnableTraceInterceptor {
 		// 默认会启用 jaeger
-		config.dialOptions = append(config.dialOptions, grpc.WithChainUnaryInterceptor(etrace.UnaryClientInterceptor()))
+		config.DialOptions = append(config.DialOptions, grpc.WithChainUnaryInterceptor(etrace.UnaryClientInterceptor()))
 	}
 
 	// 其次执行，自定义header头，这样才能赋值到ctx里
 	// options = append(options, WithDialOption(grpc.WithChainUnaryInterceptor(customHeader(transport.CustomContextKeys()))))
 
 	// 默认日志
-	config.dialOptions = append(config.dialOptions, grpc.WithChainUnaryInterceptor(interceptor.LoggerUnaryClientInterceptor(config.LogConf)))
+	config.DialOptions = append(config.DialOptions, grpc.WithChainUnaryInterceptor(interceptor.LoggerUnaryClientInterceptor(config.LogConf)))
 
 	if config.EnableTimeoutInterceptor {
-		config.dialOptions = append(config.dialOptions, grpc.WithChainUnaryInterceptor(interceptor.TimeoutInterceptor(config.ReadTimeout)))
+		config.DialOptions = append(config.DialOptions, grpc.WithChainUnaryInterceptor(interceptor.TimeoutInterceptor(config.ReadTimeout)))
 	}
 
 	if config.EnableMetricInterceptor {
-		config.dialOptions = append(config.dialOptions,
+		config.DialOptions = append(config.DialOptions,
 			grpc.WithChainUnaryInterceptor(interceptor.MetricUnaryClientInterceptor(config.MetricSuccessCodes)),
 		)
 	}
