@@ -7,6 +7,15 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
+const (
+	// ClusterMode using clusterClient
+	ClusterMode string = "cluster"
+	// StubMode using stubClient
+	StubMode string = "stub"
+	// SentinelMode using Failover sentinel client
+	SentinelMode string = "sentinel"
+)
+
 // Config for redis, contains RedisStubConfig, RedisClusterConfig and RedisSentinelConfig
 type Config struct {
 	Addrs                      []string      // Addrs 实例配置地址
@@ -37,7 +46,7 @@ type Config struct {
 // DefaultConfig default config ...
 func DefaultConfig() *Config {
 	return &Config{
-		Mode:                    "stub",
+		Mode:                    StubMode,
 		DB:                      0,
 		PoolSize:                0, // will be handled by redis v8
 		MaxRetries:              0,
@@ -51,7 +60,7 @@ func DefaultConfig() *Config {
 		EnableMetricInterceptor: true,
 		EnableTraceInterceptor:  true,
 		SlowLogThreshold:        time.Millisecond * 250,
-		OnFail:                  "panic",
+		OnFail:                  OnFailPanic,
 	}
 }
 
