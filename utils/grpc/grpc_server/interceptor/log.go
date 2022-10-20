@@ -40,14 +40,14 @@ func GrpcLogger(logConf *elog.LogConf) grpc.UnaryServerInterceptor {
 		// ctx = blog.NewContext(ctx, logger)
 		elog.SetContextLog(ctx, logConf)
 
-		reqLabel, mdLabel := zap.Any("request", req), zap.Any("metadata", md)
+		reqLabel, mdLabel := zap.Any("req", req), zap.Any("metadata", md)
 
 		resp, err = handler(ctx, req)
 
 		if err != nil {
-			elog.ErrorCtx(ctx, "grpc log", reqLabel, mdLabel, elog.FieldError(err), elog.FieldCost(time.Since(start)))
+			elog.ErrorCtx(ctx, "grpc_server", reqLabel, mdLabel, elog.FieldError(err), elog.FieldCost(time.Since(start)))
 		} else {
-			elog.InfoCtx(ctx, "grpc log", reqLabel, mdLabel, zap.Any("response", resp), elog.FieldCost(time.Since(start)))
+			elog.InfoCtx(ctx, "grpc_server", reqLabel, mdLabel, zap.Any("res", resp), elog.FieldCost(time.Since(start)))
 		}
 
 		return resp, err
