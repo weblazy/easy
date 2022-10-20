@@ -18,7 +18,7 @@ import (
 	"github.com/sunmi-OS/gocore/v2/utils"
 	"github.com/weblazy/crypto/aes"
 	"github.com/weblazy/easy/utils/code_err"
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 )
 
@@ -110,7 +110,7 @@ func ValidateSign(signParam string, appKey string, bodyParams []byte) (err error
 		return fmt.Errorf("签名错误")
 	}
 	if string(realSign) != signParam {
-		glog.InfoCtx(context.Background(), "signErr", zap.String("realSign:", realSign), zap.String("signParam:", signParam))
+		elog.InfoCtx(context.Background(), "signErr", zap.String("realSign:", realSign), zap.String("signParam:", signParam))
 		return fmt.Errorf("签名错误: correctSign：%s Token：%s body：%s", realSign, appKey, bodyParams)
 	}
 	return nil

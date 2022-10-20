@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"
@@ -65,12 +65,12 @@ func (config *Config) Build(opts ...Option) trace.TracerProvider {
 	lc := zap.Any("config", config)
 
 	if !config.Enable {
-		glog.InfoCtx(emptyCtx, "jaeger not enable", lc)
+		elog.InfoCtx(emptyCtx, "jaeger not enable", lc)
 		return trace.NewNoopTracerProvider()
 	}
 
 	if config.ServiceName == "" {
-		glog.InfoCtx(emptyCtx, "jaeger not enable, empty ServiceName", lc)
+		elog.InfoCtx(emptyCtx, "jaeger not enable, empty ServiceName", lc)
 		return trace.NewNoopTracerProvider()
 	}
 
@@ -78,7 +78,7 @@ func (config *Config) Build(opts ...Option) trace.TracerProvider {
 	exp, err := jaeger.New(endpoint)
 
 	if err != nil {
-		glog.InfoCtx(emptyCtx, "init jaeger client error", lc, zap.Error(err))
+		elog.InfoCtx(emptyCtx, "init jaeger client error", lc, zap.Error(err))
 		return trace.NewNoopTracerProvider()
 	}
 
@@ -106,7 +106,7 @@ func (config *Config) Build(opts ...Option) trace.TracerProvider {
 	options = append(options, config.options...)
 	tp := tracesdk.NewTracerProvider(options...)
 
-	glog.InfoCtx(emptyCtx, "jaeger init success", lc)
+	elog.InfoCtx(emptyCtx, "jaeger init success", lc)
 
 	return tp
 }

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/timex"
 	"go.uber.org/zap"
 )
@@ -35,7 +35,7 @@ func DaemonRun(interval time.Duration, f func(), daemon func()) {
 func RunSafeWrap(ctx context.Context, fn func() error) (err error) {
 	defer func() {
 		if p := recover(); p != nil {
-			glog.ErrorCtx(ctx, "panic", zap.Any("err", p), zap.String("stack", string(debug.Stack())))
+			elog.ErrorCtx(ctx, "panic", zap.Any("err", p), zap.String("stack", string(debug.Stack())))
 			err = errors.Errorf("panic: %v", p)
 		}
 	}()

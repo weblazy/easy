@@ -1,4 +1,4 @@
-package glog
+package elog
 
 import (
 	"fmt"

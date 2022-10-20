@@ -11,7 +11,7 @@ import (
 	"github.com/sunmi-OS/gocore/v2/utils/hash"
 	"github.com/weblazy/easy/utils/closes"
 	"github.com/weblazy/easy/utils/conf/viper"
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 )
 
 var Map sync.Map
@@ -89,7 +89,7 @@ func NewOrUpdateRedis(dbName string) error {
 
 func Close() {
 	Map.Range(func(dbName, rc interface{}) bool {
-		glog.WarnF("close db %s", dbName)
+		elog.WarnF("close db %s", dbName)
 		Map.Delete(dbName)
 		err := rc.(*redis.ClusterClient).Close()
 		return err == nil

@@ -41,4 +41,5 @@ require (
 	google.golang.org/grpc v1.47.0
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/gorm v1.23.5
+	honnef.co/go/tools v0.0.1-2020.1.4
 )

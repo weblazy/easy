@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/weblazy/easy/utils/glog/logx"
+	"github.com/weblazy/easy/utils/elog/logx"
 
 	"github.com/sunmi-OS/gocore/v2/conf/viper"
 	"github.com/sunmi-OS/gocore/v2/utils/file"
@@ -186,6 +186,8 @@ func (*Zap) DebugF(format string, args ...interface{}) {
 }
 
 func (*Zap) Warn(msg string, fields ...zap.Field) {
+	fmt.Printf("%#v\n", LocalLogger)
+	fmt.Printf("%#v\n", fields)
 	LocalLogger.Warn(msg, fields...)
 }
 

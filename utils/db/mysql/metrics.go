@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -40,7 +40,7 @@ func monitor() {
 			db := value.(*gorm.DB)
 			sqlDB, err := db.DB()
 			if err != nil {
-				glog.ErrorCtx(context.Background(), "monitor db error", zap.Error(err))
+				elog.ErrorCtx(context.Background(), "monitor db error", zap.Error(err))
 				return false
 			}
 

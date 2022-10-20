@@ -19,7 +19,7 @@ type HttpClient struct {
 	Request *resty.Request
 }
 
-func New(c *http_client_config.Config) *HttpClient {
+func NewHttpClient(c *http_client_config.Config) *HttpClient {
 	if c == nil {
 		c = http_client_config.DefaultConfig()
 	}

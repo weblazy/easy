@@ -3,7 +3,7 @@ package interceptor
 import (
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
-	"github.com/weblazy/easy/utils/http/http_client/config"
+	"github.com/weblazy/easy/utils/http/http_client/http_client_config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
@@ -11,7 +11,7 @@ import (
 )
 
 // Deprecated: use otel http transport
-func TraceInterceptor(name string, cfg *config.Config) (resty.RequestMiddleware, resty.ResponseMiddleware, resty.ErrorHook) { //nolint
+func TraceInterceptor(name string, cfg *http_client_config.Config) (resty.RequestMiddleware, resty.ResponseMiddleware, resty.ErrorHook) { //nolint
 	tracer := otel.Tracer("")
 
 	beforeFn := func(cli *resty.Client, req *resty.Request) error {

@@ -9,7 +9,7 @@ import (
 
 	"github.com/SkyAPM/go2sky"
 	"github.com/SkyAPM/go2sky/reporter"
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 )
 
 const (
@@ -45,26 +45,26 @@ func (config *Config) Build(ops ...Option) *go2sky.Tracer {
 	lc := zap.Any("config", config)
 
 	if !config.Enable {
-		glog.InfoCtx(emptyCtx, "skywalking not enable", lc)
+		elog.InfoCtx(emptyCtx, "skywalking not enable", lc)
 		return nil
 	}
 
 	r, err := reporter.NewGRPCReporter(config.AgentEndPoint)
 	if err != nil {
-		glog.InfoCtx(emptyCtx, "skywalking new reporter error", lc, zap.Error(err))
+		elog.InfoCtx(emptyCtx, "skywalking new reporter error", lc, zap.Error(err))
 		return nil
 	}
 
 	tracer, err := go2sky.NewTracer(fmt.Sprintf("%s-%s", config.EnvName, config.ServiceName), go2sky.WithReporter(r), go2sky.WithSampler(config.Sampler))
 	if err != nil {
-		glog.InfoCtx(emptyCtx, "skywalking new tracer error", lc, zap.Error(err))
+		elog.InfoCtx(emptyCtx, "skywalking new tracer error", lc, zap.Error(err))
 		return nil
 	}
 
 	// registers `tracer` as the global Tracer
 	go2sky.SetGlobalTracer(tracer)
 
-	glog.InfoCtx(emptyCtx, "skywalking init success", lc)
+	elog.InfoCtx(emptyCtx, "skywalking init success", lc)
 
 	return tracer
 }

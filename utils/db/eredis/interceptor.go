@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/glog"
 	"go.uber.org/zap"
 )
 
@@ -104,10 +104,10 @@ func debugInterceptor(compName string, config *Config) *interceptor {
 			duration := time.Since(ctx.Value(ctxBegKey).(time.Time))
 			err := cmd.Err()
 			if err != nil {
-				glog.ErrorCtx(ctx, "eredis.response", glog.MakeReqResError(1, compName, config.AddrString(), duration, fmt.Sprintf("%v", cmd.Args()), err.Error()))
+				elog.ErrorCtx(ctx, "eredis.response", elog.MakeReqResError(1, compName, config.AddrString(), duration, fmt.Sprintf("%v", cmd.Args()), err.Error()))
 
 			} else {
-				glog.InfoCtx(ctx, "eredis.response", glog.MakeReqResInfo(1, compName, config.AddrString(), duration, fmt.Sprintf("%v", cmd.Args()), response(cmd)))
+				elog.InfoCtx(ctx, "eredis.response", elog.MakeReqResInfo(1, compName, config.AddrString(), duration, fmt.Sprintf("%v", cmd.Args()), response(cmd)))
 			}
 			return err
 		},
@@ -158,23 +158,23 @@ func accessInterceptor(compName string, config *Config) *interceptor {
 			}
 
 			if config.SlowLogThreshold > time.Duration(0) && duration > config.SlowLogThreshold {
-				glog.InfoCtx(ctx, "slow", fields...)
+				elog.InfoCtx(ctx, "slow", fields...)
 			}
 
 			// error metric
 			if err != nil {
 				fields = append(fields, zap.String("event", "error"), zap.Error(err))
 				if errors.Is(err, redis.Nil) {
-					glog.WarnCtx(ctx, "access", fields...)
+					elog.WarnCtx(ctx, "access", fields...)
 					return err
 				}
-				glog.ErrorCtx(ctx, "access", fields...)
+				elog.ErrorCtx(ctx, "access", fields...)
 				return err
 			}
 
 			if config.EnableAccessInterceptor {
 				fields = append(fields, zap.String("event", "normal"))
-				glog.InfoCtx(ctx, "access", fields...)
+				elog.InfoCtx(ctx, "access", fields...)
 			}
 			return err
 		},

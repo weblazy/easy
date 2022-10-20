@@ -7,13 +7,13 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/google/uuid"
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/glog"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
 
-func GrpcLogger(logConf *glog.LogConf) grpc.UnaryServerInterceptor {
+func GrpcLogger(logConf *elog.LogConf) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		start := time.Now()
 
@@ -38,23 +38,23 @@ func GrpcLogger(logConf *glog.LogConf) grpc.UnaryServerInterceptor {
 
 		// // set new logger to context
 		// ctx = blog.NewContext(ctx, logger)
-		glog.SetContextLog(ctx, logConf)
+		elog.SetContextLog(ctx, logConf)
 
 		reqLabel, mdLabel := zap.Any("request", req), zap.Any("metadata", md)
 
 		resp, err = handler(ctx, req)
 
 		if err != nil {
-			glog.ErrorCtx(ctx, "grpc log", reqLabel, mdLabel, glog.FieldError(err), glog.FieldCost(time.Since(start)))
+			elog.ErrorCtx(ctx, "grpc log", reqLabel, mdLabel, elog.FieldError(err), elog.FieldCost(time.Since(start)))
 		} else {
-			glog.InfoCtx(ctx, "grpc log", reqLabel, mdLabel, zap.Any("response", resp), glog.FieldCost(time.Since(start)))
+			elog.InfoCtx(ctx, "grpc log", reqLabel, mdLabel, zap.Any("response", resp), elog.FieldCost(time.Since(start)))
 		}
 
 		return resp, err
 	}
 }
 
-func GrpcLoggerLite(logConf glog.LogConf) grpc.UnaryServerInterceptor {
+func GrpcLoggerLite(logConf elog.LogConf) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 		// otel trace
 		traceId := etrace.ExtractTraceID(ctx)

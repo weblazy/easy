@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 )
 
@@ -139,12 +139,12 @@ func RetryWithLog(ctx context.Context, operation backoff.Operation, b backoff.Ba
 	return NotifyRecover(operation, b, func(err error, duration time.Duration, times int) {
 		newLabels := []zap.Field{}
 		newLabels = append(newLabels, base...)
-		newLabels = append(newLabels, zap.Int64("retry_times", int64(times)), glog.FieldError(err))
-		glog.WarnCtx(ctx, "Error running function. Retrying...", newLabels...)
+		newLabels = append(newLabels, zap.Int64("retry_times", int64(times)), elog.FieldError(err))
+		elog.WarnCtx(ctx, "Error running function. Retrying...", newLabels...)
 	}, func(times int) {
 		newLabels := make([]zap.Field, 0)
 		newLabels = append(newLabels, base...)
 		newLabels = append(newLabels, zap.Int64("retry_times", int64(times)))
-		glog.InfoCtx(ctx, "Successfully run function after it previously failed.", newLabels...)
+		elog.InfoCtx(ctx, "Successfully run function after it previously failed.", newLabels...)
 	}, true)
 }

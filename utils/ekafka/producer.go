@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama"
 	"go.uber.org/zap"
 
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 
 	"github.com/weblazy/easy/utils/etrace"
 )
@@ -56,19 +56,19 @@ func (c *Producer) SendMessage(ctx context.Context, msg *Message) error {
 	}
 
 	if tid := etrace.ExtractTraceID(ctx); tid != "" {
-		labels = append(labels, glog.FieldTrace(tid))
+		labels = append(labels, elog.FieldTrace(tid))
 	}
 
 	if err != nil {
-		labels = append(labels, glog.FieldError(err))
-		glog.ErrorCtx(ctx, "kafka publish failed", labels...)
+		labels = append(labels, elog.FieldError(err))
+		elog.ErrorCtx(ctx, "kafka publish failed", labels...)
 		kafkaPublishCounter.WithLabelValues(c.config.brokers(), msg.Topic, CodeError).Inc()
 		return err
 	}
 
 	labels = append(labels, zap.Int64("partition", int64(partition)), zap.Int64("offset", offset))
 
-	glog.InfoCtx(ctx, "kafka publish success", labels...)
+	elog.InfoCtx(ctx, "kafka publish success", labels...)
 	kafkaPublishCounter.WithLabelValues(c.config.brokers(), msg.Topic, CodeOK).Inc()
 
 	return nil
@@ -76,7 +76,7 @@ func (c *Producer) SendMessage(ctx context.Context, msg *Message) error {
 
 func (c *Producer) Close() error {
 	if c.producer != nil {
-		glog.InfoCtx(context.Background(), "producer exit")
+		elog.InfoCtx(context.Background(), "producer exit")
 		return c.producer.Close()
 	}
 

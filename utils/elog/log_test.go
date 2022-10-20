@@ -1,11 +1,11 @@
-package glog
+package elog
 
 import (
 	"errors"
 	"fmt"
 	"testing"
 
-	"github.com/weblazy/easy/utils/glog/zap"
+	"github.com/weblazy/easy/utils/elog/zap"
 )
 
 func TestLog(t *testing.T) {

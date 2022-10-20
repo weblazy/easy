@@ -7,8 +7,9 @@ import (
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"honnef.co/go/tools/config"
 
-	"github.com/weblazy/easy/utils/http/http_server/config"
+	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
 	"github.com/weblazy/easy/utils/http/http_server/interceptor"
 )
 
@@ -18,7 +19,7 @@ type HttpServer struct {
 }
 
 func NewHttpServerViper(key string, cfg *viper.Viper) (*HttpServer, error) {
-	c := config.DefaultConfig()
+	c := http_server_config.DefaultConfig()
 	cfg.UnmarshalKey(key, c)
 	server := &HttpServer{
 		Config: c,
@@ -26,9 +27,9 @@ func NewHttpServerViper(key string, cfg *viper.Viper) (*HttpServer, error) {
 	return server, nil
 }
 
-func NewHttpServer(c *config.Config) (*HttpServer, error) {
+func NewHttpServer(c *http_server_config.Config) (*HttpServer, error) {
 	if c == nil {
-		c = config.DefaultConfig()
+		c = http_server_config.DefaultConfig()
 	}
 
 	server := &HttpServer{

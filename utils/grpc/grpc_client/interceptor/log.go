@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/weblazy/easy/utils/ecodes"
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/glog"
 	"github.com/weblazy/easy/utils/transport"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -51,9 +51,9 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 			zap.Int64("code", int64(spbStatus.Code())),
 			zap.Int64("uniformCode", int64(httpStatusCode)),
 			zap.String("description", spbStatus.Message()),
-			glog.FieldMethod(method),
-			glog.FieldCost(duration),
-			glog.FieldName(cc.Target()),
+			elog.FieldMethod(method),
+			elog.FieldCost(duration),
+			elog.FieldName(cc.Target()),
 		)
 
 		span := trace.SpanFromContext(ctx)
@@ -64,7 +64,7 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 
 		// 开启了链路，那么就记录链路id
 		if config.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-			fields = append(fields, glog.FieldTrace(etrace.ExtractTraceID(ctx)))
+			fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
 		}
 
 		if config.EnableAccessInterceptorReq {
@@ -75,25 +75,25 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 		}
 
 		if config.SlowLogThreshold > time.Duration(0) && duration > config.SlowLogThreshold {
-			glog.WarnCtx(ctx, "slow", fields...)
+			elog.WarnCtx(ctx, "slow", fields...)
 		}
 
 		if err != nil {
-			fields = append(fields, glog.FieldEvent("error"), glog.FieldError(err))
+			fields = append(fields, elog.FieldEvent("error"), elog.FieldError(err))
 			// 只记录系统级别错误
 			if httpStatusCode >= http.StatusInternalServerError {
 				// 只记录系统级别错误
-				glog.ErrorCtx(ctx, "access", fields...)
+				elog.ErrorCtx(ctx, "access", fields...)
 				return err
 			}
 			// 业务报错只做warning
-			glog.WarnCtx(ctx, "access", fields...)
+			elog.WarnCtx(ctx, "access", fields...)
 			return err
 		}
 
 		if config.EnableAccessInterceptor {
-			fields = append(fields, glog.FieldEvent("normal"))
-			glog.InfoCtx(ctx, "access", fields...)
+			fields = append(fields, elog.FieldEvent("normal"))
+			elog.InfoCtx(ctx, "access", fields...)
 		}
 		return nil
 	}

@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/reflection"
 
@@ -27,13 +27,13 @@ const (
 // Component ...
 type GrpcServer struct {
 	config  *Config
-	logConf *glog.LogConf
+	logConf *elog.LogConf
 	*grpc.Server
 	listener net.Listener
 	quit     chan struct{}
 }
 
-func NewGrpcServer(config *Config, logConf *glog.LogConf) *GrpcServer {
+func NewGrpcServer(config *Config, logConf *elog.LogConf) *GrpcServer {
 	if config == nil {
 		config = DefaultConfig()
 	}
@@ -42,12 +42,12 @@ func NewGrpcServer(config *Config, logConf *glog.LogConf) *GrpcServer {
 	newServer := grpc.NewServer(config.serverOptions...)
 
 	if config.EnableServerReflection {
-		glog.InfoCtx(emptyCtx, "enable grpc server reflection")
+		elog.InfoCtx(emptyCtx, "enable grpc server reflection")
 		reflection.Register(newServer)
 	}
 
 	if config.EnableHealth {
-		glog.InfoCtx(emptyCtx, "enable grpc health")
+		elog.InfoCtx(emptyCtx, "enable grpc health")
 		healthpb.RegisterHealthServer(newServer, health.NewServer())
 	}
 
@@ -85,7 +85,7 @@ func (c *GrpcServer) Init() error {
 	// 正式listener
 	listener, err = net.Listen(c.config.Network, c.config.Address())
 	if err != nil {
-		glog.ErrorCtx(emptyCtx, "new grpc server err", glog.FieldError(err))
+		elog.ErrorCtx(emptyCtx, "new grpc server err", elog.FieldError(err))
 	}
 	c.config.Port = listener.Addr().(*net.TCPAddr).Port
 
@@ -116,10 +116,10 @@ func (c *GrpcServer) GracefulStop(ctx context.Context) error {
 
 	select {
 	case <-ctx.Done():
-		glog.WarnCtx(ctx, "grpc graceful shutdown timeout")
+		elog.WarnCtx(ctx, "grpc graceful shutdown timeout")
 		return ctx.Err()
 	case <-c.quit:
-		glog.InfoCtx(ctx, "grpc graceful shutdown success")
+		elog.InfoCtx(ctx, "grpc graceful shutdown success")
 		return nil
 	}
 }

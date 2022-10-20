@@ -4,7 +4,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/weblazy/easy/utils/conf/viper"
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 )
 
@@ -62,7 +62,7 @@ func (vt *ViperToml) GetConfig() (string, error) {
 				OnChange: vt.callbackList[group+v],
 			})
 			if err != nil {
-				glog.Error(group+"\r\n"+v+"\r\n ListenConfig Error", zap.Error(err))
+				elog.Error(group+"\r\n"+v+"\r\n ListenConfig Error", zap.Error(err))
 			}
 		}
 	}
@@ -89,7 +89,7 @@ func (vt *ViperToml) SetDataIds(group string, dataIds ...string) {
 	for _, v := range dataIds {
 		vt.callbackList[group+v] = func(namespace, group, dataId, data string) {
 			vt.NacosToViper()
-			glog.Warn(namespace + "\r\n" + group + "\r\n" + dataId + "\r\n" + data + "\r\n Update Config")
+			elog.Warn(namespace + "\r\n" + group + "\r\n" + dataId + "\r\n" + data + "\r\n Update Config")
 		}
 	}
 }

@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/glog"
 	"github.com/weblazy/easy/utils/http/http_client/http_client_config"
 	"go.uber.org/zap"
 )
@@ -85,15 +85,15 @@ func logAccess(cfg *http_client_config.Config, req *resty.Request, res *resty.Re
 		fields = append(fields, zap.String("event", "error"), zap.Error(err))
 		if res == nil {
 			// 无 res 的是连接超时等系统级错误
-			glog.ErrorCtx(req.Context(), "access", fields...)
+			elog.ErrorCtx(req.Context(), "access", fields...)
 			return
 		}
-		glog.WarnCtx(req.Context(), "access", fields...)
+		elog.WarnCtx(req.Context(), "access", fields...)
 		return
 	}
 
 	if cfg.EnableAccessInterceptor {
 		fields = append(fields, zap.String("event", "normal"))
-		glog.InfoCtx(req.Context(), "access", fields...)
+		elog.InfoCtx(req.Context(), "access", fields...)
 	}
 }

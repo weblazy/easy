@@ -1,10 +1,10 @@
-package glog
+package elog
 
 import (
 	uzap "go.uber.org/zap"
 	"golang.org/x/net/context"
 
-	"github.com/weblazy/easy/utils/glog/logx"
+	"github.com/weblazy/easy/utils/elog/logx"
 )
 
 const CtxKey = "logConf"
@@ -17,10 +17,10 @@ type LogConf struct {
 var defaultLogConf = &LogConf{}
 
 func GetContextLog(ctx context.Context) *LogConf {
-	if v, ok := ctx.Value(CtxKey).(*LogConf); !ok {
+	if v, ok := ctx.Value(CtxKey).(*LogConf); ok {
 		return v
 	} else {
-		return defaultLogConf
+		return &LogConf{}
 	}
 }
 
@@ -49,7 +49,7 @@ func MergeLabels(ctx context.Context, fields ...uzap.Field) []uzap.Field {
 	flen := len(fields)
 	newFields := make([]uzap.Field, llen+flen)
 	copy(newFields, logConf.Labels)
-	copy(newFields[llen:], newFields)
+	copy(newFields[llen:], fields)
 	return newFields
 }
 

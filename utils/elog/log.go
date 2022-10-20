@@ -1,20 +1,20 @@
-package glog
+package elog
 
 import (
 	"sync"
 
-	"github.com/weblazy/easy/utils/glog/zap"
+	"github.com/weblazy/easy/utils/elog/zap"
 
 	uzap "go.uber.org/zap"
 
-	"github.com/weblazy/easy/utils/glog/logx"
+	"github.com/weblazy/easy/utils/elog/logx"
 )
 
 var (
 	Logger sync.Map
 )
 
-//  默认加入zap组件
+// 默认加入zap组件
 func init() {
 	Logger.Store("zap", &zap.Zap{})
 }

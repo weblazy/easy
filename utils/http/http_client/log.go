@@ -8,8 +8,8 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
-	"github.com/weblazy/easy/utils/glog"
-	"github.com/weblazy/easy/utils/glog/sls"
+	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/utils/elog/sls"
 )
 
 type Log interface {
@@ -60,7 +60,7 @@ func NewGocoreLog() *GocoreLog {
 
 func (l *GocoreLog) Info(obj *LogObject) error {
 	data, _ := json.Marshal(obj)
-	glog.InfoF(string(data))
+	elog.InfoF(string(data))
 	return nil
 }
 
@@ -72,7 +72,7 @@ type AliyunLog struct {
 	topic string
 }
 
-//  使用阿里云日志需要提前调用sls.InitLog初始化
+// 使用阿里云日志需要提前调用sls.InitLog初始化
 func (l *AliyunLog) Info(obj *LogObject) error {
 	requestHeaderBytes, _ := json.Marshal(obj.RequestHders)
 	requestBodyBytes, _ := json.Marshal(obj.RequestRawBody)

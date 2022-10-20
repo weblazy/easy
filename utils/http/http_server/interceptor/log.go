@@ -16,9 +16,9 @@ import (
 	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
 	"github.com/weblazy/easy/utils/http/http_server/service"
 
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 
-	gocorezap "github.com/weblazy/easy/utils/glog/zap"
+	gocorezap "github.com/weblazy/easy/utils/elog/zap"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -101,13 +101,13 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 		}
 		if err != nil {
 			fields = append(fields, zap.String("event", "error"), zap.Error(err))
-			glog.WarnCtx(req.Context(), "access", fields...)
+			elog.WarnCtx(req.Context(), "access", fields...)
 			return
 		}
 
 		if cfg.EnableAccessInterceptor {
 			fields = append(fields, zap.String("event", "normal"))
-			glog.InfoCtx(req.Context(), "access", fields...)
+			elog.InfoCtx(req.Context(), "access", fields...)
 		}
 	}()
 
@@ -119,7 +119,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 func Error(c *gin.Context, codeErr *code_err.CodeErr, err error) {
 	_, file, line, ok := runtime.Caller(1)
 	if ok {
-		glog.InfoCtx(c.Request.Context(), fmt.Sprintf("%s:%d %s", file, line, err.Error()))
+		elog.InfoCtx(c.Request.Context(), fmt.Sprintf("%s:%d %s", file, line, err.Error()))
 	}
 	resp := &service.Response{
 		Code: codeErr.Code,

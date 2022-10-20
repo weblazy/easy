@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/weblazy/easy/utils/glog"
+	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -73,11 +73,11 @@ func NewGrpcClient(config *Config) *GrpcClient {
 	}
 
 	if err != nil {
-		glog.ErrorCtx(emptyCtx, "dial grpc server", glog.FieldError(err), glog.FieldName(config.Name), zap.String("addr", config.Addr), glog.FieldCost(time.Since(startTime)))
+		elog.ErrorCtx(emptyCtx, "dial grpc server", elog.FieldError(err), elog.FieldName(config.Name), zap.String("addr", config.Addr), elog.FieldCost(time.Since(startTime)))
 		return client
 	}
 
-	glog.InfoCtx(emptyCtx, "start grpc client", glog.FieldName(config.Name), glog.FieldCost(time.Since(startTime)))
+	elog.InfoCtx(emptyCtx, "start grpc client", elog.FieldName(config.Name), elog.FieldCost(time.Since(startTime)))
 	return client
 }
 

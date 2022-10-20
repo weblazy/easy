@@ -137,7 +137,7 @@ func checkConfig(conf AliyunLog) (err error) {
 
 // 将glog设置为输出到阿里云
 func SetGLog() {
-	// glog.SetLogger("alilog", &LogClient)
+	// elog.SetLogger("alilog", &LogClient)
 }
 
 func (aLog *AliyunLog) Info(args ...interface{}) {

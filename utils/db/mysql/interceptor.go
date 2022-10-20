@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/glog"
 	"go.uber.org/zap"
 
 	"go.opentelemetry.io/otel"
@@ -43,9 +43,9 @@ func debugInterceptor(compName string, dsn *manager.DSN, op string, options *Con
 			next(db)
 			duration := time.Since(beg)
 			if db.Error != nil {
-				glog.ErrorCtx(db.Statement.Context, "fgorm.response", glog.MakeReqResError(1, compName, dsn.Addr+"/"+dsn.DBName, duration, logSQL(db.Statement.SQL.String(), db.Statement.Vars, true), db.Error.Error()))
+				elog.ErrorCtx(db.Statement.Context, "fgorm.response", elog.MakeReqResError(1, compName, dsn.Addr+"/"+dsn.DBName, duration, logSQL(db.Statement.SQL.String(), db.Statement.Vars, true), db.Error.Error()))
 			} else {
-				glog.InfoCtx(db.Statement.Context, "fgorm.response", glog.MakeReqResInfo(1, compName, dsn.Addr+"/"+dsn.DBName, duration, logSQL(db.Statement.SQL.String(), db.Statement.Vars, true), fmt.Sprintf("%v", db.Statement.Dest)))
+				elog.InfoCtx(db.Statement.Context, "fgorm.response", elog.MakeReqResInfo(1, compName, dsn.Addr+"/"+dsn.DBName, duration, logSQL(db.Statement.SQL.String(), db.Statement.Vars, true), fmt.Sprintf("%v", db.Statement.Dest)))
 			}
 		}
 	}
@@ -62,21 +62,21 @@ func metricInterceptor(compName string, dsn *manager.DSN, op string, config *Con
 
 			var fields = make([]zap.Field, 0, 15+len(loggerKeys))
 			fields = append(fields,
-				glog.FieldMethod(op),
-				glog.FieldName(dsn.DBName+"."+db.Statement.Table), glog.FieldCost(duration))
+				elog.FieldMethod(op),
+				elog.FieldName(dsn.DBName+"."+db.Statement.Table), elog.FieldCost(duration))
 
 			if config.EnableAccessInterceptorReq {
 				// todo: EnableDetailSQL 参数是否只在错误时生效
-				fields = append(fields, zap.String(glog.KeyReq, logSQL(db.Statement.SQL.String(), db.Statement.Vars, config.EnableDetailSQL)))
+				fields = append(fields, zap.String(elog.KeyReq, logSQL(db.Statement.SQL.String(), db.Statement.Vars, config.EnableDetailSQL)))
 			}
 
 			if config.EnableAccessInterceptorRes {
-				fields = append(fields, glog.FieldResp(db.Statement.Dest))
+				fields = append(fields, elog.FieldResp(db.Statement.Dest))
 			}
 
 			// 开启了链路，那么就记录链路id
 			if config.EnableTraceInterceptor {
-				fields = append(fields, glog.FieldTrace(etrace.ExtractTraceID(db.Statement.Context)))
+				fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(db.Statement.Context)))
 			}
 
 			// 支持自定义log
@@ -91,20 +91,20 @@ func metricInterceptor(compName string, dsn *manager.DSN, op string, config *Con
 
 			// 如果有慢日志，就记录
 			if config.SlowLogThreshold > time.Duration(0) && config.SlowLogThreshold < duration {
-				glog.WarnCtx(db.Statement.Context, "slow", fields...)
+				elog.WarnCtx(db.Statement.Context, "slow", fields...)
 			}
 
 			// 如果有错误，记录错误信息
 			if db.Error != nil {
-				fields = append(fields, glog.FieldEvent("error"), glog.FieldError(db.Error))
+				fields = append(fields, elog.FieldEvent("error"), elog.FieldError(db.Error))
 				if errors.Is(db.Error, ErrRecordNotFound) {
 					if config.EnableRecordNotFoundLog {
-						glog.WarnCtx(db.Statement.Context, "access", fields...)
+						elog.WarnCtx(db.Statement.Context, "access", fields...)
 					}
 					DBHandleCounter.WithLabelValues(TypeGorm, compName, dsn.DBName+"."+db.Statement.Table, dsn.Addr, "Empty").Inc()
 					return
 				}
-				glog.ErrorCtx(db.Statement.Context, "access", fields...)
+				elog.ErrorCtx(db.Statement.Context, "access", fields...)
 				DBHandleCounter.WithLabelValues(TypeGorm, compName, dsn.DBName+"."+db.Statement.Table, dsn.Addr, "Error").Inc()
 				return
 			}
@@ -114,9 +114,9 @@ func metricInterceptor(compName string, dsn *manager.DSN, op string, config *Con
 			// event normal和error，代表全部access的请求数
 			if config.EnableAccessInterceptor {
 				fields = append(fields,
-					glog.FieldEvent("normal"),
+					elog.FieldEvent("normal"),
 				)
-				glog.InfoCtx(db.Statement.Context, "access", fields...)
+				elog.InfoCtx(db.Statement.Context, "access", fields...)
 			}
 		}
 	}

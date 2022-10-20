@@ -10,8 +10,8 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cenkalti/backoff/v4"
+	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/glog"
 	"github.com/weblazy/easy/utils/run"
 
 	"github.com/weblazy/easy/utils/retry"
@@ -58,7 +58,7 @@ func newConsumerGroup(config *Config, consumerGroupConfig *ConsumerGroupConfig, 
 
 func (s *ConsumerGroup) SetHandler(h Handler) {
 	if s.handler != nil {
-		glog.ErrorCtx(context.Background(), "handler already set")
+		elog.ErrorCtx(context.Background(), "handler already set")
 		return
 	}
 	s.handler = h
@@ -66,7 +66,7 @@ func (s *ConsumerGroup) SetHandler(h Handler) {
 
 func (s *ConsumerGroup) Start() {
 	if s.handler == nil {
-		glog.ErrorCtx(context.Background(), "empty handler")
+		elog.ErrorCtx(context.Background(), "empty handler")
 		return
 	}
 
@@ -74,9 +74,9 @@ func (s *ConsumerGroup) Start() {
 	s.cancel = cancel
 
 	go func() {
-		glog.InfoCtx(ctx, fmt.Sprintf("Subscribed and listening to topics: %v", s.consumerGroupConfig.Topics))
+		elog.InfoCtx(ctx, fmt.Sprintf("Subscribed and listening to topics: %v", s.consumerGroupConfig.Topics))
 		for {
-			glog.InfoCtx(ctx, "Starting loop to consume.")
+			elog.InfoCtx(ctx, "Starting loop to consume.")
 
 			// Consume the requested topics
 			bo := backoff.WithContext(backoff.NewConstantBackOff(s.consumeRetryInterval), ctx)
@@ -86,7 +86,7 @@ func (s *ConsumerGroup) Start() {
 			}, bo, "fkafka consumeRetry")
 
 			if innerErr != nil && !errors.Is(innerErr, context.Canceled) {
-				glog.ErrorCtx(ctx, fmt.Sprintf("Permanent error consuming %v", s.consumerGroupConfig.Topics), glog.FieldError(innerErr))
+				elog.ErrorCtx(ctx, fmt.Sprintf("Permanent error consuming %v", s.consumerGroupConfig.Topics), elog.FieldError(innerErr))
 			}
 
 			// If the context was canceled, as is the case when handling SIGINT and SIGTERM below, then this pops
@@ -100,7 +100,7 @@ func (s *ConsumerGroup) Start() {
 
 func (s *ConsumerGroup) Close() error {
 	if s.cg != nil {
-		glog.InfoCtx(context.Background(), "consumer group close")
+		elog.InfoCtx(context.Background(), "consumer group close")
 		s.cancel()
 		return s.cg.Close()
 	}
@@ -132,7 +132,7 @@ func (s *ConsumerGroup) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 		labels = append(labels, zap.String("topic", message.Topic))
 
 		if tid := etrace.ExtractTraceID(ctx); tid != "" {
-			labels = append(labels, glog.FieldTrace(tid))
+			labels = append(labels, elog.FieldTrace(tid))
 		}
 
 		if s.config.EnableAccessInterceptorRes {
@@ -146,14 +146,14 @@ func (s *ConsumerGroup) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 		}, b, fmt.Sprintf("fkafka message handler retry, topic %s partition %d offset %d", message.Topic, message.Partition, message.Offset))
 
 		duration := time.Since(start)
-		labels = append(labels, glog.FieldCost(duration))
+		labels = append(labels, elog.FieldCost(duration))
 
 		if err != nil {
-			labels = append(labels, glog.FieldError(err))
-			glog.ErrorCtx(ctx, "kafka handler message error", labels...)
+			labels = append(labels, elog.FieldError(err))
+			elog.ErrorCtx(ctx, "kafka handler message error", labels...)
 			kafkaConsumerGroupCounter.WithLabelValues(s.config.brokers(), s.consumerGroupConfig.GroupID, message.Topic, CodeError).Inc()
 		} else {
-			glog.InfoCtx(ctx, "kafka handler message success", labels...)
+			elog.InfoCtx(ctx, "kafka handler message success", labels...)
 			kafkaConsumerGroupCounter.WithLabelValues(s.config.brokers(), s.consumerGroupConfig.GroupID, message.Topic, CodeOK).Inc()
 		}
 

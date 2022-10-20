@@ -59,9 +59,9 @@ package grpc_server
 // 				zap.Int64("code", int64(spbStatus.Code())),
 // 				zap.Int64("uniformCode", int64(httpStatusCode)),
 // 				zap.String("description", spbStatus.Message()),
-// 				glog.FieldEvent(event),
-// 				glog.FieldMethod(info.FullMethod),
-// 				glog.FieldCost(time.Since(beg)),
+// 				elog.FieldEvent(event),
+// 				elog.FieldMethod(info.FullMethod),
+// 				elog.FieldCost(time.Since(beg)),
 // 				zap.String("peerIp", getPeerIP(ctx)),
 // 			)
 
@@ -72,7 +72,7 @@ package grpc_server
 // 			}
 
 // 			if config.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-// 				fields = append(fields, glog.FieldTrace(etrace.ExtractTraceID(ctx)))
+// 				fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
 // 			}
 
 // 			if config.EnableAccessInterceptorReq {
@@ -90,7 +90,7 @@ package grpc_server
 // 			}
 
 // 			if err != nil {
-// 				fields = append(fields, glog.FieldError(err))
+// 				fields = append(fields, elog.FieldError(err))
 // 				// 只记录系统级别错误
 // 				if httpStatusCode >= http.StatusInternalServerError {
 // 					// 只记录系统级别错误
