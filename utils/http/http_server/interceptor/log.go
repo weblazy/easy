@@ -101,13 +101,11 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 		}
 		if err != nil {
 			fields = append(fields, zap.String("event", "error"), zap.Error(err))
-			elog.WarnCtx(req.Context(), "access", fields...)
+			elog.WarnCtx(req.Context(), "http_server", fields...)
 			return
-		}
-
-		if cfg.EnableAccessInterceptor {
+		} else if cfg.EnableAccessInterceptor {
 			fields = append(fields, zap.String("event", "normal"))
-			elog.InfoCtx(req.Context(), "access", fields...)
+			elog.InfoCtx(req.Context(), "http_server", fields...)
 		}
 	}()
 

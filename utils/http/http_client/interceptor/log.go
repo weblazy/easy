@@ -85,15 +85,15 @@ func logAccess(cfg *http_client_config.Config, req *resty.Request, res *resty.Re
 		fields = append(fields, zap.String("event", "error"), zap.Error(err))
 		if res == nil {
 			// 无 res 的是连接超时等系统级错误
-			elog.ErrorCtx(req.Context(), "access", fields...)
+			elog.ErrorCtx(req.Context(), "http_client", fields...)
 			return
 		}
-		elog.WarnCtx(req.Context(), "access", fields...)
+		elog.WarnCtx(req.Context(), "http_client", fields...)
 		return
 	}
 
 	if cfg.EnableAccessInterceptor {
 		fields = append(fields, zap.String("event", "normal"))
-		elog.InfoCtx(req.Context(), "access", fields...)
+		elog.InfoCtx(req.Context(), "http_client", fields...)
 	}
 }

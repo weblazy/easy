@@ -14,7 +14,7 @@ type startTimeKey struct{}
 
 func SetStartTimeInterceptor() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Request.WithContext(context.WithValue(c.Request.Context(), startTimeKey{}, time.Now()))
+		c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), startTimeKey{}, time.Now()))
 	}
 }
 

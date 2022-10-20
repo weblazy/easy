@@ -7,14 +7,13 @@ import (
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"honnef.co/go/tools/config"
 
 	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
 	"github.com/weblazy/easy/utils/http/http_server/interceptor"
 )
 
 type HttpServer struct {
-	Config *config.Config
+	Config *http_server_config.Config
 	Engine *gin.Engine
 }
 
