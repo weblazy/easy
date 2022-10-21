@@ -14,8 +14,8 @@ import (
 )
 
 type HttpClient struct {
-	config  *http_client_config.Config
-	Client  *resty.Client
+	config *http_client_config.Config
+	*resty.Client
 	Request *resty.Request
 }
 

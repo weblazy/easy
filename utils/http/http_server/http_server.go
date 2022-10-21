@@ -14,7 +14,7 @@ import (
 
 type HttpServer struct {
 	Config *http_server_config.Config
-	Engine *gin.Engine
+	*gin.Engine
 }
 
 func NewHttpServerViper(key string, cfg *viper.Viper) (*HttpServer, error) {
@@ -60,5 +60,5 @@ func NewHttpServer(c *http_server_config.Config) (*HttpServer, error) {
 }
 
 func (s *HttpServer) Start() error {
-	return endless.ListenAndServe(fmt.Sprintf("%s:%d", s.Config.Host, s.Config.Port), s.Engine)
+	return endless.ListenAndServe(fmt.Sprintf("%s:%d", s.Config.Host, s.Config.Port), s)
 }
