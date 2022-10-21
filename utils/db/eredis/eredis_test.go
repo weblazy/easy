@@ -11,7 +11,7 @@ func TestNewRedisClient(t *testing.T) {
 		// cfg := DefaultConfig()
 		// cfg.Addr = "127.0.0.1:16379"
 		// client := NewRedisClient(cfg)
-		// cmd := client.GetClient().Get(context.Background(), "test")
+		// cmd := client.Get(context.Background(), "test")
 		// resp, err := cmd.Result()
 		// fmt.Printf("%#v\n", resp)
 		// convey.So(resp, convey.ShouldNotBeNil)

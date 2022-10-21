@@ -2,7 +2,7 @@ package mysql
 
 import "gorm.io/gorm"
 
-var MysqlClient Client
+// var MysqlClient Client
 
 type GetMysqlDB func(key string) *gorm.DB
 

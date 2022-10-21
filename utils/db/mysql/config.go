@@ -2,10 +2,13 @@ package mysql
 
 import (
 	"time"
+
+	"github.com/weblazy/easy/utils/db/mysql/manager"
 )
 
 // Config options
 type Config struct {
+	Name                       string
 	Dialect                    string        // 选择数据库种类，默认mysql,postgres
 	DSN                        string        // DSN地址: mysql://username:password@tcp(127.0.0.1:3306)/mysql?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local&timeout=1s&readTimeout=3s&writeTimeout=3s
 	Debug                      bool          // 是否开启调试，默认不开启，开启后，可以看到每次请求，配置名、地址、耗时、请求数据、响应数据, 标准输出, 生产请使用 access log
@@ -26,7 +29,7 @@ type Config struct {
 	EnableSkyWalking bool // 是否额外开启 skywalking, 默认关闭
 
 	interceptors []Interceptor
-	// dsnCfg       *manager.DSN
+	DsnCfg       *manager.DSN
 }
 
 // DefaultConfig 返回默认配置

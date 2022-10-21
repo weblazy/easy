@@ -33,7 +33,7 @@ type Processor interface {
 }
 
 // Interceptor ...
-type Interceptor func(string, *manager.DSN, string) func(next Handler) Handler
+type Interceptor func(string, *manager.DSN, string, *Config) func(next Handler) Handler
 
 // 确保在生产不要开 debug
 func debugInterceptor(compName string, dsn *manager.DSN, op string, options *Config) func(Handler) Handler {
