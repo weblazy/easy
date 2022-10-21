@@ -1,4 +1,4 @@
-package mysql
+package interceptor
 
 import (
 	"context"
@@ -15,6 +15,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 
 	"github.com/weblazy/easy/utils/db/mysql/manager"
+	"github.com/weblazy/easy/utils/db/mysql/mysql_config"
 
 	"gorm.io/gorm"
 )
@@ -23,8 +24,12 @@ const (
 	TypeGorm = "gorm"
 )
 
-// Handler ...
-type Handler func(*gorm.DB)
+var (
+	// ErrRecordNotFound record not found error, happens when haven't find any matched data when looking up with a struct
+	ErrRecordNotFound = gorm.ErrRecordNotFound
+	// ErrInvalidTransaction invalid transaction when you are trying to `Commit` or `Rollback`
+	ErrInvalidTransaction = gorm.ErrInvalidTransaction
+)
 
 // Processor ...
 type Processor interface {
@@ -32,12 +37,9 @@ type Processor interface {
 	Replace(name string, handler func(*gorm.DB)) error
 }
 
-// Interceptor ...
-type Interceptor func(string, *manager.DSN, string, *Config) func(next Handler) Handler
-
 // 确保在生产不要开 debug
-func debugInterceptor(compName string, dsn *manager.DSN, op string, options *Config) func(Handler) Handler {
-	return func(next Handler) Handler {
+func DebugInterceptor(compName string, dsn *manager.DSN, op string, options *mysql_config.Config) func(mysql_config.Handler) mysql_config.Handler {
+	return func(next mysql_config.Handler) mysql_config.Handler {
 		return func(db *gorm.DB) {
 			beg := time.Now()
 			next(db)
@@ -51,8 +53,8 @@ func debugInterceptor(compName string, dsn *manager.DSN, op string, options *Con
 	}
 }
 
-func metricInterceptor(compName string, dsn *manager.DSN, op string, config *Config) func(Handler) Handler {
-	return func(next Handler) Handler {
+func MetricInterceptor(compName string, dsn *manager.DSN, op string, config *mysql_config.Config) func(mysql_config.Handler) mysql_config.Handler {
+	return func(next mysql_config.Handler) mysql_config.Handler {
 		return func(db *gorm.DB) {
 			beg := time.Now()
 			next(db)
@@ -129,10 +131,10 @@ func logSQL(sql string, args []interface{}, containArgs bool) string {
 	return sql
 }
 
-func traceInterceptor(compName string, dsn *manager.DSN, op string, options *Config) func(Handler) Handler {
+func TraceInterceptor(compName string, dsn *manager.DSN, op string, options *mysql_config.Config) func(mysql_config.Handler) mysql_config.Handler {
 	tracer := otel.Tracer("")
 
-	return func(next Handler) Handler {
+	return func(next mysql_config.Handler) mysql_config.Handler {
 		return func(db *gorm.DB) {
 			if db.Statement.Context != nil {
 				_, span := tracer.Start(db.Statement.Context, "GORM", trace.WithSpanKind(trace.SpanKindClient))

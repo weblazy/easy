@@ -1,9 +1,10 @@
-package mysql
+package mysql_config
 
 import (
 	"time"
 
 	"github.com/weblazy/easy/utils/db/mysql/manager"
+	"gorm.io/gorm"
 )
 
 // Config options
@@ -28,9 +29,15 @@ type Config struct {
 	// Deprecated: not affect anything
 	EnableSkyWalking bool // 是否额外开启 skywalking, 默认关闭
 
-	interceptors []Interceptor
+	Interceptors []Interceptor
 	DsnCfg       *manager.DSN
 }
+
+// Interceptor ...
+type Interceptor func(string, *manager.DSN, string, *Config) func(next Handler) Handler
+
+// Handler ...
+type Handler func(*gorm.DB)
 
 // DefaultConfig 返回默认配置
 func DefaultConfig() *Config {

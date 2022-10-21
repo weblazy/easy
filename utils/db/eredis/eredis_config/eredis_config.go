@@ -1,4 +1,4 @@
-package eredis
+package eredis_config
 
 import (
 	"strings"
@@ -16,8 +16,13 @@ const (
 	SentinelMode string = "sentinel"
 )
 
+const (
+	OnFailPanic = "panic"
+)
+
 // Config for redis, contains RedisStubConfig, RedisClusterConfig and RedisSentinelConfig
 type Config struct {
+	Name                       string
 	Addrs                      []string      // Addrs 实例配置地址
 	Addr                       string        // Addr stubConfig 实例配置地址
 	Mode                       string        // Mode Redis模式 cluster|stub|sentinel
@@ -40,7 +45,7 @@ type Config struct {
 	EnableAccessInterceptor    bool          // 是否开启，记录请求数据
 	EnableAccessInterceptorReq bool          // 是否开启记录请求参数
 	EnableAccessInterceptorRes bool          // 是否开启记录响应参数
-	interceptors               []redis.Hook
+	Interceptors               []redis.Hook
 }
 
 // DefaultConfig default config ...

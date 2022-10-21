@@ -1,4 +1,4 @@
-package eredis
+package interceptor
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 
+	"github.com/weblazy/easy/utils/db/eredis/eredis_config"
 	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
 	"go.uber.org/zap"
@@ -21,31 +22,31 @@ type fredis2ContextKeyType struct{}
 
 var ctxBegKey = fredis2ContextKeyType{}
 
-type interceptor struct {
+type Interceptor struct {
 	beforeProcess         func(ctx context.Context, cmd redis.Cmder) (context.Context, error)
 	afterProcess          func(ctx context.Context, cmd redis.Cmder) error
 	beforeProcessPipeline func(ctx context.Context, cmds []redis.Cmder) (context.Context, error)
 	afterProcessPipeline  func(ctx context.Context, cmds []redis.Cmder) error
 }
 
-func (i *interceptor) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
+func (i *Interceptor) BeforeProcess(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
 	return i.beforeProcess(ctx, cmd)
 }
 
-func (i *interceptor) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
+func (i *Interceptor) AfterProcess(ctx context.Context, cmd redis.Cmder) error {
 	return i.afterProcess(ctx, cmd)
 }
 
-func (i *interceptor) BeforeProcessPipeline(ctx context.Context, cmds []redis.Cmder) (context.Context, error) {
+func (i *Interceptor) BeforeProcessPipeline(ctx context.Context, cmds []redis.Cmder) (context.Context, error) {
 	return i.beforeProcessPipeline(ctx, cmds)
 }
 
-func (i *interceptor) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) error {
+func (i *Interceptor) AfterProcessPipeline(ctx context.Context, cmds []redis.Cmder) error {
 	return i.afterProcessPipeline(ctx, cmds)
 }
 
-func newInterceptor(compName string, config *Config) *interceptor {
-	return &interceptor{
+func newInterceptor(compName string, config *eredis_config.Config) *Interceptor {
+	return &Interceptor{
 		beforeProcess: func(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
 			return ctx, nil
 		},
@@ -61,27 +62,27 @@ func newInterceptor(compName string, config *Config) *interceptor {
 	}
 }
 
-func (i *interceptor) setBeforeProcess(p func(ctx context.Context, cmd redis.Cmder) (context.Context, error)) *interceptor {
+func (i *Interceptor) setBeforeProcess(p func(ctx context.Context, cmd redis.Cmder) (context.Context, error)) *Interceptor {
 	i.beforeProcess = p
 	return i
 }
 
-func (i *interceptor) setAfterProcess(p func(ctx context.Context, cmd redis.Cmder) error) *interceptor {
+func (i *Interceptor) setAfterProcess(p func(ctx context.Context, cmd redis.Cmder) error) *Interceptor {
 	i.afterProcess = p
 	return i
 }
 
-func (i *interceptor) setBeforeProcessPipeline(p func(ctx context.Context, cmds []redis.Cmder) (context.Context, error)) *interceptor { //nolint
+func (i *Interceptor) setBeforeProcessPipeline(p func(ctx context.Context, cmds []redis.Cmder) (context.Context, error)) *Interceptor { //nolint
 	i.beforeProcessPipeline = p
 	return i
 }
 
-func (i *interceptor) setAfterProcessPipeline(p func(ctx context.Context, cmds []redis.Cmder) error) *interceptor { //nolint
+func (i *Interceptor) setAfterProcessPipeline(p func(ctx context.Context, cmds []redis.Cmder) error) *Interceptor { //nolint
 	i.afterProcessPipeline = p
 	return i
 }
 
-func fixedInterceptor(compName string, config *Config) *interceptor {
+func FixedInterceptor(compName string, config *eredis_config.Config) *Interceptor {
 	return newInterceptor(compName, config).
 		setBeforeProcess(func(ctx context.Context, cmd redis.Cmder) (context.Context, error) {
 			return context.WithValue(ctx, ctxBegKey, time.Now()), nil
@@ -98,7 +99,7 @@ func fixedInterceptor(compName string, config *Config) *interceptor {
 	//})
 }
 
-func debugInterceptor(compName string, config *Config) *interceptor {
+func DebugInterceptor(compName string, config *eredis_config.Config) *Interceptor {
 	return newInterceptor(compName, config).setAfterProcess(
 		func(ctx context.Context, cmd redis.Cmder) error {
 			duration := time.Since(ctx.Value(ctxBegKey).(time.Time))
@@ -114,7 +115,7 @@ func debugInterceptor(compName string, config *Config) *interceptor {
 	)
 }
 
-func metricInterceptor(compName string, config *Config) *interceptor {
+func MetricInterceptor(compName string, config *eredis_config.Config) *Interceptor {
 	return newInterceptor(compName, config).setAfterProcess(
 		func(ctx context.Context, cmd redis.Cmder) error {
 			duration := time.Since(ctx.Value(ctxBegKey).(time.Time))
@@ -135,7 +136,7 @@ func metricInterceptor(compName string, config *Config) *interceptor {
 	)
 }
 
-func accessInterceptor(compName string, config *Config) *interceptor {
+func AccessInterceptor(compName string, config *eredis_config.Config) *Interceptor {
 	return newInterceptor(compName, config).setAfterProcess(
 		func(ctx context.Context, cmd redis.Cmder) error {
 			var fields = make([]zap.Field, 0, 15)

@@ -4,8 +4,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/weblazy/easy/utils/db/mysql/interceptor"
 	_ "github.com/weblazy/easy/utils/db/mysql/internal/dsn"
 	"github.com/weblazy/easy/utils/db/mysql/manager"
+	"github.com/weblazy/easy/utils/db/mysql/mysql_config"
+
 	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -20,10 +23,10 @@ type MysqlClient struct {
 }
 
 // Option 可选项
-type Option func(c *Config)
+type Option func(c *mysql_config.Config)
 
 // NewMysqlClient ...
-func NewMysqlClient(config *Config, options ...Option) (*MysqlClient, error) {
+func NewMysqlClient(config *mysql_config.Config, options ...Option) (*MysqlClient, error) {
 	mysqlClient := MysqlClient{}
 
 	gormCfg := gorm.Config{}
@@ -33,15 +36,15 @@ func NewMysqlClient(config *Config, options ...Option) (*MysqlClient, error) {
 	}
 
 	if config.Debug {
-		options = append(options, WithInterceptor(debugInterceptor))
+		options = append(options, WithInterceptor(interceptor.DebugInterceptor))
 	}
 
 	if config.EnableTraceInterceptor {
-		options = append(options, WithInterceptor(traceInterceptor))
+		options = append(options, WithInterceptor(interceptor.TraceInterceptor))
 	}
 
 	if config.EnableMetricInterceptor {
-		options = append(options, WithInterceptor(metricInterceptor))
+		options = append(options, WithInterceptor(interceptor.MetricInterceptor))
 	}
 
 	for _, option := range options {
@@ -58,7 +61,6 @@ func NewMysqlClient(config *Config, options ...Option) (*MysqlClient, error) {
 	}
 
 	config.DsnCfg, err = mysqlClient.dsnParser.ParseDSN(config.DSN)
-	fmt.Printf("%#v\n", config.DsnCfg)
 
 	if err == nil {
 		elog.InfoCtx(emptyCtx, "start db", zap.String("addr", config.DsnCfg.Addr), zap.String("name", config.DsnCfg.DBName))
@@ -89,10 +91,10 @@ func NewMysqlClient(config *Config, options ...Option) (*MysqlClient, error) {
 	}
 
 	var lastErr error
-	replace := func(processor Processor, callbackName string, interceptors ...Interceptor) {
+	replace := func(processor interceptor.Processor, callbackName string, interceptors ...mysql_config.Interceptor) {
 		handler := processor.Get(callbackName)
-		for _, interceptor := range config.interceptors {
-			handler = interceptor(config.Name, config.DsnCfg, callbackName, config)(handler)
+		for _, interceptorFunc := range config.Interceptors {
+			handler = interceptorFunc(config.Name, config.DsnCfg, callbackName, config)(handler)
 		}
 
 		err := processor.Replace(callbackName, handler)
@@ -101,12 +103,12 @@ func NewMysqlClient(config *Config, options ...Option) (*MysqlClient, error) {
 		}
 	}
 
-	replace(db.Callback().Create(), "gorm:create", config.interceptors...)
-	replace(db.Callback().Update(), "gorm:update", config.interceptors...)
-	replace(db.Callback().Delete(), "gorm:delete", config.interceptors...)
-	replace(db.Callback().Query(), "gorm:query", config.interceptors...)
+	replace(db.Callback().Create(), "gorm:create", config.Interceptors...)
+	replace(db.Callback().Update(), "gorm:update", config.Interceptors...)
+	replace(db.Callback().Delete(), "gorm:delete", config.Interceptors...)
+	replace(db.Callback().Query(), "gorm:query", config.Interceptors...)
 	// replace(db.Callback().Row(), "gorm:row", config.interceptors...)
-	replace(db.Callback().Raw(), "gorm:raw", config.interceptors...)
+	replace(db.Callback().Raw(), "gorm:raw", config.Interceptors...)
 
 	if lastErr != nil {
 		return nil, lastErr
@@ -131,11 +133,11 @@ func (c *MysqlClient) setDSNParser(dialect string) error {
 }
 
 // WithInterceptor 设置自定义拦截器
-func WithInterceptor(is ...Interceptor) Option {
-	return func(c *Config) {
-		if c.interceptors == nil {
-			c.interceptors = make([]Interceptor, 0)
+func WithInterceptor(is ...mysql_config.Interceptor) Option {
+	return func(c *mysql_config.Config) {
+		if c.Interceptors == nil {
+			c.Interceptors = make([]mysql_config.Interceptor, 0)
 		}
-		c.interceptors = append(c.interceptors, is...)
+		c.Interceptors = append(c.Interceptors, is...)
 	}
 }

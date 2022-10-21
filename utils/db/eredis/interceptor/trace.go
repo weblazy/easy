@@ -1,4 +1,4 @@
-package eredis
+package interceptor
 
 import (
 	"context"

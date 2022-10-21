@@ -1,4 +1,4 @@
-package mysql
+package interceptor
 
 import (
 	"database/sql/driver"

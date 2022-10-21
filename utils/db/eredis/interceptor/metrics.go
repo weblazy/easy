@@ -1,4 +1,4 @@
-package eredis
+package interceptor
 
 import "github.com/prometheus/client_golang/prometheus"
 

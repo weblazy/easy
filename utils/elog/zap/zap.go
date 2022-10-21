@@ -186,8 +186,6 @@ func (*Zap) DebugF(format string, args ...interface{}) {
 }
 
 func (*Zap) Warn(msg string, fields ...zap.Field) {
-	fmt.Printf("%#v\n", LocalLogger)
-	fmt.Printf("%#v\n", fields)
 	LocalLogger.Warn(msg, fields...)
 }
 

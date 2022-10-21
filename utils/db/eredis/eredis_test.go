@@ -8,7 +8,7 @@ import (
 
 func TestNewRedisClient(t *testing.T) {
 	convey.Convey("TestNewRedisClient", t, func() {
-		// cfg := DefaultConfig()
+		// cfg := eredis_config.DefaultConfig()
 		// cfg.Addr = "127.0.0.1:16379"
 		// client := NewRedisClient(cfg)
 		// cmd := client.Get(context.Background(), "test")

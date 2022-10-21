@@ -4,44 +4,58 @@ import (
 	"context"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/weblazy/easy/utils/elog"
-)
+	"github.com/weblazy/easy/utils/db/eredis/eredis_config"
+	"github.com/weblazy/easy/utils/db/eredis/interceptor"
 
-const (
-	OnFailPanic = "panic"
+	"github.com/weblazy/easy/utils/elog"
 )
 
 var emptyCtx = context.Background()
 
 type RedisClient struct {
-	Config *Config
+	Config *eredis_config.Config
 	redis.UniversalClient
 }
+type Option func(c *eredis_config.Config)
 
-func NewRedisClient(c *Config) *RedisClient {
+func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
 	if c == nil {
-		c = DefaultConfig()
+		c = eredis_config.DefaultConfig()
 	}
+	options = append(options, withInterceptor(interceptor.FixedInterceptor(c.Name, c)))
+	if c.Debug {
+		options = append(options, withInterceptor(interceptor.DebugInterceptor(c.Name, c)))
+	}
+	if c.EnableMetricInterceptor {
+		options = append(options, withInterceptor(interceptor.MetricInterceptor(c.Name, c)))
+	}
+	if c.EnableAccessInterceptor {
+		options = append(options, withInterceptor(interceptor.AccessInterceptor(c.Name, c)))
+	}
+	for _, option := range options {
+		option(c)
+	}
+
 	var client redis.UniversalClient
 	switch c.Mode {
-	case StubMode:
+	case eredis_config.StubMode:
 		client = NewClient(c)
-	case SentinelMode:
+	case eredis_config.SentinelMode:
 		client = NewFailoverClient(c)
-	case ClusterMode:
+	case eredis_config.ClusterMode:
 		client = NewClusterClient(c)
 	default:
 		panic(`redis mode must be one of ("stub", "cluster", "sentinel")`)
 	}
 	if c.EnableTraceInterceptor {
-		client.AddHook(NewTracingHook())
+		client.AddHook(interceptor.NewTracingHook())
 	}
-	for _, incpt := range c.interceptors {
+	for _, incpt := range c.Interceptors {
 		client.AddHook(incpt)
 	}
 	if err := client.Ping(emptyCtx).Err(); err != nil {
 		switch c.OnFail {
-		case OnFailPanic:
+		case eredis_config.OnFailPanic:
 			elog.ErrorCtx(emptyCtx, "start redis panic", elog.FieldError(err))
 		default:
 			elog.ErrorCtx(emptyCtx, "start redis error", elog.FieldError(err))
@@ -50,6 +64,16 @@ func NewRedisClient(c *Config) *RedisClient {
 	return &RedisClient{
 		UniversalClient: client,
 		Config:          c,
+	}
+}
+
+// withInterceptor 注入拦截器
+func withInterceptor(interceptors ...redis.Hook) Option {
+	return func(c *eredis_config.Config) {
+		if c.Interceptors == nil {
+			c.Interceptors = make([]redis.Hook, 0, len(interceptors))
+		}
+		c.Interceptors = append(c.Interceptors, interceptors...)
 	}
 }
 
@@ -82,7 +106,7 @@ func (r *RedisClient) GetSentinel() *redis.Client {
 	return nil
 }
 
-func NewClusterClient(c *Config) redis.UniversalClient {
+func NewClusterClient(c *eredis_config.Config) redis.UniversalClient {
 	if len(c.Addrs) == 0 {
 		panic(`invalid "addrs" config, "addrs" has none addresses but with cluster mode"`)
 	}
@@ -102,7 +126,7 @@ func NewClusterClient(c *Config) redis.UniversalClient {
 	return clusterClient
 }
 
-func NewClient(c *Config) redis.UniversalClient {
+func NewClient(c *eredis_config.Config) redis.UniversalClient {
 	if c.Addr == "" {
 		panic(`invalid "addr" config, "addr" is empty but with stub mode"`)
 	}
@@ -121,7 +145,7 @@ func NewClient(c *Config) redis.UniversalClient {
 	return client
 }
 
-func NewFailoverClient(c *Config) redis.UniversalClient {
+func NewFailoverClient(c *eredis_config.Config) redis.UniversalClient {
 	if len(c.Addrs) == 0 {
 		panic(`invalid "addrs" config, "addrs" has none addresses but with sentinel mode"`)
 	}
