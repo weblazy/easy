@@ -11,7 +11,46 @@ go test -coverpkg=./... -coverprofile=coverage.data -timeout=5s ./...
 go tool cover -html=coverage.data -o coverage.html
 ````
 [![Go Report Card](https://goreportcard.com/badge/github.com/sunmi-OS/gocore)](https://goreportcard.com/report/github.com/sunmi-OS/gocore/v2.0.9)
-- 监控面板
+
+##### 功能列表
+
+- grpc_server: 
+  - 日志插件
+  - metric插件
+  - recovery插件
+  - timeout插件
+  - trace插件
+- grpc_client: 
+  - 日志插件
+  - metric插件
+  - timeout插件
+  - trace插件
+- http_server: gin
+    - 日志插件
+    - metric插件
+    - recovery插件
+    - timeout插件
+    - trace插件
+- http_client: resty
+  - 日志插件
+  - metric插件
+  - timeout插件
+  - trace插件
+- db: gorm
+  - 日志插件
+  - metric插件
+  - timeout插件
+  - trace插件
+  - 脚手架: orm
+- redis: go-redis
+  - 日志插件
+  - metric插件
+  - timeout插件
+  - trace插件
+- log: zap
+- config: viper
+- 监控面板: prometheus+grafana
 - 告警
+- 脚手架: easy-cli
 
 
