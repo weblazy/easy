@@ -25,32 +25,35 @@ go tool cover -html=coverage.data -o coverage.html
   - metric插件
   - timeout插件
   - trace插件
-- http_server: gin
+- http_server: github.com/gin-gonic/gin
     - 日志插件
     - metric插件
     - recovery插件
     - timeout插件
     - trace插件
-- http_client: resty
+- http_client: github.com/go-resty/resty/v2
   - 日志插件
   - metric插件
   - timeout插件
   - trace插件
-- db: gorm
+- db: gorm.io/gorm
   - 日志插件
   - metric插件
   - timeout插件
   - trace插件
   - 脚手架: orm
-- redis: go-redis
+- redis: github.com/go-redis/redis/v8
   - 日志插件
   - metric插件
   - timeout插件
   - trace插件
-- log: zap
-- config: viper
+- log: go.uber.org/zap
+- config: github.com/spf13/viper
 - 监控面板: prometheus+grafana
-- 告警
-- 脚手架: easy-cli
+- 告警: lark+钉钉
+- 脚手架: github.com/weblazy/easy-cli
+- cli: github.com/urfave/cli/v2
+- cron: github.com/robfig/cron
+- trace: go.opentelemetry.io/otel/trace
 
 
