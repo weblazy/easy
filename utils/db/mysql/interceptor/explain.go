@@ -1,8 +1,8 @@
 package interceptor
 
 import (
-	"fmt"
-
+	"github.com/weblazy/easy/utils/elog"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -32,10 +32,10 @@ func (e *ExplainPlugin) Name() string {
 }
 
 func (e *ExplainPlugin) Initialize(db *gorm.DB) error {
-	return db.Callback().Query().After("gorm:query").Register("explain", checkIndex)
+	return db.Callback().Query().After("gorm:query").Register("explain", CheckIndex)
 }
 
-func checkIndex(db *gorm.DB) {
+func CheckIndex(db *gorm.DB) {
 	result := &Explain{}
 	session := &gorm.Session{
 		NewDB:   true,
@@ -48,6 +48,6 @@ func checkIndex(db *gorm.DB) {
 
 	// 命中索引
 	if result.Key != "" {
-		fmt.Printf("hits index: %s", result.Key)
+		elog.InfoCtx(db.Statement.Context, "hits index", zap.String("index", result.Key))
 	}
 }

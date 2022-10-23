@@ -29,6 +29,7 @@ require (
 	github.com/tidwall/gjson v1.10.2
 	github.com/weblazy/crypto v1.0.1
 	github.com/weblazy/goutil v1.1.2
+	go.opencensus.io v0.23.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama v0.34.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.33.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.33.0

@@ -53,5 +53,6 @@ func DefaultConfig() *Config {
 		EnableMetricInterceptor: true,
 		EnableTraceInterceptor:  true,
 		EnableRecordNotFoundLog: true,
+		// EnableAccessInterceptor: true,
 	}
 }

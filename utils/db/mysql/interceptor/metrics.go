@@ -1,7 +1,12 @@
 package interceptor
 
 import (
+	"errors"
+
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/weblazy/easy/utils/db/mysql/manager"
+	"github.com/weblazy/easy/utils/db/mysql/mysql_config"
+	"gorm.io/gorm"
 )
 
 var (
@@ -51,4 +56,43 @@ func monitor() {
 	// 		return true
 	// 	})
 	// }
+}
+
+type MetricPlugin struct {
+	dsn    *manager.DSN
+	config *mysql_config.Config
+}
+
+func NewMetricPlugin() *ExplainPlugin {
+	return &ExplainPlugin{}
+}
+
+func (e *MetricPlugin) Name() string {
+	return "metric"
+}
+
+func (e *MetricPlugin) Initialize(db *gorm.DB) error {
+	return db.Callback().Query().After("gorm:query").Register("MetricEnd", e.MetricEnd("gorm:query"))
+}
+
+func (e *MetricPlugin) MetricEnd(method string) func(db *gorm.DB) {
+	return func(db *gorm.DB) {
+		ctx := db.Statement.Context
+		duration := GetDuration(ctx)
+
+		// 记录监控耗时
+		DBHandleHistogram.WithLabelValues(TypeGorm, e.config.Name, e.dsn.DBName+"."+db.Statement.Table, e.dsn.Addr).Observe(duration.Seconds())
+
+		// 如果有错误，记录错误信息
+		if db.Error != nil {
+			if errors.Is(db.Error, ErrRecordNotFound) {
+				DBHandleCounter.WithLabelValues(TypeGorm, e.config.Name, e.dsn.DBName+"."+db.Statement.Table, e.dsn.Addr, "Empty").Inc()
+				return
+			}
+			DBHandleCounter.WithLabelValues(TypeGorm, e.config.Name, e.dsn.DBName+"."+db.Statement.Table, e.dsn.Addr, "Error").Inc()
+			return
+		}
+
+		DBHandleCounter.WithLabelValues(TypeGorm, e.config.Name, e.dsn.DBName+"."+db.Statement.Table, e.dsn.Addr, "OK").Inc()
+	}
 }

@@ -14,6 +14,13 @@ var (
 	numericPlaceHolderRegexp = regexp.MustCompile(`\$\d+`)
 )
 
+func logSQL(sql string, args []interface{}, containArgs bool) string {
+	if containArgs {
+		return bindSQL(sql, args)
+	}
+	return sql
+}
+
 // from gorm.LogFormatter
 func bindSQL(oriSql string, args []interface{}) (sql string) {
 	formattedValues := make([]string, 0)

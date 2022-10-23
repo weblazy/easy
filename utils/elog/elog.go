@@ -7,7 +7,7 @@ import (
 	"github.com/weblazy/easy/utils/elog/logx"
 )
 
-const CtxKey = "logConf"
+type LogConfCtxKey struct{}
 
 type LogConf struct {
 	Name   string
@@ -17,7 +17,7 @@ type LogConf struct {
 var defaultLogConf = &LogConf{}
 
 func GetContextLog(ctx context.Context) *LogConf {
-	if v, ok := ctx.Value(CtxKey).(*LogConf); ok {
+	if v, ok := ctx.Value(LogConfCtxKey{}).(*LogConf); ok {
 		return v
 	} else {
 		return &LogConf{}
@@ -25,7 +25,7 @@ func GetContextLog(ctx context.Context) *LogConf {
 }
 
 func SetContextLog(ctx context.Context, log *LogConf) context.Context {
-	newCtx := context.WithValue(ctx, CtxKey, log)
+	newCtx := context.WithValue(ctx, LogConfCtxKey{}, log)
 	return newCtx
 }
 

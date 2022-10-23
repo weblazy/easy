@@ -35,22 +35,6 @@ func NewMysqlClient(config *mysql_config.Config, options ...Option) (*MysqlClien
 		gormCfg.Logger = logger.Discard
 	}
 
-	if config.Debug {
-		options = append(options, WithInterceptor(interceptor.DebugInterceptor))
-	}
-
-	if config.EnableTraceInterceptor {
-		options = append(options, WithInterceptor(interceptor.TraceInterceptor))
-	}
-
-	if config.EnableMetricInterceptor {
-		options = append(options, WithInterceptor(interceptor.MetricInterceptor))
-	}
-
-	for _, option := range options {
-		option(config)
-	}
-
 	// todo 设置补齐超时时间, 解析重写 config.DSN 参数
 	// timeout 1s
 	// readTimeout 5s
@@ -81,6 +65,29 @@ func NewMysqlClient(config *mysql_config.Config, options ...Option) (*MysqlClien
 	if err != nil {
 		return nil, err
 	}
+	err = db.Use(interceptor.NewStartTimePlugin())
+	if err != nil {
+		return nil, err
+	}
+	if config.EnableTraceInterceptor {
+		err = db.Use(interceptor.NewTracePlugin(config.DsnCfg))
+		if err != nil {
+			return nil, err
+		}
+	}
+	if config.EnableAccessInterceptor {
+		err = db.Use(interceptor.NewLogPlugin(config, config.DsnCfg))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if config.EnableMetricInterceptor {
+		err = db.Use(interceptor.NewMetricPlugin())
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	// 设置默认连接配置
 	gormDB.SetMaxIdleConns(config.MaxIdleConns)
@@ -90,29 +97,29 @@ func NewMysqlClient(config *mysql_config.Config, options ...Option) (*MysqlClien
 		gormDB.SetConnMaxLifetime(config.ConnMaxLifetime)
 	}
 
-	var lastErr error
-	replace := func(processor interceptor.Processor, callbackName string, interceptors ...mysql_config.Interceptor) {
-		handler := processor.Get(callbackName)
-		for _, interceptorFunc := range config.Interceptors {
-			handler = interceptorFunc(config.Name, config.DsnCfg, callbackName, config)(handler)
-		}
+	// var lastErr error
+	// replace := func(processor interceptor.Processor, callbackName string, interceptors ...mysql_config.Interceptor) {
+	// 	handler := processor.Get(callbackName)
+	// 	for _, interceptorFunc := range config.Interceptors {
+	// 		handler = interceptorFunc(config.Name, config.DsnCfg, callbackName, config)(handler)
+	// 	}
 
-		err := processor.Replace(callbackName, handler)
-		if err != nil {
-			lastErr = err
-		}
-	}
+	// 	err := processor.Replace(callbackName, handler)
+	// 	if err != nil {
+	// 		lastErr = err
+	// 	}
+	// }
 
-	replace(db.Callback().Create(), "gorm:create", config.Interceptors...)
-	replace(db.Callback().Update(), "gorm:update", config.Interceptors...)
-	replace(db.Callback().Delete(), "gorm:delete", config.Interceptors...)
-	replace(db.Callback().Query(), "gorm:query", config.Interceptors...)
-	// replace(db.Callback().Row(), "gorm:row", config.interceptors...)
-	replace(db.Callback().Raw(), "gorm:raw", config.Interceptors...)
+	// replace(db.Callback().Create(), "gorm:create", config.Interceptors...)
+	// replace(db.Callback().Update(), "gorm:update", config.Interceptors...)
+	// replace(db.Callback().Delete(), "gorm:delete", config.Interceptors...)
+	// replace(db.Callback().Query(), "gorm:query", config.Interceptors...)
+	// // replace(db.Callback().Row(), "gorm:row", config.interceptors...)
+	// replace(db.Callback().Raw(), "gorm:raw", config.Interceptors...)
 
-	if lastErr != nil {
-		return nil, lastErr
-	}
+	// if lastErr != nil {
+	// 	return nil, lastErr
+	// }
 	mysqlClient.DB = db
 	return &mysqlClient, nil
 }
