@@ -22,20 +22,6 @@ func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
 	if c == nil {
 		c = eredis_config.DefaultConfig()
 	}
-	options = append(options, withInterceptor(interceptor.FixedInterceptor(c.Name, c)))
-	if c.Debug {
-		options = append(options, withInterceptor(interceptor.DebugInterceptor(c.Name, c)))
-	}
-	if c.EnableMetricInterceptor {
-		options = append(options, withInterceptor(interceptor.MetricInterceptor(c.Name, c)))
-	}
-	if c.EnableAccessInterceptor {
-		options = append(options, withInterceptor(interceptor.AccessInterceptor(c.Name, c)))
-	}
-	for _, option := range options {
-		option(c)
-	}
-
 	var client redis.UniversalClient
 	switch c.Mode {
 	case eredis_config.StubMode:
@@ -47,11 +33,21 @@ func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
 	default:
 		panic(`redis mode must be one of ("stub", "cluster", "sentinel")`)
 	}
+
+	client.AddHook(interceptor.StartTimeHook())
+
+	if c.EnableMetricInterceptor {
+		client.AddHook(interceptor.MetricHook(c))
+	}
+	if c.EnableAccessInterceptor {
+		client.AddHook(interceptor.LogHook(c))
+	}
+
 	if c.EnableTraceInterceptor {
 		client.AddHook(interceptor.NewTracingHook())
 	}
-	for _, incpt := range c.Interceptors {
-		client.AddHook(incpt)
+	for _, hook := range c.Hooks {
+		client.AddHook(hook)
 	}
 	if err := client.Ping(emptyCtx).Err(); err != nil {
 		switch c.OnFail {
@@ -64,16 +60,6 @@ func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
 	return &RedisClient{
 		UniversalClient: client,
 		Config:          c,
-	}
-}
-
-// withInterceptor 注入拦截器
-func withInterceptor(interceptors ...redis.Hook) Option {
-	return func(c *eredis_config.Config) {
-		if c.Interceptors == nil {
-			c.Interceptors = make([]redis.Hook, 0, len(interceptors))
-		}
-		c.Interceptors = append(c.Interceptors, interceptors...)
 	}
 }
 
