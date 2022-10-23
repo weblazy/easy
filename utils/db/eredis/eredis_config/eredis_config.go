@@ -10,10 +10,10 @@ import (
 const (
 	// ClusterMode using clusterClient
 	ClusterMode string = "cluster"
-	// StubMode using stubClient
-	StubMode string = "stub"
-	// SentinelMode using Failover sentinel client
-	SentinelMode string = "sentinel"
+	// SimpleMode using Client
+	SimpleMode string = "simple"
+	// FailoverMode using Failover sentinel client
+	FailoverMode string = "failover"
 )
 
 const (
@@ -51,7 +51,7 @@ type Config struct {
 // DefaultConfig default config ...
 func DefaultConfig() *Config {
 	return &Config{
-		Mode:                    StubMode,
+		Mode:                    SimpleMode,
 		DB:                      0,
 		PoolSize:                0, // will be handled by redis v8
 		MaxRetries:              0,

@@ -24,9 +24,9 @@ func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
 	}
 	var client redis.UniversalClient
 	switch c.Mode {
-	case eredis_config.StubMode:
+	case eredis_config.SimpleMode:
 		client = NewClient(c)
-	case eredis_config.SentinelMode:
+	case eredis_config.FailoverMode:
 		client = NewFailoverClient(c)
 	case eredis_config.ClusterMode:
 		client = NewClusterClient(c)
