@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/utils/elog/ezap"
 	"google.golang.org/grpc"
 )
 
@@ -36,6 +38,9 @@ type Config struct {
 	StreamInterceptors       []grpc.StreamServerInterceptor
 	UnaryInterceptors        []grpc.UnaryServerInterceptor
 	PrependUnaryInterceptors []grpc.UnaryServerInterceptor
+
+	EnableFielLogger bool // 将日志输出到文件
+	FielLoggerPath   string
 }
 
 // DefaultConfig represents default config
@@ -58,10 +63,20 @@ func DefaultConfig() *Config {
 		ServerOptions:              []grpc.ServerOption{},
 		StreamInterceptors:         []grpc.StreamServerInterceptor{},
 		UnaryInterceptors:          []grpc.UnaryServerInterceptor{},
+		FielLoggerPath:             PkgName,
 	}
 }
 
 // Address ...
 func (config Config) Address() string {
 	return fmt.Sprintf("%s:%d", config.Host, config.Port)
+}
+
+func (config Config) InitLogger() {
+	if config.EnableFielLogger {
+		logger := ezap.NewFileEzap(config.FielLoggerPath)
+		elog.SetLogger(PkgName, logger)
+		return
+	}
+	elog.SetLogger(PkgName, elog.DefaultLogger)
 }

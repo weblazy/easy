@@ -7,10 +7,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/weblazy/easy/utils/code_err"
-	"github.com/weblazy/easy/utils/elog/ezap"
 	"github.com/weblazy/easy/utils/etrace"
 	"github.com/weblazy/easy/utils/timex"
 
@@ -23,11 +23,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func init() {
-	logger := ezap.NewFileEzap(http_server_config.PkgName)
-	elog.SetLogger(http_server_config.PkgName, logger)
-}
-
+var once sync.Once
 var emptyData = struct{}{}
 
 type LogData struct {
@@ -52,6 +48,7 @@ func (w BodyLogWriter) WriteString(s string) (int, error) {
 // Log returns a middleware
 // and handles the control to the centralized HTTPErrorHandler.
 func Log(ctx context.Context, cfg *http_server_config.Config) gin.HandlerFunc {
+	once.Do(cfg.InitLogger)
 	return func(c *gin.Context) {
 		if c.Request.Method == http.MethodGet {
 

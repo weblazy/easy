@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/weblazy/easy/utils/elog/ezap"
 	"go.uber.org/zap"
 )
 
@@ -29,13 +28,13 @@ func TestLog(t *testing.T) {
 	WarnCtx(ctx, "zap warn")
 	ErrorCtx(ctx, "zap error")
 
-	logger := ezap.NewFileEzap("test1")
-	loggerName := "test"
-	SetLogger(loggerName, logger)
-	ctx = SetLogerName(ctx, loggerName)
-	DebugCtx(ctx, "zap debug")
-	InfoCtx(ctx, "", zap.Any("obj", s))
-	WarnCtx(ctx, "zap warn")
-	ErrorCtx(ctx, "zap error")
+	// logger := ezap.NewFileEzap("test1")
+	// loggerName := "test"
+	// SetLogger(loggerName, logger)
+	// ctx = SetLogerName(ctx, loggerName)
+	// DebugCtx(ctx, "zap debug")
+	// InfoCtx(ctx, "", zap.Any("obj", s))
+	// WarnCtx(ctx, "zap warn")
+	// ErrorCtx(ctx, "zap error")
 
 }

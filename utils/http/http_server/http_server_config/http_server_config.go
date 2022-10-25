@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
+	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/utils/elog/ezap"
 )
 
 const PkgName = "http_server"
@@ -21,6 +23,8 @@ type Config struct {
 	EnableLogInterceptor    bool
 	EnableAccessInterceptor bool // 是否开启记录请求数据，默认开启
 
+	EnableFielLogger bool // 将日志输出到文件
+	FielLoggerPath   string
 }
 
 // DefaultConfig default config ...
@@ -34,6 +38,7 @@ func DefaultConfig() *Config {
 		EnableMetricInterceptor: true,
 		EnableLogInterceptor:    true,
 		EnableAccessInterceptor: true,
+		FielLoggerPath:          PkgName,
 	}
 }
 
@@ -44,4 +49,13 @@ func GetViperConfig(key string, cfg *viper.Viper) (*Config, error) {
 		return nil, err
 	}
 	return c, nil
+}
+
+func (config Config) InitLogger() {
+	if config.EnableFielLogger {
+		logger := ezap.NewFileEzap(config.FielLoggerPath)
+		elog.SetLogger(PkgName, logger)
+		return
+	}
+	elog.SetLogger(PkgName, elog.DefaultLogger)
 }

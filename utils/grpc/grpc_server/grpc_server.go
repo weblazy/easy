@@ -169,7 +169,7 @@ func BuildServerOptions(config *grpc_server_config.Config) {
 	}
 
 	unaryInterceptors = append(unaryInterceptors, config.PrependUnaryInterceptors...)
-	unaryInterceptors = append(unaryInterceptors, interceptor.GrpcLogger(&elog.LogConf{}))
+	unaryInterceptors = append(unaryInterceptors, interceptor.GrpcLogger(config))
 
 	if config.EnableMetricInterceptor {
 		unaryInterceptors = append(unaryInterceptors, interceptor.MetricUnaryServerInterceptor(config.MetricSuccessCodes))
