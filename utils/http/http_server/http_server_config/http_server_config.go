@@ -6,6 +6,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+const PkgName = "http_server"
+
 type Config struct {
 	Name string
 	Host string // IP地址，默认0.0.0.0

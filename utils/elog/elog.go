@@ -3,8 +3,6 @@ package elog
 import (
 	uzap "go.uber.org/zap"
 	"golang.org/x/net/context"
-
-	"github.com/weblazy/easy/utils/elog/logx"
 )
 
 type LogConfCtxKey struct{}
@@ -13,8 +11,6 @@ type LogConf struct {
 	Name   string
 	Labels []uzap.Field
 }
-
-var defaultLogConf = &LogConf{}
 
 func GetContextLog(ctx context.Context) *LogConf {
 	if v, ok := ctx.Value(LogConfCtxKey{}).(*LogConf); ok {
@@ -53,62 +49,51 @@ func MergeLabels(ctx context.Context, fields ...uzap.Field) []uzap.Field {
 	return newFields
 }
 
-func InfoCtx(ctx context.Context, msg string, fields ...uzap.Field) {
-	fields = MergeLabels(ctx, fields...)
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Info(msg, fields...)
-		return true
-	})
-}
-
-func InfoCtxF(ctx context.Context, format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).InfoF(format, args...)
-		return true
-	})
-}
-
 func DebugCtx(ctx context.Context, msg string, fields ...uzap.Field) {
+	logLevel, ok := ctx.Value(LogLevelCtxKey{}).(LogLevel)
+	if ok && logLevel < Debug {
+		return
+	}
 	fields = MergeLabels(ctx, fields...)
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Debug(msg, fields...)
-		return true
-	})
+	logger := GetLoggerFromCtx(ctx)
+	if logger != nil {
+		logger.DebugCtx(ctx, msg, fields...)
+	}
 }
 
-func DebugCtxF(ctx context.Context, format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).DebugF(format, args...)
-		return true
-	})
+func InfoCtx(ctx context.Context, msg string, fields ...uzap.Field) {
+	logLevel, ok := ctx.Value(LogLevelCtxKey{}).(LogLevel)
+	if ok && logLevel < Info {
+		return
+	}
+	fields = MergeLabels(ctx, fields...)
+
+	logger := GetLoggerFromCtx(ctx)
+	if logger != nil {
+		logger.InfoCtx(ctx, msg, fields...)
+	}
 }
 
 func WarnCtx(ctx context.Context, msg string, fields ...uzap.Field) {
+	logLevel, ok := ctx.Value(LogLevelCtxKey{}).(LogLevel)
+	if ok && logLevel < Warn {
+		return
+	}
 	fields = MergeLabels(ctx, fields...)
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Warn(msg, fields...)
-		return true
-	})
-}
-
-func WarnCtxF(ctx context.Context, format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).WarnF(format, args...)
-		return true
-	})
+	logger := GetLoggerFromCtx(ctx)
+	if logger != nil {
+		logger.WarnCtx(ctx, msg, fields...)
+	}
 }
 
 func ErrorCtx(ctx context.Context, msg string, fields ...uzap.Field) {
+	logLevel, ok := ctx.Value(LogLevelCtxKey{}).(LogLevel)
+	if ok && logLevel < Error {
+		return
+	}
 	fields = MergeLabels(ctx, fields...)
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Error(msg, fields...)
-		return true
-	})
-}
-
-func ErrorCtxF(ctx context.Context, format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).ErrorF(format, args...)
-		return true
-	})
+	logger := GetLoggerFromCtx(ctx)
+	if logger != nil {
+		logger.ErrorCtx(ctx, msg, fields...)
+	}
 }

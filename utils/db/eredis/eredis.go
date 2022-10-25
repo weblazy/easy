@@ -2,6 +2,7 @@ package eredis
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/weblazy/easy/utils/db/eredis/eredis_config"
@@ -16,9 +17,8 @@ type RedisClient struct {
 	Config *eredis_config.Config
 	redis.UniversalClient
 }
-type Option func(c *eredis_config.Config)
 
-func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
+func NewRedisClient(c *eredis_config.Config) *RedisClient {
 	if c == nil {
 		c = eredis_config.DefaultConfig()
 	}
@@ -31,31 +31,25 @@ func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
 	case eredis_config.ClusterMode:
 		client = NewClusterClient(c)
 	default:
-		panic(`redis mode must be one of ("stub", "cluster", "sentinel")`)
+		elog.ErrorCtx(emptyCtx, "redis mode must be one of (simple, cluster, failover)", elog.FieldName(c.Name))
+		return nil
 	}
 
 	client.AddHook(interceptor.StartTimeHook())
 
-	if c.EnableMetricInterceptor {
-		client.AddHook(interceptor.MetricHook(c))
-	}
-	if c.EnableAccessInterceptor {
-		client.AddHook(interceptor.LogHook(c))
-	}
-
 	if c.EnableTraceInterceptor {
 		client.AddHook(interceptor.NewTracingHook())
 	}
+	if c.EnableMetricInterceptor {
+		client.AddHook(interceptor.MetricHook(c))
+	}
+	client.AddHook(interceptor.LogHook(c))
 	for _, hook := range c.Hooks {
 		client.AddHook(hook)
 	}
 	if err := client.Ping(emptyCtx).Err(); err != nil {
-		switch c.OnFail {
-		case eredis_config.OnFailPanic:
-			elog.ErrorCtx(emptyCtx, "start redis panic", elog.FieldError(err))
-		default:
-			elog.ErrorCtx(emptyCtx, "start redis error", elog.FieldError(err))
-		}
+		elog.ErrorCtx(emptyCtx, "start redis error", elog.FieldName(c.Name), elog.FieldError(err))
+		return nil
 	}
 	return &RedisClient{
 		UniversalClient: client,
@@ -63,38 +57,59 @@ func NewRedisClient(c *eredis_config.Config, options ...Option) *RedisClient {
 	}
 }
 
-// Client returns a universal redis client(ClusterClient, StubClient or SentinelClient), it depends on you config.
-func (r *RedisClient) GetClient() redis.UniversalClient {
+// GetUniversalClient returns a universal redis client(ClusterClient, SimpleClient or FailoverClient), it depends on you config.
+func (r *RedisClient) GetUniversalClient() redis.UniversalClient {
 	return r
 }
 
-// Cluster try to get a redis.ClusterClient
-func (r *RedisClient) GetCluster() *redis.ClusterClient {
+// GetClient try to get a redis.client
+func (r *RedisClient) GetClient() *redis.Client {
+	if c, ok := r.UniversalClient.(*redis.Client); ok {
+		return c
+	}
+	return nil
+}
+
+// GetClusterClient try to get a redis.ClusterClient
+func (r *RedisClient) GetClusterClient() *redis.ClusterClient {
 	if c, ok := r.UniversalClient.(*redis.ClusterClient); ok {
 		return c
 	}
 	return nil
 }
 
-// Stub try to get a redis.client
-func (r *RedisClient) GetStub() *redis.Client {
+// GetFailoverClient try to get a redis Failover Sentinel client
+func (r *RedisClient) GetFailoverClient() *redis.Client {
 	if c, ok := r.UniversalClient.(*redis.Client); ok {
 		return c
 	}
 	return nil
 }
 
-// Sentinel try to get a redis Failover Sentinel client
-func (r *RedisClient) GetSentinel() *redis.Client {
-	if c, ok := r.UniversalClient.(*redis.Client); ok {
-		return c
+func NewClient(c *eredis_config.Config) redis.UniversalClient {
+	if c.Addr == "" {
+		elog.ErrorCtx(emptyCtx, eredis_config.PkgName, elog.FieldName(c.Name), elog.FieldError(fmt.Errorf(`invalid "addr" config, "addr" is empty but with stub mode"`)))
+		return nil
 	}
-	return nil
+	client := redis.NewClient(&redis.Options{
+		Addr:         c.Addr,
+		Password:     c.Password,
+		DB:           c.DB,
+		MaxRetries:   c.MaxRetries,
+		DialTimeout:  c.DialTimeout,
+		ReadTimeout:  c.ReadTimeout,
+		WriteTimeout: c.WriteTimeout,
+		PoolSize:     c.PoolSize,
+		MinIdleConns: c.MinIdleConns,
+		IdleTimeout:  c.IdleTimeout,
+	})
+	return client
 }
 
 func NewClusterClient(c *eredis_config.Config) redis.UniversalClient {
 	if len(c.Addrs) == 0 {
-		panic(`invalid "addrs" config, "addrs" has none addresses but with cluster mode"`)
+		elog.ErrorCtx(emptyCtx, "invalid addrs config, addrs has none addresses but with cluster mode", elog.FieldName(c.Name))
+		return nil
 	}
 	clusterClient := redis.NewClusterClient(&redis.ClusterOptions{
 		Addrs:        c.Addrs,
@@ -112,31 +127,14 @@ func NewClusterClient(c *eredis_config.Config) redis.UniversalClient {
 	return clusterClient
 }
 
-func NewClient(c *eredis_config.Config) redis.UniversalClient {
-	if c.Addr == "" {
-		panic(`invalid "addr" config, "addr" is empty but with stub mode"`)
-	}
-	client := redis.NewClient(&redis.Options{
-		Addr:         c.Addr,
-		Password:     c.Password,
-		DB:           c.DB,
-		MaxRetries:   c.MaxRetries,
-		DialTimeout:  c.DialTimeout,
-		ReadTimeout:  c.ReadTimeout,
-		WriteTimeout: c.WriteTimeout,
-		PoolSize:     c.PoolSize,
-		MinIdleConns: c.MinIdleConns,
-		IdleTimeout:  c.IdleTimeout,
-	})
-	return client
-}
-
 func NewFailoverClient(c *eredis_config.Config) redis.UniversalClient {
 	if len(c.Addrs) == 0 {
-		panic(`invalid "addrs" config, "addrs" has none addresses but with sentinel mode"`)
+		elog.ErrorCtx(emptyCtx, `invalid "addrs" config, "addrs" has none addresses but with failover mode`, elog.FieldName(c.Name))
+		return nil
 	}
 	if c.MasterName == "" {
-		panic(`invalid "masterName" config, "masterName" is empty but with sentinel mode"`)
+		elog.ErrorCtx(emptyCtx, `invalid "masterName" config, "masterName" is empty but with sentinel mode"`, elog.FieldName(c.Name))
+		return nil
 	}
 	failoverClient := redis.NewFailoverClient(&redis.FailoverOptions{
 		MasterName:    c.MasterName,

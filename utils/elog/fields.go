@@ -16,6 +16,7 @@ const (
 	KeySpanID        = "span_id"
 	KeyEvent         = "event"
 	KeyCost          = "duration"
+	KeyDuration      = "duration"
 	KeyMethod        = "method"
 	KeyName          = "name"
 	KeyAddr          = "addr"
@@ -23,6 +24,7 @@ const (
 	KeyReq           = "req"
 	KeyResp          = "resp"
 	KeyDetail        = "detail"
+	KeySlow          = "slow"
 )
 
 // FieldComponent 设置组件.
@@ -33,6 +35,11 @@ func FieldComponent(value string) zap.Field {
 // FieldError 设置错误.
 func FieldError(err error) zap.Field {
 	return zap.Error(err)
+}
+
+// FieldSlow 慢操作.
+func FieldSlow(isSlow bool) zap.Field {
+	return zap.Bool(KeySlow, isSlow)
 }
 
 // FieldTrace 设置 trace id.
@@ -53,6 +60,11 @@ func FieldEvent(event string) zap.Field {
 // FieldCost 设置 duration in ms.
 func FieldCost(v time.Duration) zap.Field {
 	return zap.Int64(KeyCost, int64(v.Microseconds())/1000)
+}
+
+// FieldCost 设置 duration in ms.
+func FieldDuration(v time.Duration) zap.Field {
+	return zap.Int64(KeyDuration, int64(v.Microseconds())/1000)
 }
 
 // FieldMethod 设置 method.

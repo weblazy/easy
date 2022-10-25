@@ -5,10 +5,12 @@ import (
 	"strings"
 
 	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/utils/etrace"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/weblazy/easy/utils/grpc/grpc_server/grpc_server_config"
+	"github.com/weblazy/easy/utils/grpc/grpc_server/interceptor"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
@@ -38,7 +40,7 @@ func NewGrpcServer(config *grpc_server_config.Config, logConf *elog.LogConf) *Gr
 	if config == nil {
 		config = grpc_server_config.DefaultConfig()
 	}
-	config.BuildServerOptions()
+	BuildServerOptions(config)
 
 	newServer := grpc.NewServer(config.ServerOptions...)
 
@@ -155,4 +157,37 @@ func getPeerIP(ctx context.Context) string {
 		return addSlice[0]
 	}
 	return ""
+}
+
+func BuildServerOptions(config *grpc_server_config.Config) {
+	// 暂时没有 stream 需求
+	var streamInterceptors []grpc.StreamServerInterceptor
+	var unaryInterceptors []grpc.UnaryServerInterceptor
+	// trace 必须在最外层，否则无法取到trace信息，传递到其他中间件
+	if config.EnableTraceInterceptor {
+		unaryInterceptors = append(unaryInterceptors, etrace.UnaryServerInterceptor())
+	}
+
+	unaryInterceptors = append(unaryInterceptors, config.PrependUnaryInterceptors...)
+	unaryInterceptors = append(unaryInterceptors, interceptor.GrpcLogger(&elog.LogConf{}))
+
+	if config.EnableMetricInterceptor {
+		unaryInterceptors = append(unaryInterceptors, interceptor.MetricUnaryServerInterceptor(config.MetricSuccessCodes))
+	}
+
+	streamInterceptors = append(
+		streamInterceptors,
+		config.StreamInterceptors...,
+	)
+
+	unaryInterceptors = append(
+		unaryInterceptors,
+		config.UnaryInterceptors...,
+	)
+
+	config.ServerOptions = append(config.ServerOptions,
+		grpc.ChainStreamInterceptor(streamInterceptors...),
+		grpc.ChainUnaryInterceptor(unaryInterceptors...),
+	)
+
 }

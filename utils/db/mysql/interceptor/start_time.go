@@ -11,7 +11,7 @@ import (
 
 type StartTimePlugin struct{}
 
-type startTimeCtxkey struct{}
+type startTimeCtxKey struct{}
 
 func NewStartTimePlugin() *StartTimePlugin {
 	return &StartTimePlugin{}
@@ -63,21 +63,21 @@ func (e *StartTimePlugin) Initialize(db *gorm.DB) error {
 
 func SetStartTime(db *gorm.DB) {
 	startTime := time.Now()
-	db.Statement.Context = context.WithValue(db.Statement.Context, startTimeCtxkey{}, startTime)
+	db.Statement.Context = context.WithValue(db.Statement.Context, startTimeCtxKey{}, startTime)
 	return
 }
 
 func GetStartTime(db *gorm.DB) time.Time {
-	return db.Statement.Context.Value(startTimeCtxkey{}).(time.Time)
+	return db.Statement.Context.Value(startTimeCtxKey{}).(time.Time)
 }
 
 func GetDuration(ctx context.Context) time.Duration {
-	startTime, _ := ctx.Value(startTimeCtxkey{}).(time.Time)
+	startTime, _ := ctx.Value(startTimeCtxKey{}).(time.Time)
 	return time.Since(startTime)
 }
 
 func GetDurationMilliseconds(ctx context.Context) float64 {
-	startTime, _ := ctx.Value(startTimeCtxkey{}).(time.Time)
+	startTime, _ := ctx.Value(startTimeCtxKey{}).(time.Time)
 	return float64(time.Since(startTime).Microseconds()) / 1000
 
 }

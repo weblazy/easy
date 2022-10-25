@@ -1,11 +1,8 @@
 package elog
 
 import (
+	"context"
 	"sync"
-
-	"github.com/weblazy/easy/utils/elog/zap"
-
-	uzap "go.uber.org/zap"
 
 	"github.com/weblazy/easy/utils/elog/logx"
 )
@@ -14,9 +11,11 @@ var (
 	Logger sync.Map
 )
 
+type LoggerNameCtxKey struct{}
+
 // 默认加入zap组件
 func init() {
-	Logger.Store("zap", &zap.Zap{})
+	Logger.Store(Ezap, DefaultLogger)
 }
 
 // SetLogger 设置日志打印实例,选择输出到文件,终端,阿里云日志等
@@ -29,58 +28,21 @@ func DelLogger(name string) {
 	Logger.Delete(name)
 }
 
-func Info(msg string, fields ...uzap.Field) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Info(msg, fields...)
-		return true
-	})
+// GetLoggerFromCtx
+func GetLoggerFromCtx(ctx context.Context) logx.GLog {
+	loggerName, ok := ctx.Value(LoggerNameCtxKey{}).(string)
+	if ok {
+		logger, ok := Logger.Load(loggerName)
+		if !ok {
+			// 指定了logger,但是没有找到
+			return nil
+		}
+		return logger.(logx.GLog)
+	}
+	// 没有指定logger使用默认全局logger
+	return DefaultLogger
 }
 
-func InfoF(format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).InfoF(format, args...)
-		return true
-	})
-}
-
-func Debug(msg string, fields ...uzap.Field) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Debug(msg, fields...)
-		return true
-	})
-}
-
-func DebugF(format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).DebugF(format, args...)
-		return true
-	})
-}
-
-func Warn(msg string, fields ...uzap.Field) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Warn(msg, fields...)
-		return true
-	})
-}
-
-func WarnF(format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).WarnF(format, args...)
-		return true
-	})
-}
-
-func Error(msg string, fields ...uzap.Field) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).Error(msg, fields...)
-		return true
-	})
-}
-
-func ErrorF(format string, args ...interface{}) {
-	Logger.Range(func(k, v interface{}) bool {
-		v.(logx.GLog).ErrorF(format, args...)
-		return true
-	})
+func SetLogerName(ctx context.Context, name string) context.Context {
+	return context.WithValue(ctx, LoggerNameCtxKey{}, name)
 }

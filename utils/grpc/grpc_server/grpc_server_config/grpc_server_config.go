@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/grpc/grpc_server/interceptor"
 	"google.golang.org/grpc"
 )
 
 const (
 	DefaultPort = 9090
+	PkgName     = "grpc_server"
 )
 
 // Config ...
@@ -66,37 +64,4 @@ func DefaultConfig() *Config {
 // Address ...
 func (config Config) Address() string {
 	return fmt.Sprintf("%s:%d", config.Host, config.Port)
-}
-
-func (config *Config) BuildServerOptions() {
-	// 暂时没有 stream 需求
-	var streamInterceptors []grpc.StreamServerInterceptor
-	var unaryInterceptors []grpc.UnaryServerInterceptor
-	// trace 必须在最外层，否则无法取到trace信息，传递到其他中间件
-	if config.EnableTraceInterceptor {
-		unaryInterceptors = append(unaryInterceptors, etrace.UnaryServerInterceptor())
-	}
-
-	unaryInterceptors = append(unaryInterceptors, config.PrependUnaryInterceptors...)
-	unaryInterceptors = append(unaryInterceptors, interceptor.GrpcLogger(&elog.LogConf{}))
-
-	if config.EnableMetricInterceptor {
-		unaryInterceptors = append(unaryInterceptors, interceptor.MetricUnaryServerInterceptor(config.MetricSuccessCodes))
-	}
-
-	streamInterceptors = append(
-		streamInterceptors,
-		config.StreamInterceptors...,
-	)
-
-	unaryInterceptors = append(
-		unaryInterceptors,
-		config.UnaryInterceptors...,
-	)
-
-	config.ServerOptions = append(config.ServerOptions,
-		grpc.ChainStreamInterceptor(streamInterceptors...),
-		grpc.ChainUnaryInterceptor(unaryInterceptors...),
-	)
-
 }

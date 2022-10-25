@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/weblazy/easy/utils/code_err"
+	"github.com/weblazy/easy/utils/elog/ezap"
 	"github.com/weblazy/easy/utils/etrace"
 	"github.com/weblazy/easy/utils/timex"
 
@@ -18,14 +19,13 @@ import (
 
 	"github.com/weblazy/easy/utils/elog"
 
-	gocorezap "github.com/weblazy/easy/utils/elog/zap"
-
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
 func init() {
-	gocorezap.InitFileLog("log/access")
+	logger := ezap.NewFileEzap(http_server_config.PkgName)
+	elog.SetLogger(http_server_config.PkgName, logger)
 }
 
 var emptyData = struct{}{}
@@ -66,6 +66,7 @@ func Log(ctx context.Context, cfg *http_server_config.Config) gin.HandlerFunc {
 
 func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 	req := c.Request
+	ctx := elog.SetLogerName(req.Context(), http_server_config.PkgName)
 	logData := &LogData{}
 	blw := &BodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 	c.Writer = blw
@@ -77,7 +78,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 	}
 	logData.RequestBody = string(bodyBytes)
 	defer func() {
-		duration := time.Since(GetStartTime(req.Context()))
+		duration := time.Since(GetStartTime(ctx))
 		fields := []zap.Field{
 			zap.String("url", req.URL.String()),
 			zap.String("host", c.GetHeader("Host")),
@@ -88,7 +89,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 			zap.Any("res_header", c.Writer.Header()),
 			zap.String("res_body", blw.body.String()),
 			zap.String("client_ip", c.ClientIP()),
-			zap.String("start_time", GetStartTime(req.Context()).Format(timex.TimeLayout)),
+			zap.String("start_time", GetStartTime(ctx).Format(timex.TimeLayout)),
 			zap.Float64("duration", float64(duration.Microseconds())/1000),
 		}
 		fields = append(fields, zap.Int("status_code", c.Writer.Status()))
@@ -97,15 +98,15 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 		}
 		// 开启了链路，那么就记录链路id
 		if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-			fields = append(fields, zap.String("trace_id", etrace.ExtractTraceID(req.Context())))
+			fields = append(fields, zap.String("trace_id", etrace.ExtractTraceID(ctx)))
 		}
 		if err != nil {
 			fields = append(fields, zap.String("event", "error"), zap.Error(err))
-			elog.WarnCtx(req.Context(), "http_server", fields...)
+			elog.WarnCtx(ctx, "http_server", fields...)
 			return
 		} else if cfg.EnableAccessInterceptor {
 			fields = append(fields, zap.String("event", "normal"))
-			elog.InfoCtx(req.Context(), "http_server", fields...)
+			elog.InfoCtx(ctx, "http_server", fields...)
 		}
 	}()
 

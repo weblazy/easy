@@ -1,11 +1,11 @@
 package elog
 
 import (
-	"errors"
-	"fmt"
+	"context"
 	"testing"
 
-	"github.com/weblazy/easy/utils/elog/zap"
+	"github.com/weblazy/easy/utils/elog/ezap"
+	"go.uber.org/zap"
 )
 
 func TestLog(t *testing.T) {
@@ -17,26 +17,25 @@ func TestLog(t *testing.T) {
 		Age:  18,
 	}
 	// zap log
-	InfoF("%+v", s)
-	Debug("zap debug")
-	Warn("zap warn")
-	Error("zap error")
-	ErrorF("s.dao.PartnerById(%d),err:%+v", 10086, errors.New("不存在此id"))
-	ErrorF("s.dao.CreateOrder(%+v),err:%+v", s, errors.New("创建订单失败"))
+	ctx := context.Background()
+	DebugCtx(ctx, "zap debug")
+	InfoCtx(ctx, "", zap.Any("obj", s))
+	WarnCtx(ctx, "zap warn")
+	ErrorCtx(ctx, "zap error")
 
-	fmt.Println("")
+	ctx = context.WithValue(ctx, LogLevelCtxKey{}, Info)
+	DebugCtx(ctx, "zap debug")
+	InfoCtx(ctx, "", zap.Any("obj", s))
+	WarnCtx(ctx, "zap warn")
+	ErrorCtx(ctx, "zap error")
 
-	zap.SetLogLevel(zap.LogLevelWarn)
-	InfoF("%+v", s)
-	Debug("zap debug")
-	Warn("zap warn")
-	Error("zap error")
-
-	fmt.Println("")
-
-	zap.InitFileLog()
-	Debug("zap debug")
-	Warn("zap warn")
-	Error("zap error")
+	logger := ezap.NewFileEzap("test1")
+	loggerName := "test"
+	SetLogger(loggerName, logger)
+	ctx = SetLogerName(ctx, loggerName)
+	DebugCtx(ctx, "zap debug")
+	InfoCtx(ctx, "", zap.Any("obj", s))
+	WarnCtx(ctx, "zap warn")
+	ErrorCtx(ctx, "zap error")
 
 }

@@ -1,6 +1,7 @@
 package http_client
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -60,7 +61,7 @@ func NewGocoreLog() *GocoreLog {
 
 func (l *GocoreLog) Info(obj *LogObject) error {
 	data, _ := json.Marshal(obj)
-	elog.InfoF(string(data))
+	elog.InfoCtx(context.Background(), string(data))
 	return nil
 }
 

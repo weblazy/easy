@@ -9,7 +9,6 @@ import (
 // https://stackoverflow.com/questions/40891345/fix-should-not-use-basic-type-string-as-key-in-context-withvalue-golint
 // https://blog.golang.org/context#TOC_3.2.
 // https://golang.org/pkg/context/#WithValue ，这边文章说明了用struct，可以避免分配
-type startTimeCtxKey struct{}
 
 type RedisHook struct {
 	redis.Hook

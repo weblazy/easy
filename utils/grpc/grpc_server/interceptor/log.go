@@ -8,10 +8,17 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/utils/elog/ezap"
 	"github.com/weblazy/easy/utils/etrace"
+	"github.com/weblazy/easy/utils/grpc/grpc_server/grpc_server_config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
+
+func init() {
+	logger := ezap.NewFileEzap(grpc_server_config.PkgName)
+	elog.SetLogger(grpc_server_config.PkgName, logger)
+}
 
 func GrpcLogger(logConf *elog.LogConf) grpc.UnaryServerInterceptor {
 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
@@ -43,7 +50,7 @@ func GrpcLogger(logConf *elog.LogConf) grpc.UnaryServerInterceptor {
 		reqLabel, mdLabel := zap.Any("req", req), zap.Any("metadata", md)
 
 		resp, err = handler(ctx, req)
-
+		ctx = elog.SetLogerName(ctx, grpc_server_config.PkgName)
 		if err != nil {
 			elog.ErrorCtx(ctx, "grpc_server", reqLabel, mdLabel, elog.FieldError(err), elog.FieldCost(time.Since(start)))
 		} else {
