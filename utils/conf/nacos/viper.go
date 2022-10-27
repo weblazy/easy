@@ -1,6 +1,8 @@
 package nacos
 
 import (
+	"context"
+
 	"github.com/BurntSushi/toml"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/weblazy/easy/utils/conf/viper"
@@ -17,6 +19,8 @@ type ViperToml struct {
 	dataIdOrGroupList []configParam
 	callbackList      map[string]func(namespace, group, dataId, data string)
 }
+
+var emptyCtx = context.Background()
 
 // GetViper 获取VT实例
 func GetViper() *ViperToml {
@@ -62,7 +66,7 @@ func (vt *ViperToml) GetConfig() (string, error) {
 				OnChange: vt.callbackList[group+v],
 			})
 			if err != nil {
-				elog.Error(group+"\r\n"+v+"\r\n ListenConfig Error", zap.Error(err))
+				elog.ErrorCtx(emptyCtx, group+"\r\n"+v+"\r\n ListenConfig Error", zap.Error(err))
 			}
 		}
 	}
@@ -89,7 +93,7 @@ func (vt *ViperToml) SetDataIds(group string, dataIds ...string) {
 	for _, v := range dataIds {
 		vt.callbackList[group+v] = func(namespace, group, dataId, data string) {
 			vt.NacosToViper()
-			elog.Warn(namespace + "\r\n" + group + "\r\n" + dataId + "\r\n" + data + "\r\n Update Config")
+			elog.WarnCtx(emptyCtx, namespace+"\r\n"+group+"\r\n"+dataId+"\r\n"+data+"\r\n Update Config")
 		}
 	}
 }

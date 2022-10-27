@@ -19,7 +19,7 @@ func DefaultConfig() *Config {
 	// zapConfig.EncoderConfig.TimeKey = zapcore.OmitKey
 	// zapConfig.EncoderConfig.LevelKey = zapcore.OmitKey
 	// zapConfig.EncoderConfig.NameKey = zapcore.OmitKey
-	// zapConfig.EncoderConfig.CallerKey = zapcore.OmitKey
+	zapConfig.EncoderConfig.CallerKey = zapcore.OmitKey
 	// zapConfig.EncoderConfig.FunctionKey = zapcore.OmitKey
 	// zapConfig.EncoderConfig.MessageKey = "msg"
 	zapConfig.EncoderConfig.StacktraceKey = zapcore.OmitKey

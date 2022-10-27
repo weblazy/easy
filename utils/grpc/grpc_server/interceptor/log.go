@@ -54,26 +54,26 @@ func GrpcLogger(config *grpc_server_config.Config) grpc.UnaryServerInterceptor {
 	}
 }
 
-func GrpcLoggerLite(logConf elog.LogConf) grpc.UnaryServerInterceptor {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-		// otel trace
-		traceId := etrace.ExtractTraceID(ctx)
+// func GrpcLoggerLite() grpc.UnaryServerInterceptor {
+// 	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
+// 		// otel trace
+// 		traceId := etrace.ExtractTraceID(ctx)
 
-		md, _ := metadata.FromIncomingContext(ctx)
-		// 尝试获取网关 traceid
-		if traceId == "" {
-			v := md.Get("traceid")
-			if len(v) > 0 {
-				traceId = v[0]
-			}
-		}
+// 		md, _ := metadata.FromIncomingContext(ctx)
+// 		// 尝试获取网关 traceid
+// 		if traceId == "" {
+// 			v := md.Get("traceid")
+// 			if len(v) > 0 {
+// 				traceId = v[0]
+// 			}
+// 		}
 
-		// 服务内部生成
-		if traceId == "" {
-			traceId = uuid.NewString()
-		}
-		logConf.Name = "server.grpc"
-		logConf.Labels = append(logConf.Labels, zap.String("trace_id", traceId), zap.String("method", info.FullMethod))
-		return handler(ctx, req)
-	}
-}
+// 		// 服务内部生成
+// 		if traceId == "" {
+// 			traceId = uuid.NewString()
+// 		}
+// 		logConf.Name = "server.grpc"
+// 		logConf.Fields = append(logConf.Fields, zap.String("trace_id", traceId), zap.String("method", info.FullMethod))
+// 		return handler(ctx, req)
+// 	}
+// }

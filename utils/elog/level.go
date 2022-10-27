@@ -2,7 +2,7 @@ package elog
 
 import "fmt"
 
-type LogLevelCtxKey struct{}
+type CtxLogLevelKey struct{}
 
 // LogLevel log level
 type LogLevel int

@@ -10,6 +10,7 @@ import (
 	"github.com/sunmi-OS/gocore/v2/conf/viper"
 	"github.com/weblazy/easy/utils/closes"
 	"github.com/weblazy/easy/utils/elog"
+	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -60,7 +61,7 @@ func NewOrUpdateDB(dbname string) error {
 	// first: open new gorm client
 	orm, err = openORM(dbname)
 	if err != nil {
-		elog.ErrorF("UpdateDB(%s) error:%+v", dbname, err)
+		elog.ErrorCtx(emptyCtx, "UpdateDB error", zap.String("dbname", dbname), zap.Error(err))
 		return err
 	}
 	// 如果NEW异常直接panic如果是Update返回error
@@ -102,7 +103,7 @@ func GetORM(dbname ...string) *gorm.DB {
 
 func Close() {
 	_Gorm.gormMaps.Range(func(dbName, orm interface{}) bool {
-		elog.WarnF("close db %s", dbName)
+		elog.WarnCtx(emptyCtx, "close db", zap.Any("dbname", dbName))
 		_Gorm.gormMaps.Delete(dbName)
 		db, _ := orm.(*gorm.DB).DB()
 		if db != nil {

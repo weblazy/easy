@@ -22,7 +22,9 @@ func TestLog(t *testing.T) {
 	WarnCtx(ctx, "zap warn")
 	ErrorCtx(ctx, "zap error")
 
-	ctx = context.WithValue(ctx, LogLevelCtxKey{}, Info)
+	ctx = context.WithValue(ctx, CtxSkipKey{}, Info)
+	// ctx = AddCtxSkip(ctx, 2)
+	ctx = AppendCtxFields(ctx, zap.String("name", "lazy"))
 	DebugCtx(ctx, "zap debug")
 	InfoCtx(ctx, "", zap.Any("obj", s))
 	WarnCtx(ctx, "zap warn")

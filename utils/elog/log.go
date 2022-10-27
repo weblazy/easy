@@ -4,14 +4,20 @@ import (
 	"context"
 	"sync"
 
+	"github.com/weblazy/easy/utils/elog/ezap"
 	"github.com/weblazy/easy/utils/elog/logx"
 )
 
 var (
-	Logger sync.Map
+	Logger        sync.Map
+	DefaultLogger = ezap.NewConsoleEzap()
 )
 
-type LoggerNameCtxKey struct{}
+const (
+	Ezap = "ezap"
+)
+
+type CtxLoggerNameKey struct{}
 
 // 默认加入zap组件
 func init() {
@@ -30,7 +36,7 @@ func DelLogger(name string) {
 
 // GetLoggerFromCtx
 func GetLoggerFromCtx(ctx context.Context) logx.GLog {
-	loggerName, ok := ctx.Value(LoggerNameCtxKey{}).(string)
+	loggerName, ok := ctx.Value(CtxLoggerNameKey{}).(string)
 	if ok {
 		logger, ok := Logger.Load(loggerName)
 		if !ok {
@@ -44,5 +50,5 @@ func GetLoggerFromCtx(ctx context.Context) logx.GLog {
 }
 
 func SetLogerName(ctx context.Context, name string) context.Context {
-	return context.WithValue(ctx, LoggerNameCtxKey{}, name)
+	return context.WithValue(ctx, CtxLoggerNameKey{}, name)
 }

@@ -7,7 +7,10 @@ import (
 	"time"
 
 	"go.uber.org/zap"
+	"golang.org/x/net/context"
 )
+
+type CtxFieldsKey struct{}
 
 const (
 	KeyComponent     = "comp"
@@ -102,4 +105,42 @@ func MakeReqResInfo(callerSkip int, compName string, addr string, duration time.
 func MakeReqResError(callerSkip int, compName string, addr string, duration time.Duration, req string, err string) zap.Field {
 	_, file, line, _ := runtime.Caller(callerSkip)
 	return zap.Error(fmt.Errorf("%s %s %s %s %s => %s ", file+":"+strconv.Itoa(line), compName, addr, fmt.Sprintf("[%vms]", float64(duration.Microseconds())/1000), req, err))
+}
+
+func GetCtxFields(ctx context.Context) []zap.Field {
+	fields, _ := ctx.Value(CtxFieldKey{}).([]zap.Field)
+	return fields
+}
+
+func AppendCtxFields(ctx context.Context, fields ...zap.Field) context.Context {
+	if ctxFields, ok := ctx.Value(CtxFieldKey{}).([]zap.Field); ok {
+		llen := len(ctxFields)
+		flen := len(fields)
+		newFields := make([]zap.Field, llen+flen)
+		copy(newFields, ctxFields)
+		copy(newFields[llen:], fields)
+		return context.WithValue(ctx, CtxFieldKey{}, newFields)
+	}
+	return context.WithValue(ctx, CtxFieldKey{}, fields)
+}
+
+func MergeCtxFields(ctx context.Context, fields ...zap.Field) []zap.Field {
+	skip := GetCtxSkip(ctx)
+	_, file, line, _ := runtime.Caller(DefaultSkip + skip)
+	skipField := zap.String("caller", fmt.Sprintf("%s:%d", file, line))
+	flen := len(fields)
+	// 获取ctx中的field
+	if ctxFields, ok := ctx.Value(CtxFieldKey{}).([]zap.Field); ok {
+		llen := len(ctxFields)
+
+		newFields := make([]zap.Field, llen+flen)
+		copy(newFields, ctxFields)
+		copy(newFields[llen:], fields)
+		newFields = append(newFields, skipField)
+		return newFields
+	}
+	newFields := make([]zap.Field, flen)
+	copy(newFields, fields)
+	fields = append(fields, skipField)
+	return fields
 }

@@ -29,14 +29,13 @@ const (
 
 // Component ...
 type GrpcServer struct {
-	config  *grpc_server_config.Config
-	logConf *elog.LogConf
+	config *grpc_server_config.Config
 	*grpc.Server
 	listener net.Listener
 	quit     chan struct{}
 }
 
-func NewGrpcServer(config *grpc_server_config.Config, logConf *elog.LogConf) *GrpcServer {
+func NewGrpcServer(config *grpc_server_config.Config) *GrpcServer {
 	if config == nil {
 		config = grpc_server_config.DefaultConfig()
 	}
@@ -56,7 +55,6 @@ func NewGrpcServer(config *grpc_server_config.Config, logConf *elog.LogConf) *Gr
 
 	return &GrpcServer{
 		config:   config,
-		logConf:  logConf,
 		Server:   newServer,
 		listener: nil,
 		quit:     make(chan struct{}),
