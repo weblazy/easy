@@ -32,10 +32,46 @@ func (e *ExplainPlugin) Name() string {
 }
 
 func (e *ExplainPlugin) Initialize(db *gorm.DB) error {
-	return db.Callback().Query().After("gorm:query").Register("explain", CheckIndex)
+	var lastErr error
+	afterErrMsg := "ExplainEndErr"
+	afterName := "ExplainEnd"
+	afterFn := ExplainEnd
+
+	err := db.Callback().Query().After("gorm:query").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Create().After("gorm:create").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Update().After("gorm:update").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Delete().After("gorm:delete").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Row().After("gorm:row").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Raw().After("gorm:raw").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	return lastErr
+
 }
 
-func CheckIndex(db *gorm.DB) {
+func ExplainEnd(db *gorm.DB) {
 	result := &Explain{}
 	session := &gorm.Session{
 		NewDB:   true,

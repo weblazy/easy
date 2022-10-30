@@ -30,7 +30,41 @@ func (e *LogPlugin) Name() string {
 }
 
 func (e *LogPlugin) Initialize(db *gorm.DB) error {
-	return db.Callback().Query().After("gorm:query").Register("LogEnd", e.LogEnd("gorm:query"))
+	var lastErr error
+	afterErrMsg := "LogEndErr"
+	afterName := "LogEnd"
+	err := db.Callback().Query().After("gorm:query").Register(afterName, e.LogEnd("gorm:query"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Create().After("gorm:create").Register(afterName, e.LogEnd("gorm:create"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Update().After("gorm:update").Register(afterName, e.LogEnd("gorm:update"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Delete().After("gorm:delete").Register(afterName, e.LogEnd("gorm:delete"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Row().After("gorm:row").Register(afterName, e.LogEnd("gorm:row"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Raw().After("gorm:raw").Register(afterName, e.LogEnd("gorm:raw"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	return lastErr
+
 }
 
 func (e *LogPlugin) LogEnd(method string) func(db *gorm.DB) {

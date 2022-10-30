@@ -6,6 +6,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/weblazy/easy/utils/db/mysql/manager"
 	"github.com/weblazy/easy/utils/db/mysql/mysql_config"
+	"github.com/weblazy/easy/utils/elog"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
@@ -72,7 +74,40 @@ func (e *MetricPlugin) Name() string {
 }
 
 func (e *MetricPlugin) Initialize(db *gorm.DB) error {
-	return db.Callback().Query().After("gorm:query").Register("MetricEnd", e.MetricEnd("gorm:query"))
+	var lastErr error
+	afterErrMsg := "MetricEndErr"
+	afterName := "MetricEnd"
+	err := db.Callback().Query().After("gorm:query").Register(afterName, e.MetricEnd("gorm:query"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Create().After("gorm:create").Register(afterName, e.MetricEnd("gorm:create"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Update().After("gorm:update").Register(afterName, e.MetricEnd("gorm:update"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Delete().After("gorm:delete").Register(afterName, e.MetricEnd("gorm:delete"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Row().After("gorm:row").Register(afterName, e.MetricEnd("gorm:row"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Raw().After("gorm:raw").Register(afterName, e.MetricEnd("gorm:raw"))
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	return lastErr
 }
 
 func (e *MetricPlugin) MetricEnd(method string) func(db *gorm.DB) {

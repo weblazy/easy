@@ -2,7 +2,9 @@ package interceptor
 
 import (
 	"github.com/weblazy/easy/utils/db/mysql/manager"
+	"github.com/weblazy/easy/utils/elog"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -20,11 +22,79 @@ func NewTracePlugin(dsn *manager.DSN) *TracePlugin {
 }
 
 func (t *TracePlugin) Name() string {
-	return "metric"
+	return "trace"
 }
 
 func (t *TracePlugin) Initialize(db *gorm.DB) error {
-	return db.Callback().Query().After("gorm:query").Register("explain", t.TraceStart)
+	var lastErr error
+	beforeErrMsg := "TraceStartErr"
+	beforeName := "TraceStart"
+	beforeFn := t.TraceStart
+	err := db.Callback().Query().Before("gorm:query").Register(beforeName, beforeFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Create().Before("gorm:create").Register(beforeName, beforeFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Update().Before("gorm:update").Register(beforeName, beforeFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Delete().Before("gorm:delete").Register(beforeName, beforeFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Row().Before("gorm:row").Register(beforeName, beforeFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Raw().Before("gorm:raw").Register(beforeName, beforeFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
+	}
+	afterErrMsg := "TraceEndErr"
+	afterName := "TraceEnd"
+	afterFn := t.TraceEnd
+	err = db.Callback().Query().After("gorm:query").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Create().After("gorm:create").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Update().After("gorm:update").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Delete().After("gorm:delete").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Row().After("gorm:row").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	err = db.Callback().Raw().After("gorm:raw").Register(afterName, afterFn)
+	if err != nil {
+		lastErr = err
+		elog.ErrorCtx(db.Statement.Context, afterErrMsg, zap.Error(err))
+	}
+	return lastErr
+
 }
 
 func (t *TracePlugin) TraceStart(db *gorm.DB) {

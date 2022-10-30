@@ -23,40 +23,38 @@ func (e *StartTimePlugin) Name() string {
 
 func (e *StartTimePlugin) Initialize(db *gorm.DB) error {
 	var lastErr error
-	err := db.Callback().Query().Before("gorm:query").Register("SetStartTime", SetStartTime)
+	beforeErrMsg := "SetStartTimeErr"
+	beforeName := "SetStartTime"
+	beforeFn := SetStartTime
+	err := db.Callback().Query().Before("gorm:query").Register(beforeName, beforeFn)
 	if err != nil {
 		lastErr = err
-		elog.ErrorCtx(db.Statement.Context, "SetStartTimeErr", zap.Error(err))
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
 	}
-	err = db.Callback().Create().Before("gorm:create").Register("SetStartTime", SetStartTime)
+	err = db.Callback().Create().Before("gorm:create").Register(beforeName, beforeFn)
 	if err != nil {
 		lastErr = err
-		elog.ErrorCtx(db.Statement.Context, "SetStartTimeErr", zap.Error(err))
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
 	}
-	err = db.Callback().Update().Before("gorm:update").Register("SetStartTime", SetStartTime)
+	err = db.Callback().Update().Before("gorm:update").Register(beforeName, beforeFn)
 	if err != nil {
 		lastErr = err
-		elog.ErrorCtx(db.Statement.Context, "SetStartTimeErr", zap.Error(err))
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
 	}
-	err = db.Callback().Delete().Before("gorm:delete").Register("SetStartTime", SetStartTime)
+	err = db.Callback().Delete().Before("gorm:delete").Register(beforeName, beforeFn)
 	if err != nil {
 		lastErr = err
-		elog.ErrorCtx(db.Statement.Context, "SetStartTimeErr", zap.Error(err))
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
 	}
-	err = db.Callback().Query().Before("gorm:query").Register("SetStartTime", SetStartTime)
+	err = db.Callback().Row().Before("gorm:row").Register(beforeName, beforeFn)
 	if err != nil {
 		lastErr = err
-		elog.ErrorCtx(db.Statement.Context, "SetStartTimeErr", zap.Error(err))
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
 	}
-	err = db.Callback().Row().Before("gorm:row").Register("SetStartTime", SetStartTime)
+	err = db.Callback().Raw().Before("gorm:raw").Register(beforeName, beforeFn)
 	if err != nil {
 		lastErr = err
-		elog.ErrorCtx(db.Statement.Context, "SetStartTimeErr", zap.Error(err))
-	}
-	err = db.Callback().Raw().Before("gorm:raw").Register("SetStartTime", SetStartTime)
-	if err != nil {
-		lastErr = err
-		elog.ErrorCtx(db.Statement.Context, "SetStartTimeErr", zap.Error(err))
+		elog.ErrorCtx(db.Statement.Context, beforeErrMsg, zap.Error(err))
 	}
 	return lastErr
 }
@@ -64,7 +62,6 @@ func (e *StartTimePlugin) Initialize(db *gorm.DB) error {
 func SetStartTime(db *gorm.DB) {
 	startTime := time.Now()
 	db.Statement.Context = context.WithValue(db.Statement.Context, ctxStartTimeKey{}, startTime)
-	return
 }
 
 func GetStartTime(db *gorm.DB) time.Time {
