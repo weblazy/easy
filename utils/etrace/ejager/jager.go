@@ -47,7 +47,7 @@ func DefaultConfig() *Config {
 		ServiceName:    os.Getenv(MY_PROJECT_NAME_KEY),
 		EnvName:        os.Getenv(MY_ENV_NAME_KEY),
 		ProjectEnvName: os.Getenv(MY_PROJECT_ENV_NAME_KEY),
-		AgentHost:      "jaeger-agent-cluster.inner-udp.efficiency.ww5sawfyut0k.bitsvc.io",
+		AgentHost:      "",
 		AgentPort:      "6831",
 		Fraction:       1.0,
 	}
