@@ -33,7 +33,7 @@ func DefaultConfig() *Config {
 		Enable:        true,
 		ServiceName:   os.Getenv(PROJECT_NAME_KEY),
 		EnvName:       os.Getenv(ENV_KEY),
-		AgentEndPoint: "monitor.infra.ww5sawfyut0k.bitsvc.io:31801",
+		AgentEndPoint: "",
 		Sampler:       0.1,
 	}
 }
