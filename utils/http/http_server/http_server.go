@@ -7,6 +7,7 @@ import (
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
+	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
 	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
 	"github.com/weblazy/easy/utils/http/http_server/interceptor"
@@ -43,7 +44,8 @@ func NewHttpServer(c *http_server_config.Config) (*HttpServer, error) {
 	r.Use(interceptor.SetStartTimeInterceptor())
 	r.Use(interceptor.HeaderCarrierInterceptor())
 	if server.Config.EnableTraceInterceptor {
-		r.Use(interceptor.Trace(ctx))
+		// 两个trace,去掉一个
+		r.Use(otelgin.Middleware(c.Name))
 	}
 	if server.Config.EnableLogInterceptor {
 		r.Use(interceptor.Log(ctx, c))

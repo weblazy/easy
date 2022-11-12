@@ -63,6 +63,8 @@ func DefaultConfig() *Config {
 }
 
 func (config *Config) BuildDialOptions() {
+	config.DialOptions = append(config.DialOptions, interceptor.GrpcHeaderCarrierInterceptor())
+
 	// 最先执行trace
 	if config.EnableTraceInterceptor {
 		// 默认会启用 jaeger

@@ -57,8 +57,8 @@ func logAccess(cfg *http_client_config.Config, req *resty.Request, res *resty.Re
 	)
 
 	// 开启了链路，那么就记录链路id
-	if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-		fields = append(fields, zap.String("trace_id", etrace.ExtractTraceID(req.Context())))
+	if cfg.EnableTraceInterceptor {
+		fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(req.Context())))
 	}
 
 	if cfg.EnableAccessInterceptorReq {

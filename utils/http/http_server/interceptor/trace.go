@@ -11,11 +11,7 @@ import (
 func Trace(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// otel trace
-
 		traceId := etrace.ExtractTraceID(c.Request.Context())
-		if c.Request.Header.Get("Traceid") != "" {
-			traceId = c.Request.Header.Get("Traceid")
-		}
 		// 服务内部生成
 		if traceId == "" {
 			traceId = uuid.NewString()

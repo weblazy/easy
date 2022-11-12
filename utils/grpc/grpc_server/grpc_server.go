@@ -161,6 +161,7 @@ func BuildServerOptions(config *grpc_server_config.Config) {
 	// 暂时没有 stream 需求
 	var streamInterceptors []grpc.StreamServerInterceptor
 	var unaryInterceptors []grpc.UnaryServerInterceptor
+
 	// trace 必须在最外层，否则无法取到trace信息，传递到其他中间件
 	if config.EnableTraceInterceptor {
 		unaryInterceptors = append(unaryInterceptors, etrace.UnaryServerInterceptor())

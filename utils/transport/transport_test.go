@@ -280,7 +280,7 @@ func benchmarkAutoPassLen(b *testing.B, l int) {
 		h.Add(testKeys[i], testKeys[i])
 	}
 
-	ck := CustomKeysMapPropagator
+	ck := 
 	h2 := http.Header{}
 
 	for i := 0; i < b.N; i++ {
