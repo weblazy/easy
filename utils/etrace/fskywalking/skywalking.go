@@ -13,8 +13,9 @@ import (
 )
 
 const (
-	ENV_KEY          = "MY_ENV_NAME"
-	PROJECT_NAME_KEY = "MY_PROJECT_NAME"
+	ENV_KEY               = "MY_ENV_NAME"
+	PROJECT_NAME_KEY      = "MY_PROJECT_NAME"
+	MY_PROJECT_TRACE_HOST = "MY_PROJECT_TRACE_HOST"
 )
 
 var emptyCtx = context.Background()
@@ -33,7 +34,7 @@ func DefaultConfig() *Config {
 		Enable:        true,
 		ServiceName:   os.Getenv(PROJECT_NAME_KEY),
 		EnvName:       os.Getenv(ENV_KEY),
-		AgentEndPoint: "",
+		AgentEndPoint: os.Getenv(MY_PROJECT_TRACE_HOST),
 		Sampler:       0.1,
 	}
 }

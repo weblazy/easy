@@ -1,4 +1,4 @@
-package ejager
+package ejaeger
 
 import (
 	"context"
@@ -23,6 +23,7 @@ const (
 	MY_ENV_NAME_KEY         = "BSM_SERVICE_STAGE"
 	MY_PROJECT_ENV_NAME_KEY = "MY_PROJECT_ENV_NAME"
 	MY_PROJECT_NAME_KEY     = "MY_PROJECT_NAME"
+	MY_PROJECT_TRACE_HOST   = "MY_PROJECT_TRACE_HOST"
 )
 
 var emptyCtx = context.Background()
@@ -47,7 +48,7 @@ func DefaultConfig() *Config {
 		ServiceName:    os.Getenv(MY_PROJECT_NAME_KEY),
 		EnvName:        os.Getenv(MY_ENV_NAME_KEY),
 		ProjectEnvName: os.Getenv(MY_PROJECT_ENV_NAME_KEY),
-		AgentHost:      "",
+		AgentHost:      os.Getenv(MY_PROJECT_TRACE_HOST),
 		AgentPort:      "6831",
 		Fraction:       1.0,
 	}

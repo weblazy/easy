@@ -44,6 +44,7 @@ func NewHttpServer(c *http_server_config.Config) (*HttpServer, error) {
 	r.Use(interceptor.SetStartTimeInterceptor())
 	if server.Config.EnableTraceInterceptor {
 		r.Use(otelgin.Middleware(c.Name))
+		r.Use(interceptor.Trace(ctx))
 	}
 	r.Use(interceptor.HeaderCarrierInterceptor())
 

@@ -95,7 +95,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 		}
 		// 开启了链路，那么就记录链路id
 		if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-			fields = append(fields, zap.String("trace_id", etrace.ExtractTraceID(ctx)))
+			fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
 		}
 		if err != nil {
 			fields = append(fields, zap.String("event", "error"), zap.Error(err))

@@ -8,6 +8,8 @@ import (
 
 func TestNewHttpServer(t *testing.T) {
 	convey.Convey("TestNewHttpServer", t, func() {
+		// fcfg := ejaeger.DefaultConfig()
+		// etrace.SetGlobalTracer(fcfg.Build())
 		// cfg := http_server_config.DefaultConfig()
 		// server, err := NewHttpServer(cfg)
 		// convey.So(err, convey.ShouldBeNil)
