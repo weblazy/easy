@@ -63,13 +63,13 @@ func DefaultConfig() *Config {
 }
 
 func (config *Config) BuildDialOptions() {
-	config.DialOptions = append(config.DialOptions, interceptor.GrpcHeaderCarrierInterceptor())
-
 	// 最先执行trace
 	if config.EnableTraceInterceptor {
 		// 默认会启用 jaeger
 		config.DialOptions = append(config.DialOptions, grpc.WithChainUnaryInterceptor(etrace.UnaryClientInterceptor()))
 	}
+	// 透传公共参数
+	config.DialOptions = append(config.DialOptions, interceptor.GrpcHeaderCarrierInterceptor())
 
 	// 其次执行，自定义header头，这样才能赋值到ctx里
 	// options = append(options, WithDialOption(grpc.WithChainUnaryInterceptor(customHeader(transport.CustomContextKeys()))))

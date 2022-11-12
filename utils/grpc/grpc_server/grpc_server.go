@@ -166,7 +166,7 @@ func BuildServerOptions(config *grpc_server_config.Config) {
 	if config.EnableTraceInterceptor {
 		unaryInterceptors = append(unaryInterceptors, etrace.UnaryServerInterceptor())
 	}
-
+	unaryInterceptors = append(unaryInterceptors, interceptor.GrpcHeaderCarrierInterceptor())
 	unaryInterceptors = append(unaryInterceptors, config.PrependUnaryInterceptors...)
 	unaryInterceptors = append(unaryInterceptors, interceptor.GrpcLogger(config))
 

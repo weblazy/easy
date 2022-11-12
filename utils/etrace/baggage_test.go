@@ -1,4 +1,4 @@
-package ftrace
+package etrace
 
 import (
 	"context"

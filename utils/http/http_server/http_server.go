@@ -42,11 +42,11 @@ func NewHttpServer(c *http_server_config.Config) (*HttpServer, error) {
 	// }
 	r := gin.New()
 	r.Use(interceptor.SetStartTimeInterceptor())
-	r.Use(interceptor.HeaderCarrierInterceptor())
 	if server.Config.EnableTraceInterceptor {
-		// 两个trace,去掉一个
 		r.Use(otelgin.Middleware(c.Name))
 	}
+	r.Use(interceptor.HeaderCarrierInterceptor())
+
 	if server.Config.EnableLogInterceptor {
 		r.Use(interceptor.Log(ctx, c))
 	}
