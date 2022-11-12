@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/weblazy/easy/utils/etrace"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 )
@@ -129,6 +130,9 @@ func MergeCtxFields(ctx context.Context, fields ...zap.Field) []zap.Field {
 	_, file, line, _ := runtime.Caller(DefaultSkip + skip)
 	skipField := zap.String("caller", fmt.Sprintf("%s:%d", file, line))
 	flen := len(fields)
+
+	traceId := etrace.ExtractTraceID(ctx)
+
 	// 获取ctx中的field
 	if ctxFields, ok := ctx.Value(CtxFieldKey{}).([]zap.Field); ok {
 		llen := len(ctxFields)
@@ -136,11 +140,11 @@ func MergeCtxFields(ctx context.Context, fields ...zap.Field) []zap.Field {
 		newFields := make([]zap.Field, llen+flen)
 		copy(newFields, ctxFields)
 		copy(newFields[llen:], fields)
-		newFields = append(newFields, skipField)
+		newFields = append(newFields, FieldTrace(traceId), skipField)
 		return newFields
 	}
 	newFields := make([]zap.Field, flen)
 	copy(newFields, fields)
-	fields = append(fields, skipField)
-	return fields
+	newFields = append(newFields, FieldTrace(traceId), skipField, skipField)
+	return newFields
 }
