@@ -39,15 +39,15 @@ func GrpcLogger(config *grpc_server_config.Config) grpc.UnaryServerInterceptor {
 			traceId = uuid.NewString()
 		}
 		fields := make([]zap.Field, 0)
-		fields = append(fields, zap.String("trace_id", traceId), zap.String("method", info.FullMethod), zap.Any("req", req), zap.Any("metadata", md))
+		fields = append(fields, elog.FieldTrace(traceId), elog.FieldMethod(info.FullMethod), elog.FieldReq(req), zap.Any("metadata", md))
 
 		resp, err = handler(ctx, req)
 		ctx = elog.SetLogerName(ctx, grpc_server_config.PkgName)
 		if err != nil {
-			fields = append(fields, elog.FieldError(err), elog.FieldCost(time.Since(start)))
+			fields = append(fields, elog.FieldError(err), elog.FieldDuration(time.Since(start)))
 			elog.ErrorCtx(ctx, grpc_server_config.PkgName, fields...)
 		} else {
-			fields = append(fields, zap.Any("res", resp), elog.FieldCost(time.Since(start)))
+			fields = append(fields, elog.FieldResp(resp), elog.FieldDuration(time.Since(start)))
 			elog.InfoCtx(ctx, grpc_server_config.PkgName, fields...)
 		}
 		return resp, err

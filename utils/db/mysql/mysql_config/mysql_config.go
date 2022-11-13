@@ -7,6 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	PkgName = "emysql"
+)
+
 // Config options
 type Config struct {
 	Name                       string

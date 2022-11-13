@@ -10,6 +10,10 @@ import (
 	"google.golang.org/grpc/keepalive"
 )
 
+const (
+	PkgName = "grpc_client"
+)
+
 // Config fgrpc client config.
 type Config struct {
 	Name             string

@@ -100,30 +100,33 @@ func (e *LogPlugin) LogEnd(method string) func(db *gorm.DB) {
 		}
 
 		// 如果有慢日志，就记录
+		var isSlow bool
 		if e.config.SlowLogThreshold > time.Duration(0) && e.config.SlowLogThreshold < duration {
-			fields = append(fields, zap.Bool("slow", true))
+			isSlow = true
 		}
-
+		fields = append(fields, elog.FieldSlow(isSlow))
 		// 如果有错误，记录错误信息
 		if db.Error != nil {
 			fields = append(fields, elog.FieldEvent("error"), elog.FieldError(db.Error))
 			if errors.Is(db.Error, ErrRecordNotFound) {
 				if e.config.EnableRecordNotFoundLog {
-					elog.WarnCtx(db.Statement.Context, "gorm_client", fields...)
+					elog.WarnCtx(db.Statement.Context, mysql_config.PkgName, fields...)
 				}
 				return
 			}
-			elog.ErrorCtx(db.Statement.Context, "gorm_client", fields...)
+			elog.ErrorCtx(db.Statement.Context, mysql_config.PkgName, fields...)
+			return
+		}
+
+		if isSlow {
+			elog.WarnCtx(db.Statement.Context, mysql_config.PkgName, fields...)
 			return
 		}
 
 		// 开启了记录日志信息，那么就记录access
 		// event normal和error，代表全部access的请求数
 		if e.config.EnableAccessInterceptor {
-			fields = append(fields,
-				elog.FieldEvent("normal"),
-			)
-			elog.InfoCtx(db.Statement.Context, "gorm_client", fields...)
+			elog.InfoCtx(db.Statement.Context, mysql_config.PkgName, fields...)
 		}
 
 	}

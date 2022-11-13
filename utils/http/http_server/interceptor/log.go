@@ -80,30 +80,34 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 			zap.String("url", req.URL.String()),
 			zap.String("host", c.GetHeader("Host")),
 			zap.String("path", req.URL.Path),
-			zap.String("method", c.GetHeader("Method")),
+			elog.FieldMethod(c.GetHeader("Method")),
 			zap.Any("req_header", req.Header),
 			zap.String("req_body", logData.RequestBody),
 			zap.Any("res_header", c.Writer.Header()),
 			zap.String("res_body", blw.body.String()),
 			zap.String("client_ip", c.ClientIP()),
 			zap.String("start_time", GetStartTime(ctx).Format(timex.TimeLayout)),
-			zap.Float64("duration", float64(duration.Microseconds())/1000),
+			elog.FieldDuration(duration),
 		}
 		fields = append(fields, zap.Int("status_code", c.Writer.Status()))
+		var isSlow bool
 		if cfg.SlowLogThreshold > time.Duration(0) && duration > cfg.SlowLogThreshold {
-			fields = append(fields, zap.Bool("slow", true))
+			isSlow = true
 		}
+		fields = append(fields, elog.FieldSlow(isSlow))
 		// 开启了链路，那么就记录链路id
 		if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
 			fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
 		}
 		if err != nil {
 			fields = append(fields, zap.String("event", "error"), zap.Error(err))
-			elog.WarnCtx(ctx, "http_server", fields...)
+			elog.ErrorCtx(ctx, http_server_config.PkgName, fields...)
 			return
+		} else if isSlow {
+			elog.WarnCtx(ctx, http_server_config.PkgName, fields...)
 		} else if cfg.EnableAccessInterceptor {
 			fields = append(fields, zap.String("event", "normal"))
-			elog.InfoCtx(ctx, "http_server", fields...)
+			elog.InfoCtx(ctx, http_server_config.PkgName, fields...)
 		}
 	}()
 

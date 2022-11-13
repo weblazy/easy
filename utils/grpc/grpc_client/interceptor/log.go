@@ -8,6 +8,7 @@ import (
 	"github.com/weblazy/easy/utils/ecodes"
 	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
+	"github.com/weblazy/easy/utils/grpc/grpc_client/grpc_client_config"
 	"github.com/weblazy/easy/utils/transport"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -68,30 +69,33 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 		}
 
 		if config.EnableAccessInterceptorReq {
-			fields = append(fields, zap.Any("req", req))
+			fields = append(fields, elog.FieldReq(req))
 		}
 		if config.EnableAccessInterceptorRes {
-			fields = append(fields, zap.Any("res", res))
+			fields = append(fields, elog.FieldResp(res))
 		}
-
+		var isSlow bool
 		if config.SlowLogThreshold > time.Duration(0) && duration > config.SlowLogThreshold {
-			fields = append(fields, zap.Bool("slow", true))
+			isSlow = true
 		}
+		fields = append(fields, elog.FieldSlow(isSlow))
 
 		if err != nil {
 			fields = append(fields, elog.FieldEvent("error"), elog.FieldError(err))
 			// 只记录系统级别错误
 			if httpStatusCode >= http.StatusInternalServerError {
 				// 只记录系统级别错误
-				elog.ErrorCtx(ctx, "grpc_client", fields...)
+				elog.ErrorCtx(ctx, grpc_client_config.PkgName, fields...)
 				return err
 			}
 			// 业务报错只做warning
-			elog.WarnCtx(ctx, "grpc_client", fields...)
+			elog.WarnCtx(ctx, grpc_client_config.PkgName, fields...)
 			return err
+		} else if isSlow {
+			elog.WarnCtx(ctx, grpc_client_config.PkgName, fields...)
 		} else if config.EnableAccessInterceptor {
 			fields = append(fields, elog.FieldEvent("normal"))
-			elog.InfoCtx(ctx, "grpc_client", fields...)
+			elog.InfoCtx(ctx, grpc_client_config.PkgName, fields...)
 		}
 		return nil
 	}

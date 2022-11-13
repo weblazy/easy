@@ -49,11 +49,11 @@ func logAccess(cfg *http_client_config.Config, req *resty.Request, res *resty.Re
 
 	var fields = make([]zap.Field, 0, 20)
 	fields = append(fields,
-		zap.String("name", cfg.Name),
-		zap.String("host", host),
-		zap.String("method", req.Method),
+		elog.FieldName(cfg.Name),
+		elog.FieldAddr(host),
+		elog.FieldMethod(req.Method),
 		zap.String("path", path),
-		zap.Float64("duration", float64(duration.Microseconds())/1000),
+		elog.FieldDuration(duration),
 	)
 
 	// 开启了链路，那么就记录链路id
@@ -76,24 +76,27 @@ func logAccess(cfg *http_client_config.Config, req *resty.Request, res *resty.Re
 		}
 		fields = append(fields, zap.Any("res_body", respBody))
 	}
-
+	var isSlow bool
 	if cfg.SlowLogThreshold > time.Duration(0) && duration > cfg.SlowLogThreshold {
-		fields = append(fields, zap.Bool("slow", true))
+		isSlow = true
 	}
-
+	fields = append(fields, elog.FieldSlow(isSlow))
 	if err != nil {
 		fields = append(fields, zap.String("event", "error"), zap.Error(err))
 		if res == nil {
 			// 无 res 的是连接超时等系统级错误
-			elog.ErrorCtx(req.Context(), "http_client", fields...)
+			elog.ErrorCtx(req.Context(), http_client_config.PkgName, fields...)
 			return
 		}
-		elog.WarnCtx(req.Context(), "http_client", fields...)
+		elog.WarnCtx(req.Context(), http_client_config.PkgName, fields...)
 		return
 	}
-
+	if isSlow {
+		elog.WarnCtx(req.Context(), http_client_config.PkgName, fields...)
+		return
+	}
 	if cfg.EnableAccessInterceptor {
 		fields = append(fields, zap.String("event", "normal"))
-		elog.InfoCtx(req.Context(), "http_client", fields...)
+		elog.InfoCtx(req.Context(), http_client_config.PkgName, fields...)
 	}
 }

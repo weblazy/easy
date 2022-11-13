@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const (
+	PkgName = "http_client"
+)
+
 // Config HTTP配置选项
 type Config struct {
 	Name                string        //名称
