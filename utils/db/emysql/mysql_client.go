@@ -1,13 +1,13 @@
-package mysql
+package emysql
 
 import (
 	"context"
 	"fmt"
 
-	"github.com/weblazy/easy/utils/db/mysql/interceptor"
-	_ "github.com/weblazy/easy/utils/db/mysql/internal/dsn"
-	"github.com/weblazy/easy/utils/db/mysql/manager"
-	"github.com/weblazy/easy/utils/db/mysql/mysql_config"
+	"github.com/weblazy/easy/utils/db/emysql/interceptor"
+	_ "github.com/weblazy/easy/utils/db/emysql/internal/dsn"
+	"github.com/weblazy/easy/utils/db/emysql/manager"
+	"github.com/weblazy/easy/utils/db/emysql/mysql_config"
 
 	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"

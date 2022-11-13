@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"emperror.dev/errors"
-	"github.com/weblazy/easy/utils/db/mysql/manager"
+	"github.com/weblazy/easy/utils/db/emysql/manager"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/weblazy/easy/utils/db/mysql/manager"
-	"github.com/weblazy/easy/utils/db/mysql/mysql_config"
+	"github.com/weblazy/easy/utils/db/emysql/manager"
+	"github.com/weblazy/easy/utils/db/emysql/mysql_config"
 	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
 	"go.uber.org/zap"

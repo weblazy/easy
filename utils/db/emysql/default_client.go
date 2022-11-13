@@ -1,4 +1,4 @@
-package mysql
+package emysql
 
 import (
 	"gorm.io/gorm"
