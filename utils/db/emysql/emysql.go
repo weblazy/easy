@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/weblazy/easy/utils/db/emysql/emysql_config"
 	"github.com/weblazy/easy/utils/db/emysql/interceptor"
 	_ "github.com/weblazy/easy/utils/db/emysql/internal/dsn"
 	"github.com/weblazy/easy/utils/db/emysql/manager"
-	"github.com/weblazy/easy/utils/db/emysql/mysql_config"
 
 	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
@@ -23,10 +23,10 @@ type MysqlClient struct {
 }
 
 // Option 可选项
-type Option func(c *mysql_config.Config)
+type Option func(c *emysql_config.Config)
 
 // NewMysqlClient ...
-func NewMysqlClient(config *mysql_config.Config, options ...Option) (*MysqlClient, error) {
+func NewMysqlClient(config *emysql_config.Config, options ...Option) (*MysqlClient, error) {
 	mysqlClient := MysqlClient{}
 
 	gormCfg := gorm.Config{}
@@ -98,7 +98,7 @@ func NewMysqlClient(config *mysql_config.Config, options ...Option) (*MysqlClien
 	}
 
 	// var lastErr error
-	// replace := func(processor interceptor.Processor, callbackName string, interceptors ...mysql_config.Interceptor) {
+	// replace := func(processor interceptor.Processor, callbackName string, interceptors ...emysql_config.Interceptor) {
 	// 	handler := processor.Get(callbackName)
 	// 	for _, interceptorFunc := range config.Interceptors {
 	// 		handler = interceptorFunc(config.Name, config.DsnCfg, callbackName, config)(handler)
@@ -140,10 +140,10 @@ func (c *MysqlClient) setDSNParser(dialect string) error {
 }
 
 // WithInterceptor 设置自定义拦截器
-func WithInterceptor(is ...mysql_config.Interceptor) Option {
-	return func(c *mysql_config.Config) {
+func WithInterceptor(is ...emysql_config.Interceptor) Option {
+	return func(c *emysql_config.Config) {
 		if c.Interceptors == nil {
-			c.Interceptors = make([]mysql_config.Interceptor, 0)
+			c.Interceptors = make([]emysql_config.Interceptor, 0)
 		}
 		c.Interceptors = append(c.Interceptors, is...)
 	}

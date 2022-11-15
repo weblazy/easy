@@ -4,8 +4,8 @@ import (
 	"errors"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/weblazy/easy/utils/db/emysql/emysql_config"
 	"github.com/weblazy/easy/utils/db/emysql/manager"
-	"github.com/weblazy/easy/utils/db/emysql/mysql_config"
 	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -62,7 +62,7 @@ func monitor() {
 
 type MetricPlugin struct {
 	dsn    *manager.DSN
-	config *mysql_config.Config
+	config *emysql_config.Config
 }
 
 func NewMetricPlugin() *ExplainPlugin {

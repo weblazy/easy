@@ -16,8 +16,8 @@ var (
 )
 
 // // 确保在生产不要开 debug
-// func DebugInterceptor(compName string, dsn *manager.DSN, op string, options *mysql_config.Config) func(mysql_config.Handler) mysql_config.Handler {
-// 	return func(next mysql_config.Handler) mysql_config.Handler {
+// func DebugInterceptor(compName string, dsn *manager.DSN, op string, options *emysql_config.Config) func(emysql_config.Handler) emysql_config.Handler {
+// 	return func(next emysql_config.Handler) emysql_config.Handler {
 // 		return func(db *gorm.DB) {
 // 			beg := time.Now()
 // 			next(db)

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"time"
 
+	"github.com/weblazy/easy/utils/db/emysql/emysql_config"
 	"github.com/weblazy/easy/utils/db/emysql/manager"
-	"github.com/weblazy/easy/utils/db/emysql/mysql_config"
 	"github.com/weblazy/easy/utils/elog"
 	"github.com/weblazy/easy/utils/etrace"
 	"go.uber.org/zap"
@@ -14,11 +14,11 @@ import (
 )
 
 type LogPlugin struct {
-	config *mysql_config.Config
+	config *emysql_config.Config
 	dsn    *manager.DSN
 }
 
-func NewLogPlugin(config *mysql_config.Config, dsn *manager.DSN) *LogPlugin {
+func NewLogPlugin(config *emysql_config.Config, dsn *manager.DSN) *LogPlugin {
 	return &LogPlugin{
 		config: config,
 		dsn:    dsn,
@@ -110,23 +110,23 @@ func (e *LogPlugin) LogEnd(method string) func(db *gorm.DB) {
 			fields = append(fields, elog.FieldEvent("error"), elog.FieldError(db.Error))
 			if errors.Is(db.Error, ErrRecordNotFound) {
 				if e.config.EnableRecordNotFoundLog {
-					elog.WarnCtx(db.Statement.Context, mysql_config.PkgName, fields...)
+					elog.WarnCtx(db.Statement.Context, emysql_config.PkgName, fields...)
 				}
 				return
 			}
-			elog.ErrorCtx(db.Statement.Context, mysql_config.PkgName, fields...)
+			elog.ErrorCtx(db.Statement.Context, emysql_config.PkgName, fields...)
 			return
 		}
 
 		if isSlow {
-			elog.WarnCtx(db.Statement.Context, mysql_config.PkgName, fields...)
+			elog.WarnCtx(db.Statement.Context, emysql_config.PkgName, fields...)
 			return
 		}
 
 		// 开启了记录日志信息，那么就记录access
 		// event normal和error，代表全部access的请求数
 		if e.config.EnableAccessInterceptor {
-			elog.InfoCtx(db.Statement.Context, mysql_config.PkgName, fields...)
+			elog.InfoCtx(db.Statement.Context, emysql_config.PkgName, fields...)
 		}
 
 	}

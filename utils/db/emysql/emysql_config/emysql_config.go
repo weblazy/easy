@@ -1,9 +1,9 @@
-package mysql_config
+package emysql_config
 
 import (
 	"time"
 
-	"github.com/weblazy/easy/utils/db/mysql/manager"
+	"github.com/weblazy/easy/utils/db/emysql/manager"
 	"gorm.io/gorm"
 )
 
