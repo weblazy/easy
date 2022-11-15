@@ -6,7 +6,7 @@ import (
 )
 
 func TestGetEnvConfig(t *testing.T) {
-	v := NewConfig("", "")
+	v := NewViperFromFile("", "")
 	err := os.Setenv("TEST_DEMO", "6666")
 	if err != nil {
 		t.Error(err)
