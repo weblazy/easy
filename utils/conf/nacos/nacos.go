@@ -48,7 +48,7 @@ const (
 
 var nacosHarder = &nacos{
 	vt: &ViperToml{
-		viper: &eviper.Viper{
+		Viper: &eviper.Viper{
 			Viper: viper.New(),
 		},
 		callbackList: make(map[string]func(namespace, group, dataId, data string)),

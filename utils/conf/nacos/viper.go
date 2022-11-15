@@ -16,7 +16,7 @@ type configParam struct {
 }
 
 type ViperToml struct {
-	viper             *eviper.Viper
+	Viper             *eviper.Viper
 	dataIdOrGroupList []configParam
 	callbackList      map[string]func(namespace, group, dataId, data string)
 }
@@ -34,12 +34,12 @@ func (vt *ViperToml) NacosToViper() {
 	if err != nil {
 		panic(err)
 	}
-	vt.viper.MergeViperFromString(s)
+	vt.Viper.MergeViperFromString(s)
 }
 
 // SetBaseConfig 注入基础配置
 func (vt *ViperToml) SetBaseConfig(configs string) {
-	vt.viper.MergeViperFromString(configs)
+	vt.Viper.MergeViperFromString(configs)
 }
 
 // GetConfig 获取整套配置文件
