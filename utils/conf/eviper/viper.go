@@ -1,4 +1,4 @@
-package viper
+package eviper
 
 import (
 	"bytes"
@@ -15,25 +15,26 @@ import (
 )
 
 type Viper struct {
-	C *viper.Viper
+	*viper.Viper
 }
 
 var multipleViper sync.Map
-var C = viper.New()
 
-func NewConfigToToml(configs string) {
-	C.SetConfigType("toml")
+func NewViperFromString(configs string) *Viper {
+	v := viper.New()
 	CheckToml(configs)
-	err := C.ReadConfig(bytes.NewBuffer([]byte(configs)))
+	v.SetConfigType("toml")
+	err := v.ReadConfig(bytes.NewBuffer([]byte(configs)))
 	if err != nil {
 		print(err)
 	}
+	return &Viper{v}
 }
 
-func MergeConfigToToml(configs string) {
+func (v *Viper) MergeViperFromString(configs string) {
 	CheckToml(configs)
-	C.SetConfigType("toml")
-	err := C.MergeConfig(bytes.NewBuffer([]byte(configs)))
+	v.SetConfigType("toml")
+	err := v.MergeConfig(bytes.NewBuffer([]byte(configs)))
 	if err != nil {
 		print(err)
 	}
@@ -47,8 +48,8 @@ func CheckToml(configs string) {
 	}
 }
 
-func NewConfig(filePath string, fileName string) {
-	C = newConfig(filePath, fileName).C
+func NewViperFromFile(filePath string, fileName string) *Viper {
+	return newConfig(filePath, fileName)
 }
 
 func newConfig(filePath string, fileName string) *Viper {
@@ -87,10 +88,10 @@ func LoadViperByFilename(filename string) *Viper {
 	}
 }
 
-func GetEnvConfig(key string) *utils.TypeTransform {
+func (v *Viper) GetEnvConfig(key string) *utils.TypeTransform {
 	env := os.Getenv(strings.Replace(strings.ToUpper(key), ".", "_", -1))
 	if env != "" {
 		return &utils.TypeTransform{Value: env}
 	}
-	return utils.Transform(C.Get(key))
+	return utils.Transform(v.Get(key))
 }

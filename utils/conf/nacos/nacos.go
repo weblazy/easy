@@ -4,12 +4,14 @@ import (
 	"os"
 
 	"github.com/sunmi-OS/gocore/v2/utils"
+	"github.com/weblazy/easy/utils/conf/eviper"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 	"github.com/spf13/cast"
+	"github.com/spf13/viper"
 )
 
 type nacos struct {
@@ -46,6 +48,9 @@ const (
 
 var nacosHarder = &nacos{
 	vt: &ViperToml{
+		viper: &eviper.Viper{
+			Viper: viper.New(),
+		},
 		callbackList: make(map[string]func(namespace, group, dataId, data string)),
 	},
 }

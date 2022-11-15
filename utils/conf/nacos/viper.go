@@ -5,7 +5,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"github.com/weblazy/easy/utils/conf/viper"
+	"github.com/weblazy/easy/utils/conf/eviper"
 	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 )
@@ -16,6 +16,7 @@ type configParam struct {
 }
 
 type ViperToml struct {
+	viper             *eviper.Viper
 	dataIdOrGroupList []configParam
 	callbackList      map[string]func(namespace, group, dataId, data string)
 }
@@ -33,12 +34,12 @@ func (vt *ViperToml) NacosToViper() {
 	if err != nil {
 		panic(err)
 	}
-	viper.MergeConfigToToml(s)
+	vt.viper.MergeViperFromString(s)
 }
 
 // SetBaseConfig 注入基础配置
 func (vt *ViperToml) SetBaseConfig(configs string) {
-	viper.MergeConfigToToml(configs)
+	vt.viper.MergeViperFromString(configs)
 }
 
 // GetConfig 获取整套配置文件
