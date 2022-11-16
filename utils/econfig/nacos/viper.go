@@ -5,7 +5,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/nacos-group/nacos-sdk-go/vo"
-	"github.com/weblazy/easy/utils/conf/eviper"
+	"github.com/weblazy/easy/utils/econfig/eviper"
 	"github.com/weblazy/easy/utils/elog"
 	"go.uber.org/zap"
 )
