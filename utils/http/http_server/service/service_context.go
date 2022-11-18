@@ -23,9 +23,9 @@ var (
 
 // NewContext 初始化上下文包含context.Context
 func NewServiceContext(g *gin.Context) ServiceContext {
-	g.Request.Context()
 	c := ServiceContext{
 		Context: g,
+		Ctx:     g.Request.Context(),
 		R:       NewResponse(),
 	}
 
@@ -63,6 +63,17 @@ func (c *ServiceContext) Response(code int64, msg string, data interface{}) {
 	c.R.Msg = msg
 	c.R.Data = data
 	c.JSON(http.StatusOK, c.R)
+}
+
+// 打印log
+func (c *ServiceContext) ErrLog(codeErr *code_err.CodeErr, err error) {
+	c.Error(code_err.ErrLog(c.Ctx, codeErr, err))
+}
+
+// 打印log
+func (c *ServiceContext) ErrLogf(codeErr *code_err.CodeErr, format string, a ...interface{}) error {
+	c.Error(code_err.ErrLogf(c.Ctx, codeErr, format, a...))
+	return codeErr
 }
 
 // BindValidator 参数绑定结构体，并且按照tag进行校验返回校验结果
