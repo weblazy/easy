@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sunmi-OS/gocore/v2/utils"
+	"github.com/weblazy/easy/utils/code_err"
 )
 
 type ServiceContext struct {
@@ -16,7 +17,8 @@ type ServiceContext struct {
 }
 
 var (
-	ErrorBind = errors.New("missing required parameters")
+	ErrorBind            = errors.New("missing required parameters")
+	defaultErrCode int64 = -1
 )
 
 // NewContext 初始化上下文包含context.Context
@@ -38,7 +40,12 @@ func (c *ServiceContext) Success(data interface{}) {
 
 // Error 返回异常信息，自动识别Code码
 func (c *ServiceContext) Error(err error) {
-	// c.R.Code = ecode.Transform(err)
+	if e, ok := err.(*code_err.CodeErr); ok {
+		c.R.Code = e.Code
+	}
+	if c.R.Code == 0 {
+		c.R.Code = defaultErrCode
+	}
 	c.R.Msg = err.Error()
 	c.JSON(http.StatusOK, c.R)
 }
