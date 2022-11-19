@@ -1,0 +1,11 @@
+
+syntax = "proto3";
+
+package response;
+
+option go_package = "github.com/weblazy/easy/utils/grpc/proto/response";
+
+message CodeError{
+    int64 code = 1;
+    string msg = 2;
+}

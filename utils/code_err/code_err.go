@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/weblazy/easy/utils/elog"
+	"go.uber.org/zap"
 )
 
 var (
@@ -32,16 +33,31 @@ func NewCodeErr(code int64, msg string) *CodeErr {
 }
 
 // 打印log
+func Log(ctx context.Context, msg string, codeErr *CodeErr, err error) error {
+	if _, ok := err.(*CodeErr); ok {
+		return err
+	}
+	elog.ErrorCtx(ctx, msg, elog.FieldError(err))
+	return codeErr
+}
+
+// 打印log
 func ErrLog(ctx context.Context, codeErr *CodeErr, err error) error {
 	if _, ok := err.(*CodeErr); ok {
 		return err
 	}
-	elog.ErrorCtx(ctx, "CodeErr", elog.FieldError(err))
+	elog.ErrorCtx(ctx, "Err", elog.FieldError(err))
 	return codeErr
 }
 
 // 打印log
 func ErrLogf(ctx context.Context, codeErr *CodeErr, format string, a ...interface{}) error {
-	elog.ErrorCtx(ctx, fmt.Sprintf(format, a...))
+	elog.ErrorCtx(ctx, "Errf", zap.String("error", fmt.Sprintf(format, a...)))
+	return codeErr
+}
+
+// 打印log
+func LogField(ctx context.Context, codeErr *CodeErr, msg string, fields ...zap.Field) error {
+	elog.ErrorCtx(ctx, msg, fields...)
 	return codeErr
 }
