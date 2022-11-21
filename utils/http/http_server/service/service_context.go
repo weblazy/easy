@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"net/http"
 
@@ -13,8 +12,8 @@ import (
 
 type ServiceContext struct {
 	*gin.Context
-	Ctx context.Context
-	R   Response
+	*code_err.SvcContext
+	R Response
 }
 
 var (
@@ -25,9 +24,9 @@ var (
 // NewContext 初始化上下文包含context.Context
 func NewServiceContext(g *gin.Context) ServiceContext {
 	c := ServiceContext{
-		Context: g,
-		Ctx:     g.Request.Context(),
-		R:       NewResponse(),
+		Context:    g,
+		SvcContext: code_err.NewSvcContext(g.Request.Context()),
+		R:          NewResponse(),
 	}
 
 	return c
@@ -66,23 +65,23 @@ func (c *ServiceContext) Response(code int64, msg string, data interface{}) {
 	c.JSON(http.StatusOK, c.R)
 }
 
-// 打印log
-func (c *ServiceContext) Log(msg string, codeErr *code_err.CodeErr, err error) error {
-	e := code_err.Log(c.Ctx, msg, codeErr, err)
-	c.Error(e)
-	return e
+func (c *ServiceContext) Return(err error) {
+	if err == nil {
+		c.JSON(http.StatusOK, c.R)
+		return
+	}
+	c.Error(err)
+}
+
+// Success 返回正常数据
+func (c *ServiceContext) SetData(data interface{}) error {
+	c.R.Data = data
+	return nil
 }
 
 // 打印log
-func (c *ServiceContext) ErrLog(codeErr *code_err.CodeErr, err error) error {
-	e := code_err.ErrLog(c.Ctx, codeErr, err)
-	c.Error(e)
-	return e
-}
-
-// 打印log
-func (c *ServiceContext) ErrLogf(codeErr *code_err.CodeErr, format string, a ...interface{}) error {
-	e := code_err.ErrLogf(c.Ctx, codeErr, format, a...)
+func (c *ServiceContext) LogErr(codeErr *code_err.CodeErr, msg string, err error) error {
+	e := code_err.LogErr(c.Ctx, codeErr, msg, err)
 	c.Error(e)
 	return e
 }
