@@ -15,11 +15,11 @@ func NewSvcContext(ctx context.Context) *SvcContext {
 }
 
 // 打印log
-func (c *SvcContext) LogErr(codeErr *CodeErr, msg string, err error) error {
+func (c *SvcContext) LogErr(codeErr *CodeErr, msg string, err error) *CodeErr {
 	return LogErr(c.Ctx, codeErr, msg, err)
 }
 
 // 打印log
-func (c *SvcContext) LogField(codeErr *CodeErr, msg string, fields ...zap.Field) error {
+func (c *SvcContext) LogField(codeErr *CodeErr, msg string, fields ...zap.Field) *CodeErr {
 	return LogField(c.Ctx, codeErr, msg, fields...)
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sunmi-OS/gocore/v2/utils"
 	"github.com/weblazy/easy/utils/code_err"
-	"go.uber.org/zap"
 )
 
 type ServiceContext struct {
@@ -64,33 +63,18 @@ func (c *ServiceContext) Response(code int64, msg string, data interface{}) {
 	c.R.Data = data
 	c.JSON(http.StatusOK, c.R)
 }
-
-func (c *ServiceContext) Return(err error) {
-	if err == nil {
-		c.JSON(http.StatusOK, c.R)
-		return
+func (c *ServiceContext) Return(err *code_err.CodeErr) {
+	if err != nil {
+		c.R.Code = err.Code
+		c.R.Msg = err.Msg
 	}
-	c.Error(err)
+	c.JSON(http.StatusOK, c.R)
 }
 
 // Success 返回正常数据
-func (c *ServiceContext) SetData(data interface{}) error {
+func (c *ServiceContext) SetData(data interface{}) *code_err.CodeErr {
 	c.R.Data = data
 	return nil
-}
-
-// 打印log
-func (c *ServiceContext) LogErr(codeErr *code_err.CodeErr, msg string, err error) error {
-	e := code_err.LogErr(c.Ctx, codeErr, msg, err)
-	c.Error(e)
-	return e
-}
-
-// 打印log
-func (c *ServiceContext) LogField(codeErr *code_err.CodeErr, msg string, fields ...zap.Field) error {
-	e := code_err.LogField(c.Ctx, codeErr, msg, fields...)
-	c.Error(e)
-	return e
 }
 
 // BindValidator 参数绑定结构体，并且按照tag进行校验返回校验结果

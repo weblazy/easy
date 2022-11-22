@@ -32,17 +32,27 @@ func NewCodeErr(code int64, msg string) *CodeErr {
 	}
 }
 
+func GetCodeErr(err error) *CodeErr {
+	if err == nil {
+		return nil
+	}
+	if v, ok := err.(*CodeErr); ok {
+		return v
+	}
+	return SystemErr
+}
+
 // 打印msg和err
-func LogErr(ctx context.Context, codeErr *CodeErr, msg string, err error) error {
-	if _, ok := err.(*CodeErr); ok {
-		return err
+func LogErr(ctx context.Context, codeErr *CodeErr, msg string, err error) *CodeErr {
+	if v, ok := err.(*CodeErr); ok {
+		return v
 	}
 	elog.ErrorCtx(ctx, msg, elog.FieldError(err))
 	return codeErr
 }
 
 // 打印field
-func LogField(ctx context.Context, codeErr *CodeErr, msg string, fields ...zap.Field) error {
+func LogField(ctx context.Context, codeErr *CodeErr, msg string, fields ...zap.Field) *CodeErr {
 	elog.ErrorCtx(ctx, msg, fields...)
 	return codeErr
 }
