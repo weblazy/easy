@@ -21,14 +21,14 @@ var (
 )
 
 // NewContext 初始化上下文包含context.Context
-func NewServiceContext(g *gin.Context) ServiceContext {
+func NewServiceContext(g *gin.Context) *ServiceContext {
 	c := ServiceContext{
 		Context:    g,
 		SvcContext: code_err.NewSvcContext(g.Request.Context()),
 		R:          NewResponse(),
 	}
 
-	return c
+	return &c
 }
 
 // Success 返回正常数据
