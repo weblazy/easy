@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/sunmi-OS/gocore/v2/conf/viper"
-	"github.com/weblazy/easy/utils/closes"
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/closes"
+	"github.com/weblazy/easy/elog"
 	"go.uber.org/zap"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/weblazy/easy/utils/elog/logx"
+	"github.com/weblazy/easy/elog/logx"
 
 	"go.uber.org/zap"
 )

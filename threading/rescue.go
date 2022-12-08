@@ -1,6 +1,6 @@
 package threading
 
-import "github.com/weblazy/easy/utils/logx"
+import "github.com/weblazy/easy/logx"
 
 func Rescue(cleanups ...func()) {
 	for _, cleanup := range cleanups {

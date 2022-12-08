@@ -3,9 +3,9 @@ package syncx
 import (
 	"time"
 
-	"github.com/weblazy/easy/utils/timex"
+	"github.com/weblazy/easy/timex"
 
-	"github.com/weblazy/easy/utils/lang"
+	"github.com/weblazy/easy/lang"
 )
 
 type Cond struct {

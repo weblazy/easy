@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/weblazy/easy/utils/lang"
+	"github.com/weblazy/easy/lang"
 )
 
 type (

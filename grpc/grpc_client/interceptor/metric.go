@@ -5,8 +5,8 @@ import (
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/weblazy/easy/utils/eerror"
-	"github.com/weblazy/easy/utils/fmetric"
+	"github.com/weblazy/easy/eerror"
+	"github.com/weblazy/easy/fmetric"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )

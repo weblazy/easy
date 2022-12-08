@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/elog"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
 	"go.opentelemetry.io/otel/sdk/resource"

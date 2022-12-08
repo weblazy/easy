@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/weblazy/easy/utils/etrace"
+	"github.com/weblazy/easy/etrace"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 )

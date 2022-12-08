@@ -2,7 +2,7 @@ package interceptor
 
 import (
 	"github.com/go-resty/resty/v2"
-	"github.com/weblazy/easy/utils/transport"
+	"github.com/weblazy/easy/transport"
 	"go.opentelemetry.io/otel/propagation"
 )
 

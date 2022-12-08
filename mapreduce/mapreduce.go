@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"sync"
 
-	errorx "github.com/weblazy/easy/utils/eerror"
+	errorx "github.com/weblazy/easy/eerror"
 
-	"github.com/weblazy/easy/utils/syncx"
+	"github.com/weblazy/easy/syncx"
 
-	"github.com/weblazy/easy/utils/threading"
+	"github.com/weblazy/easy/threading"
 
-	"github.com/weblazy/easy/utils/lang"
+	"github.com/weblazy/easy/lang"
 )
 
 const (

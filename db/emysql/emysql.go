@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/weblazy/easy/utils/db/emysql/emysql_config"
-	"github.com/weblazy/easy/utils/db/emysql/interceptor"
-	_ "github.com/weblazy/easy/utils/db/emysql/internal/dsn"
-	"github.com/weblazy/easy/utils/db/emysql/manager"
+	"github.com/weblazy/easy/db/emysql/emysql_config"
+	"github.com/weblazy/easy/db/emysql/interceptor"
+	_ "github.com/weblazy/easy/db/emysql/internal/dsn"
+	"github.com/weblazy/easy/db/emysql/manager"
 
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/elog"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"

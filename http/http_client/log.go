@@ -9,8 +9,8 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/elog/sls"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/elog/sls"
 )
 
 type Log interface {

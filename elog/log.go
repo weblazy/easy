@@ -4,8 +4,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/weblazy/easy/utils/elog/ezap"
-	"github.com/weblazy/easy/utils/elog/logx"
+	"github.com/weblazy/easy/elog/ezap"
+	"github.com/weblazy/easy/elog/logx"
 )
 
 var (

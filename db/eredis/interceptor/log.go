@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/weblazy/easy/utils/db/eredis/eredis_config"
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/etrace"
+	"github.com/weblazy/easy/db/eredis/eredis_config"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/etrace"
 	"go.uber.org/zap"
 )
 

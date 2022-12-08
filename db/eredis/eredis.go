@@ -5,10 +5,10 @@ import (
 	"fmt"
 
 	"github.com/go-redis/redis/v8"
-	"github.com/weblazy/easy/utils/db/eredis/eredis_config"
-	"github.com/weblazy/easy/utils/db/eredis/interceptor"
+	"github.com/weblazy/easy/db/eredis/eredis_config"
+	"github.com/weblazy/easy/db/eredis/interceptor"
 
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/elog"
 )
 
 var emptyCtx = context.Background()

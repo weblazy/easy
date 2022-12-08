@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/grpc/grpc_client/grpc_client_config"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/grpc/grpc_client/grpc_client_config"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/credentials/insecure"
 

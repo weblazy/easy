@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/weblazy/easy/utils/stringx"
+	"github.com/weblazy/easy/stringx"
 )
 
 // 编译http参数

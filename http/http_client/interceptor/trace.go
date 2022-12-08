@@ -3,7 +3,7 @@ package interceptor
 import (
 	"github.com/go-resty/resty/v2"
 	"github.com/spf13/cast"
-	"github.com/weblazy/easy/utils/http/http_client/http_client_config"
+	"github.com/weblazy/easy/http/http_client/http_client_config"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"

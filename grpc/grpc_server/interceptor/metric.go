@@ -5,11 +5,11 @@ import (
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/weblazy/easy/utils/eerror"
+	"github.com/weblazy/easy/eerror"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 
-	"github.com/weblazy/easy/utils/fmetric"
+	"github.com/weblazy/easy/fmetric"
 )
 
 // 目前图表只用到了 resultCode 和 app 字段(收集时自动注入)

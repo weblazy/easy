@@ -4,9 +4,9 @@ import (
 	"errors"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/weblazy/easy/utils/db/emysql/emysql_config"
-	"github.com/weblazy/easy/utils/db/emysql/manager"
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/db/emysql/emysql_config"
+	"github.com/weblazy/easy/db/emysql/manager"
+	"github.com/weblazy/easy/elog"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

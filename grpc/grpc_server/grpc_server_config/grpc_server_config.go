@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/elog/ezap"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/elog/ezap"
 	"google.golang.org/grpc"
 )
 

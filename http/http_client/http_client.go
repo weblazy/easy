@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/weblazy/easy/utils/http/http_client/http_client_config"
-	"github.com/weblazy/easy/utils/http/http_client/interceptor"
+	"github.com/weblazy/easy/http/http_client/http_client_config"
+	"github.com/weblazy/easy/http/http_client/interceptor"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/net/publicsuffix"
 )

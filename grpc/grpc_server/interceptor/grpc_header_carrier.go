@@ -3,7 +3,7 @@ package interceptor
 import (
 	"context"
 
-	"github.com/weblazy/easy/utils/transport"
+	"github.com/weblazy/easy/transport"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

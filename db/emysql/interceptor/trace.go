@@ -1,8 +1,8 @@
 package interceptor
 
 import (
-	"github.com/weblazy/easy/utils/db/emysql/manager"
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/db/emysql/manager"
+	"github.com/weblazy/easy/elog"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 

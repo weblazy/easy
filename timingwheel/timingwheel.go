@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/tal-tech/go-zero/core/collection"
-	"github.com/weblazy/easy/utils/list"
-	"github.com/weblazy/easy/utils/threading"
-	"github.com/weblazy/easy/utils/timex"
+	"github.com/weblazy/easy/list"
+	"github.com/weblazy/easy/threading"
+	"github.com/weblazy/easy/timex"
 )
 
 const (

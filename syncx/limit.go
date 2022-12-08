@@ -3,7 +3,7 @@ package syncx
 import (
 	"errors"
 
-	"github.com/weblazy/easy/utils/lang"
+	"github.com/weblazy/easy/lang"
 )
 
 var ErrReturn = errors.New("discarding limited token, resource pool is full, someone returned multiple times")

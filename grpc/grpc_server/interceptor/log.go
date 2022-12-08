@@ -8,9 +8,9 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/google/uuid"
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/grpc/grpc_server/grpc_server_config"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/etrace"
+	"github.com/weblazy/easy/grpc/grpc_server/grpc_server_config"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

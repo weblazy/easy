@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/weblazy/easy/utils/db/eredis/eredis_config"
+	"github.com/weblazy/easy/db/eredis/eredis_config"
 )
 
 var (

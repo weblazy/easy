@@ -9,7 +9,7 @@ import (
 
 	"github.com/SkyAPM/go2sky"
 	"github.com/SkyAPM/go2sky/reporter"
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/elog"
 )
 
 const (

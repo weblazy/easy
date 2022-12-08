@@ -3,7 +3,7 @@ package emysql_config
 import (
 	"time"
 
-	"github.com/weblazy/easy/utils/db/emysql/manager"
+	"github.com/weblazy/easy/db/emysql/manager"
 	"gorm.io/gorm"
 )
 

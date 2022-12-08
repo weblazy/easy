@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/timex"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/timex"
 	"go.uber.org/zap"
 )
 

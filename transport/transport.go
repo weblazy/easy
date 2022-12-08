@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"github.com/weblazy/easy/utils/set"
+	"github.com/weblazy/easy/set"
 
 	"go.opentelemetry.io/otel/propagation"
 )

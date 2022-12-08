@@ -11,7 +11,7 @@ import (
 	"github.com/aliyun/aliyun-log-go-sdk/producer"
 	"github.com/sunmi-OS/gocore/v2/conf/viper"
 	"github.com/tidwall/gjson"
-	"github.com/weblazy/easy/utils/closes"
+	"github.com/weblazy/easy/closes"
 )
 
 // AliyunLog 阿里云日志配置结构体

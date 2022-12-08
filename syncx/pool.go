@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/weblazy/easy/utils/timex"
+	"github.com/weblazy/easy/timex"
 )
 
 type (

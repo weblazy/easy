@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/smartystreets/goconvey/convey"
-	"github.com/weblazy/easy/utils/grpc/proto/user"
+	"github.com/weblazy/easy/grpc/proto/user"
 )
 
 func TestNewGrpcServer(t *testing.T) {

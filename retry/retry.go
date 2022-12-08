@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v4"
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/elog"
 	"go.uber.org/zap"
 )
 

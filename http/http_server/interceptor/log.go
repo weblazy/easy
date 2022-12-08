@@ -10,14 +10,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/weblazy/easy/utils/code_err"
-	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/timex"
+	"github.com/weblazy/easy/code_err"
+	"github.com/weblazy/easy/etrace"
+	"github.com/weblazy/easy/timex"
 
-	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
-	"github.com/weblazy/easy/utils/http/http_server/service"
+	"github.com/weblazy/easy/http/http_server/http_server_config"
+	"github.com/weblazy/easy/http/http_server/service"
 
-	"github.com/weblazy/easy/utils/elog"
+	"github.com/weblazy/easy/elog"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

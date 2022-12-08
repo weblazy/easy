@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/weblazy/easy/utils/lang"
+	"github.com/weblazy/easy/lang"
 
 	"github.com/stretchr/testify/assert"
 )

@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sunmi-OS/gocore/v2/utils"
-	"github.com/weblazy/easy/utils/code_err"
+	"github.com/weblazy/easy/code_err"
 )
 
 type ServiceContext struct {

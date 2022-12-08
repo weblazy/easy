@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
+	"github.com/weblazy/easy/http/http_server/http_server_config"
 )
 
 var (

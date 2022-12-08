@@ -10,11 +10,11 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/cenkalti/backoff/v4"
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/run"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/etrace"
+	"github.com/weblazy/easy/run"
 
-	"github.com/weblazy/easy/utils/retry"
+	"github.com/weblazy/easy/retry"
 
 	"go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama"
 	"go.opentelemetry.io/otel"

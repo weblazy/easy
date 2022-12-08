@@ -3,8 +3,8 @@ package grpc_client_config
 import (
 	"time"
 
-	"github.com/weblazy/easy/utils/etrace"
-	"github.com/weblazy/easy/utils/grpc/grpc_client/interceptor"
+	"github.com/weblazy/easy/etrace"
+	"github.com/weblazy/easy/grpc/grpc_client/interceptor"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/balancer/roundrobin"
 	"google.golang.org/grpc/keepalive"

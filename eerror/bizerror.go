@@ -3,7 +3,7 @@ package eerror
 import (
 	"strconv"
 
-	"github.com/weblazy/easy/utils/set"
+	"github.com/weblazy/easy/set"
 )
 
 const (

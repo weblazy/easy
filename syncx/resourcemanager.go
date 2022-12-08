@@ -4,7 +4,7 @@ import (
 	"io"
 	"sync"
 
-	errorx "github.com/weblazy/easy/utils/eerror"
+	errorx "github.com/weblazy/easy/eerror"
 )
 
 type ResourceManager struct {

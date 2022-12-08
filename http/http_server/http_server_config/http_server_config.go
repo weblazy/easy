@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/spf13/viper"
-	"github.com/weblazy/easy/utils/elog"
-	"github.com/weblazy/easy/utils/elog/ezap"
+	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/elog/ezap"
 )
 
 const PkgName = "http_server"

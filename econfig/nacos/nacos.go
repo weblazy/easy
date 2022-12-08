@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/sunmi-OS/gocore/v2/utils"
-	"github.com/weblazy/easy/utils/econfig/eviper"
+	"github.com/weblazy/easy/econfig/eviper"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/clients/config_client"

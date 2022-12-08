@@ -9,8 +9,8 @@ import (
 	"github.com/spf13/viper"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 
-	"github.com/weblazy/easy/utils/http/http_server/http_server_config"
-	"github.com/weblazy/easy/utils/http/http_server/interceptor"
+	"github.com/weblazy/easy/http/http_server/http_server_config"
+	"github.com/weblazy/easy/http/http_server/interceptor"
 )
 
 type HttpServer struct {

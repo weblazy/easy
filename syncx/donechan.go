@@ -3,7 +3,7 @@ package syncx
 import (
 	"sync"
 
-	"github.com/weblazy/easy/utils/lang"
+	"github.com/weblazy/easy/lang"
 )
 
 type DoneChan struct {
