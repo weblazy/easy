@@ -54,7 +54,7 @@ func DefaultConfig() *Config {
 		ConnMaxLifetime:         time.Second * 300,
 		OnFail:                  "panic",
 		SlowLogThreshold:        time.Millisecond * 500,
-		EnableMetricInterceptor: true,
+		EnableMetricInterceptor: false,
 		EnableTraceInterceptor:  true,
 		EnableRecordNotFoundLog: true,
 		// EnableAccessInterceptor: true,
