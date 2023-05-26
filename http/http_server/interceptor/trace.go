@@ -11,5 +11,6 @@ import (
 func Trace(ctx context.Context) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Writer.Header().Set(transport.PrefixPass+"traceid", etrace.ExtractTraceID(c.Request.Context()))
+		c.Next()
 	}
 }
