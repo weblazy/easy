@@ -6,20 +6,20 @@ import (
 	"go.uber.org/zap"
 )
 
-type SvcContext struct {
+type Log struct {
 	Ctx context.Context
 }
 
-func NewSvcContext(ctx context.Context) *SvcContext {
-	return &SvcContext{Ctx: ctx}
+func NewLog(ctx context.Context) *Log {
+	return &Log{Ctx: ctx}
 }
 
 // 打印log
-func (c *SvcContext) LogErr(codeErr *CodeErr, msg string, err error) *CodeErr {
+func (c *Log) LogErr(codeErr *CodeErr, msg string, err error) *CodeErr {
 	return LogErr(c.Ctx, codeErr, msg, err)
 }
 
 // 打印log
-func (c *SvcContext) LogField(codeErr *CodeErr, msg string, fields ...zap.Field) *CodeErr {
+func (c *Log) LogField(codeErr *CodeErr, msg string, fields ...zap.Field) *CodeErr {
 	return LogField(c.Ctx, codeErr, msg, fields...)
 }

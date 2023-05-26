@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"net/http"
 
@@ -11,8 +12,9 @@ import (
 
 type ServiceContext struct {
 	*gin.Context
-	*code_err.SvcContext
-	R Response
+	*code_err.Log
+	R   Response
+	Ctx context.Context //gin.Context.Request.Context
 }
 
 var (
@@ -22,10 +24,12 @@ var (
 
 // NewContext 初始化上下文包含context.Context
 func NewServiceContext(g *gin.Context) *ServiceContext {
+	ctx := g.Request.Context()
 	c := ServiceContext{
-		Context:    g,
-		SvcContext: code_err.NewSvcContext(g.Request.Context()),
-		R:          NewResponse(),
+		Context: g,
+		Log:     code_err.NewLog(ctx),
+		R:       NewResponse(),
+		Ctx:     ctx,
 	}
 
 	return &c
