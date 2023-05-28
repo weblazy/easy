@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/weblazy/easy/db/eredis/eredis_config"
-	"github.com/weblazy/easy/econfig/eviper"
+	"github.com/weblazy/easy/econfig"
 )
 
 var RedisMap sync.Map
@@ -15,7 +15,7 @@ func GetRedis(dbName string) *RedisClient {
 		return v.(*RedisClient)
 	}
 	conf := eredis_config.DefaultConfig()
-	eviper.GlobalViper.UnmarshalKey(dbName, conf)
+	econfig.GlobalViper.UnmarshalKey(dbName, conf)
 	redisClient := NewRedisClient(conf)
 	RedisMap.Store(dbName, redisClient)
 	return redisClient

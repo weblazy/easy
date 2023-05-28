@@ -11,6 +11,7 @@ import (
 	"github.com/aliyun/aliyun-log-go-sdk/producer"
 	"github.com/tidwall/gjson"
 	"github.com/weblazy/easy/closes"
+	"github.com/weblazy/easy/econfig"
 )
 
 // AliyunLog 阿里云日志配置结构体
@@ -32,10 +33,10 @@ var LogClient AliyunLog
 func InitLog(configName, LogStore string) {
 	hostname, _ := os.Hostname()
 	LogClient = AliyunLog{
-		Project:   eviper.GetEnvConfig(configName + ".Project"),
-		Endpoint:  eviper.GetEnvConfig(configName + ".Endpoint"),
-		AccessKey: eviper.GetEnvConfig(configName + ".AccessKey"),
-		SecretKey: eviper.GetEnvConfig(configName + ".SecretKey"),
+		Project:   econfig.GetEnvConfig(configName + ".Project"),
+		Endpoint:  econfig.GetEnvConfig(configName + ".Endpoint"),
+		AccessKey: econfig.GetEnvConfig(configName + ".AccessKey"),
+		SecretKey: econfig.GetEnvConfig(configName + ".SecretKey"),
 		LogStore:  LogStore,
 		HostName:  hostname,
 	}

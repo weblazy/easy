@@ -8,7 +8,6 @@ import (
 	"github.com/weblazy/easy/ecodes"
 	"github.com/weblazy/easy/elog"
 	"github.com/weblazy/easy/etrace"
-	"github.com/weblazy/easy/grpc/grpc_client/grpc_client_config"
 	"github.com/weblazy/easy/transport"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -16,6 +15,8 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
+
+const PkgName = "grpc_client"
 
 type LogConf struct {
 	EnableTraceInterceptor     bool
@@ -85,17 +86,17 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 			// 只记录系统级别错误
 			if httpStatusCode >= http.StatusInternalServerError {
 				// 只记录系统级别错误
-				elog.ErrorCtx(ctx, grpc_client_config.PkgName, fields...)
+				elog.ErrorCtx(ctx, PkgName, fields...)
 				return err
 			}
 			// 业务报错只做warning
-			elog.WarnCtx(ctx, grpc_client_config.PkgName, fields...)
+			elog.WarnCtx(ctx, PkgName, fields...)
 			return err
 		} else if isSlow {
-			elog.WarnCtx(ctx, grpc_client_config.PkgName, fields...)
+			elog.WarnCtx(ctx, PkgName, fields...)
 		} else if config.EnableAccessInterceptor {
 			fields = append(fields, elog.FieldEvent("normal"))
-			elog.InfoCtx(ctx, grpc_client_config.PkgName, fields...)
+			elog.InfoCtx(ctx, PkgName, fields...)
 		}
 		return nil
 	}

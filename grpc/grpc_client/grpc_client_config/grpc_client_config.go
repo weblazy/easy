@@ -73,7 +73,7 @@ func (config *Config) BuildDialOptions() {
 		config.DialOptions = append(config.DialOptions, grpc.WithChainUnaryInterceptor(etrace.UnaryClientInterceptor()))
 	}
 	// 透传公共参数
-	config.DialOptions = append(config.DialOptions, interceptor.GrpcHeaderCarrierInterceptor())
+	config.DialOptions = append(config.DialOptions, grpc.WithChainUnaryInterceptor(interceptor.GrpcHeaderCarrierInterceptor()))
 
 	// 其次执行，自定义header头，这样才能赋值到ctx里
 	// options = append(options, WithDialOption(grpc.WithChainUnaryInterceptor(customHeader(transport.CustomContextKeys()))))

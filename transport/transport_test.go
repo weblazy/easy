@@ -270,24 +270,24 @@ func benchmarkLen(b *testing.B, l int) {
 	}
 }
 
-func benchmarkAutoPassLen(b *testing.B, l int) {
-	reset()
+// func benchmarkAutoPassLen(b *testing.B, l int) {
+// 	reset()
 
-	testKeys := make([]string, l)
-	h := http.Header{}
-	for i := 0; i < len(testKeys); i++ {
-		testKeys[i] = fmt.Sprintf("%s%d", PrefixPass, i)
-		h.Add(testKeys[i], testKeys[i])
-	}
+// 	testKeys := make([]string, l)
+// 	h := http.Header{}
+// 	for i := 0; i < len(testKeys); i++ {
+// 		testKeys[i] = fmt.Sprintf("%s%d", PrefixPass, i)
+// 		h.Add(testKeys[i], testKeys[i])
+// 	}
 
-	ck := 
-	h2 := http.Header{}
+// 	ck :=
+// 	h2 := http.Header{}
 
-	for i := 0; i < b.N; i++ {
-		ctx1 := ck.Extract(context.Background(), propagation.HeaderCarrier(h))
-		ck.Inject(ctx1, propagation.HeaderCarrier(h2))
-	}
-}
+// 	for i := 0; i < b.N; i++ {
+// 		ctx1 := ck.Extract(context.Background(), propagation.HeaderCarrier(h))
+// 		ck.Inject(ctx1, propagation.HeaderCarrier(h2))
+// 	}
+// }
 
 func benchmarkMixLen(b *testing.B, l int) {
 	reset()
@@ -327,17 +327,17 @@ func BenchmarkCustomKeys_50(b *testing.B) {
 	benchmarkLen(b, 50)
 }
 
-func BenchmarkCustomKeysAutoPass(b *testing.B) {
-	benchmarkAutoPassLen(b, 5)
-}
+// func BenchmarkCustomKeysAutoPass(b *testing.B) {
+// 	benchmarkAutoPassLen(b, 5)
+// }
 
-func BenchmarkCustomKeysAutoPass_10(b *testing.B) {
-	benchmarkAutoPassLen(b, 10)
-}
+// func BenchmarkCustomKeysAutoPass_10(b *testing.B) {
+// 	benchmarkAutoPassLen(b, 10)
+// }
 
-func BenchmarkCustomKeysAutoPass_50(b *testing.B) {
-	benchmarkAutoPassLen(b, 50)
-}
+// func BenchmarkCustomKeysAutoPass_50(b *testing.B) {
+// 	benchmarkAutoPassLen(b, 50)
+// }
 
 func BenchmarkCustomKeysMix(b *testing.B) {
 	benchmarkMixLen(b, 5)

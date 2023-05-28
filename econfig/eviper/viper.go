@@ -11,33 +11,10 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/spf13/viper"
-	"github.com/weblazy/easy/econfig"
-	"github.com/weblazy/easy/econfig/nacos"
 )
 
 type Viper struct {
 	*viper.Viper
-}
-
-var GlobalViper *Viper
-
-func InitGlobalViper(config interface{}, localConfig ...string) {
-	switch os.Getenv(econfig.EasyConfigType) {
-	case econfig.LocalType:
-		GlobalViper = NewViperFromString(localConfig[0])
-	case econfig.FielType:
-		GlobalViper = NewViperFromFile("", os.Getenv(econfig.EasyConfigFile))
-	case econfig.NacosType:
-		nacos.NewNacosEnv()
-		vt := nacos.GetViper()
-		vt.SetDataIds(os.Getenv("ServiceName"), os.Getenv("DataId"))
-		// 注册配置更新回调
-		vt.NacosToViper()
-		GlobalViper = vt.Viper
-	default:
-		GlobalViper = NewViperFromString(localConfig[0])
-	}
-	GlobalViper.Unmarshal(&config)
 }
 
 var multipleViper sync.Map
@@ -78,7 +55,7 @@ func newConfig(filePath string, fileName string) *Viper {
 	v := viper.New()
 	v.SetConfigName(fileName)
 	//filePath支持相对路径和绝对路径 etc:"/a/b" "b" "./b"
-	if filePath[:1] != "/" {
+	if filePath == "" || filePath[:1] != "/" {
 		v.AddConfigPath(path.Join(GetPath(), filePath))
 	} else {
 		v.AddConfigPath(filePath)
@@ -118,14 +95,6 @@ func LoadViperByFilename(filename string) *Viper {
 	} else {
 		return value.(*Viper)
 	}
-}
-
-func GetEnvConfig(key string) string {
-	env := os.Getenv(strings.Replace(strings.ToUpper(key), ".", "_", -1))
-	if env != "" {
-		return env
-	}
-	return GlobalViper.GetString(key)
 }
 
 func (v *Viper) GetEnvConfig(key string) string {
