@@ -3,9 +3,9 @@ package ezap
 import (
 	"testing"
 
-	"github.com/sunmi-OS/gocore/v2/utils/file"
+	"github.com/weblazy/easy/filex"
 )
 
 func TestName(t *testing.T) {
-	deleteLog(file.GetPath()+"/RunTime", 7)
+	deleteLog(filex.GetPath()+"/RunTime", 7)
 }

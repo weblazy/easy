@@ -5,17 +5,39 @@ import (
 	"log"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 	"sync"
 
 	"github.com/BurntSushi/toml"
 	"github.com/spf13/viper"
-	"github.com/sunmi-OS/gocore/v2/utils"
-	"github.com/sunmi-OS/gocore/v2/utils/file"
+	"github.com/weblazy/easy/econfig"
+	"github.com/weblazy/easy/econfig/nacos"
 )
 
 type Viper struct {
 	*viper.Viper
+}
+
+var GlobalViper *Viper
+
+func InitGlobalViper(config interface{}, localConfig ...string) {
+	switch os.Getenv(econfig.EasyConfigType) {
+	case econfig.LocalType:
+		GlobalViper = NewViperFromString(localConfig[0])
+	case econfig.FielType:
+		GlobalViper = NewViperFromFile("", os.Getenv(econfig.EasyConfigFile))
+	case econfig.NacosType:
+		nacos.NewNacosEnv()
+		vt := nacos.GetViper()
+		vt.SetDataIds(os.Getenv("ServiceName"), os.Getenv("DataId"))
+		// 注册配置更新回调
+		vt.NacosToViper()
+		GlobalViper = vt.Viper
+	default:
+		GlobalViper = NewViperFromString(localConfig[0])
+	}
+	GlobalViper.Unmarshal(&config)
 }
 
 var multipleViper sync.Map
@@ -57,7 +79,7 @@ func newConfig(filePath string, fileName string) *Viper {
 	v.SetConfigName(fileName)
 	//filePath支持相对路径和绝对路径 etc:"/a/b" "b" "./b"
 	if filePath[:1] != "/" {
-		v.AddConfigPath(path.Join(file.GetPath(), filePath))
+		v.AddConfigPath(path.Join(GetPath(), filePath))
 	} else {
 		v.AddConfigPath(filePath)
 	}
@@ -67,6 +89,16 @@ func newConfig(filePath string, fileName string) *Viper {
 		panic(err)
 	}
 	return &Viper{v}
+}
+
+// GetPath 获取项目路径
+func GetPath() string {
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		print(err.Error())
+	}
+	path := strings.Replace(dir, "\\", "/", -1)
+	return path
 }
 
 func BuildVipers(filePath string, fileName ...string) {
@@ -88,10 +120,18 @@ func LoadViperByFilename(filename string) *Viper {
 	}
 }
 
-func (v *Viper) GetEnvConfig(key string) *utils.TypeTransform {
+func GetEnvConfig(key string) string {
 	env := os.Getenv(strings.Replace(strings.ToUpper(key), ".", "_", -1))
 	if env != "" {
-		return &utils.TypeTransform{Value: env}
+		return env
 	}
-	return utils.Transform(v.Get(key))
+	return GlobalViper.GetString(key)
+}
+
+func (v *Viper) GetEnvConfig(key string) string {
+	env := os.Getenv(strings.Replace(strings.ToUpper(key), ".", "_", -1))
+	if env != "" {
+		return env
+	}
+	return v.GetString(key)
 }

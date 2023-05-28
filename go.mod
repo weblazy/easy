@@ -23,8 +23,6 @@ require (
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.8.0
-	github.com/sunmi-OS/gocore v1.5.10
-	github.com/sunmi-OS/gocore/v2 v2.0.10
 	github.com/tal-tech/go-zero v1.2.2
 	github.com/tidwall/gjson v1.14.3
 	github.com/weblazy/crypto v1.0.1

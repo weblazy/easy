@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sunmi-OS/gocore/v2/utils/file"
+	"github.com/weblazy/easy/filex"
 )
 
 func NewFileEzap(path ...string) *Ezap {
@@ -16,11 +16,11 @@ func NewFileEzap(path ...string) *Ezap {
 		logPath = path[0]
 	}
 	if logPath == "" {
-		logPath = file.GetPath() + "/Runtime"
+		logPath = filex.GetPath() + "/Runtime"
 	}
 
-	if !file.CheckDir(logPath) {
-		if err := file.MkdirDir(logPath); err != nil {
+	if !filex.CheckDir(logPath) {
+		if err := filex.MkdirDir(logPath); err != nil {
 			log.Printf("l.initZap(),err:%+v.\n", err)
 		}
 	}
@@ -63,8 +63,8 @@ func (e *Ezap) updateLogFile(logPath string) {
 		t := time.NewTimer(next.Sub(now))
 		<-t.C
 		//以下为定时执行的操作
-		if !file.CheckDir(logPath) {
-			if err := file.MkdirDir(logPath); err != nil {
+		if !filex.CheckDir(logPath) {
+			if err := filex.MkdirDir(logPath); err != nil {
 				log.Printf("l.initZap(),err:%+v.\n", err)
 			}
 		}

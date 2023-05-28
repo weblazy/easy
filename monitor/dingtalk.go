@@ -1,9 +1,11 @@
 package monitor
 
 import (
+	"context"
 	"fmt"
 
-	http_request "github.com/sunmi-OS/gocore/http-request"
+	"github.com/weblazy/easy/http/http_client"
+	"github.com/weblazy/easy/http/http_client/http_client_config"
 )
 
 type (
@@ -63,7 +65,11 @@ func (dingTalk *DingTalk) WithIsAtAll(isAtAll bool) *DingTalk {
 // @param
 // @return
 func (dingTalk *DingTalk) SendMsg(body interface{}) ([]byte, error) {
-	return Request(dingTalk.Url, body, nil)
+	cfg := http_client_config.DefaultConfig()
+	client := http_client.NewHttpClient(cfg)
+	request := client.Request.SetContext(context.Background()).SetBody(body)
+	resp, err := request.Post(dingTalk.Url)
+	return resp.Body(), err
 }
 
 // @desc 发送钉钉文本消息
@@ -84,22 +90,22 @@ func (dingTalk *DingTalk) SendTextMsg(content string) error {
 	return err
 }
 
-// @desc Request 通用请求
-// @auth liuguoqiang 2020-12-07
-// @param
-// @return
-func Request(url string, body interface{}, headers map[string]string) ([]byte, error) {
-	client := http_request.New()
-	req := client.Request
-	if headers != nil {
-		req = req.SetHeaders(headers)
-	}
-	response, err := req.
-		SetBody(body).
-		Post(url)
-	if err != nil {
-		return nil, err
-	}
-	respByte := response.Body()
-	return respByte, err
-}
+// // @desc Request 通用请求
+// // @auth liuguoqiang 2020-12-07
+// // @param
+// // @return
+// func Request(url string, body interface{}, headers map[string]string) ([]byte, error) {
+// 	client := http_request.New()
+// 	req := client.Request
+// 	if headers != nil {
+// 		req = req.SetHeaders(headers)
+// 	}
+// 	response, err := req.
+// 		SetBody(body).
+// 		Post(url)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	respByte := response.Body()
+// 	return respByte, err
+// }

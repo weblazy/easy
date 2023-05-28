@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sunmi-OS/gocore/v2/utils"
 	"github.com/weblazy/easy/code_err"
+	"github.com/weblazy/easy/env"
 )
 
 type ServiceContext struct {
@@ -85,7 +85,7 @@ func (c *ServiceContext) SetData(data interface{}) *code_err.CodeErr {
 func (c *ServiceContext) BindValidator(obj interface{}) error {
 	err := c.ShouldBind(obj)
 	if err != nil {
-		if utils.IsRelease() {
+		if env.IsRelease() {
 			return ErrorBind
 		}
 		return err

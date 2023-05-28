@@ -5,14 +5,14 @@ import (
 	"io/ioutil"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sunmi-OS/gocore/v2/utils"
 	"github.com/weblazy/easy/code_err"
+	"github.com/weblazy/easy/env"
 )
 
 // Token
 func Token(c *gin.Context) {
 	debugKey := c.Request.Header.Get(DebugHeader)
-	if utils.GetRunTime() == "onl" || debugKey != "test" {
+	if env.GetRunTime() == "onl" || debugKey != "test" {
 		token := c.Request.Header.Get(TokenHeader)
 		if token == "" {
 			Error(c, code_err.TokenErr, fmt.Errorf("token 不存在"))
@@ -34,7 +34,7 @@ func Sign(validateToken func(token string) (uid string, err error)) gin.HandlerF
 			Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
 			return
 		}
-		if utils.GetRunTime() == "onl" || debugKey != "test" {
+		if env.GetRunTime() == "onl" || debugKey != "test" {
 			sign := header.Get(SignHeader)
 			token := header.Get(TokenHeader)
 			timestamp := header.Get(TimestampHeader)

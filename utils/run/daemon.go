@@ -3,7 +3,7 @@ package run
 import (
 	"time"
 
-	"github.com/weblazy/easy/utils/timex"
+	"github.com/weblazy/easy/timex"
 )
 
 func DaemonRun(interval time.Duration, f func(), daemon func()) {

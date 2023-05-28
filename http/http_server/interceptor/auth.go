@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sunmi-OS/gocore/v2/utils"
 	"github.com/weblazy/crypto/aes"
 	"github.com/weblazy/easy/code_err"
 	"github.com/weblazy/easy/elog"
+	"github.com/weblazy/easy/env"
 	"go.uber.org/zap"
 )
 
@@ -64,7 +64,7 @@ func AuthJson(c *gin.Context) {
 		return
 	}
 
-	if utils.GetRunTime() == "onl" || debugKey != "test" {
+	if env.GetRunTime() == "onl" || debugKey != "test" {
 		token := header.Get(TokenHeader)
 		if token == "" {
 			timestamp := header.Get(TimestampHeader)

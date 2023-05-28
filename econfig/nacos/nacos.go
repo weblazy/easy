@@ -3,7 +3,6 @@ package nacos
 import (
 	"os"
 
-	"github.com/sunmi-OS/gocore/v2/utils"
 	"github.com/weblazy/easy/econfig/eviper"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
@@ -59,10 +58,10 @@ var nacosHarder = &nacos{
 // 兼容endpoint 和 service 两种方式
 func NewNacosEnv() {
 	// 获取nacos鉴权、地区、命名空间
-	namespaceId := utils.Either(os.Getenv(_NacosNamespaceId), os.Getenv(_NamespaceId))
-	accessKey := utils.Either(os.Getenv(_NacosAccessKey), os.Getenv(_AccessKey))
-	secretKey := utils.Either(os.Getenv(_NacosSecretKey), os.Getenv(_SecretKey))
-	regionID := utils.Either(os.Getenv(_NacosRegionId), os.Getenv(_RegionId))
+	namespaceId := Either(os.Getenv(_NacosNamespaceId), os.Getenv(_NamespaceId))
+	accessKey := Either(os.Getenv(_NacosAccessKey), os.Getenv(_AccessKey))
+	secretKey := Either(os.Getenv(_NacosSecretKey), os.Getenv(_SecretKey))
+	regionID := Either(os.Getenv(_NacosRegionId), os.Getenv(_RegionId))
 	if namespaceId == "" || accessKey == "" || secretKey == "" {
 		panic("The configuration file cannot be empty.")
 	}
@@ -94,7 +93,7 @@ func NewNacosEnv() {
 	}
 
 	// 如果未使用service检查是否配置了endpoint兼容acm
-	endpoint := utils.Either(os.Getenv(_NacosEndpoint), os.Getenv(_Endpoint))
+	endpoint := Either(os.Getenv(_NacosEndpoint), os.Getenv(_Endpoint))
 	if endpoint == "" {
 		panic("The configuration file cannot be empty.")
 	}
@@ -103,6 +102,16 @@ func NewNacosEnv() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// Either 返回一个存在的字符串
+func Either(list ...string) string {
+	for _, v := range list {
+		if v != "" {
+			return v
+		}
+	}
+	return ""
 }
 
 // NewNacos 注入Nacos配置文件
