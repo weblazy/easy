@@ -13,8 +13,8 @@ type Sort struct {
 	Sort int64       `json:"sort"`
 }
 type SortList struct {
-	List  []Sort
-	Order Order
+	List  []Sort `json:"list"`
+	Order Order  `json:"order"`
 }
 
 func NewSortList(order Order) *SortList {
