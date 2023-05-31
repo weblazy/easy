@@ -10,7 +10,7 @@ const (
 
 type Sort struct {
 	Obj  interface{} `json:"obj"`
-	Sort int64       `json:"sort"`
+	Sort float64     `json:"sort"`
 }
 type SortList struct {
 	List  []Sort `json:"list"`
