@@ -62,7 +62,7 @@ func BulkSave(db *gorm.DB, table string, fields []string, params []map[string]in
 	valueArr := make([]string, 0)
 	varArr := make([]string, 0)
 	for _, value := range fields {
-		updateArr = append(updateArr, value+"=VALUES("+value+")")
+		updateArr = append(updateArr, "`"+value+"`=VALUES(`"+value+"`)")
 	}
 	for _, obj := range params {
 		varArr = varArr[:0]
