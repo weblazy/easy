@@ -80,7 +80,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 			zap.String("url", req.URL.String()),
 			zap.String("host", c.GetHeader("Host")),
 			zap.String("path", req.URL.Path),
-			elog.FieldMethod(c.GetHeader("Method")),
+			elog.FieldMethod(req.Method),
 			zap.Any("req_header", req.Header),
 			zap.String("req_body", logData.RequestBody),
 			zap.Any("res_header", c.Writer.Header()),
