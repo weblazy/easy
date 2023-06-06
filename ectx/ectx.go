@@ -1,4 +1,4 @@
-package ctx
+package ectx
 
 import (
 	"context"
@@ -16,6 +16,6 @@ func (c NoCancelContext) Err() error                        { return nil }
 func (c NoCancelContext) Value(key interface{}) interface{} { return c.ctx.Value(key) }
 
 // NoCancel remove ctx deadline then return a new context
-func NoCancel(ctx context.Context) context.Context {
+func NewNoCancelContext(ctx context.Context) context.Context {
 	return NoCancelContext{ctx}
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/weblazy/easy/code_err"
+	"github.com/weblazy/easy/ectx"
 	"github.com/weblazy/easy/env"
 )
 
@@ -29,7 +30,7 @@ func NewServiceContext(g *gin.Context) *ServiceContext {
 		Context: g,
 		Log:     code_err.NewLog(ctx),
 		R:       NewResponse(),
-		Ctx:     ctx,
+		Ctx:     ectx.NewNoCancelContext(ctx),
 	}
 
 	return &c
