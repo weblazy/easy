@@ -78,7 +78,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 		duration := time.Since(GetStartTime(ctx))
 		fields := []zap.Field{
 			zap.String("url", req.URL.String()),
-			zap.String("host", c.GetHeader("Host")),
+			zap.String("host", req.Host),
 			zap.String("path", req.URL.Path),
 			elog.FieldMethod(req.Method),
 			zap.Any("req_header", req.Header),
