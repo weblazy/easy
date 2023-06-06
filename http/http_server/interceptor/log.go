@@ -51,7 +51,7 @@ func Log(ctx context.Context, cfg *http_server_config.Config) gin.HandlerFunc {
 	once.Do(cfg.InitLogger)
 	return func(c *gin.Context) {
 		if c.Request.Method == http.MethodGet {
-
+			LogJson(c, cfg)
 		} else if c.ContentType() == gin.MIMEJSON {
 			LogJson(c, cfg)
 		} else if c.ContentType() == gin.MIMEMultipartPOSTForm {
