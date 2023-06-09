@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/http"
 	"runtime"
 	"sync"
 	"time"
@@ -50,9 +49,7 @@ func (w BodyLogWriter) WriteString(s string) (int, error) {
 func Log(ctx context.Context, cfg *http_server_config.Config) gin.HandlerFunc {
 	once.Do(cfg.InitLogger)
 	return func(c *gin.Context) {
-		if c.Request.Method == http.MethodGet {
-			LogJson(c, cfg)
-		} else if c.ContentType() == gin.MIMEJSON {
+		if c.ContentType() == gin.MIMEJSON {
 			LogJson(c, cfg)
 		} else if c.ContentType() == gin.MIMEMultipartPOSTForm {
 
