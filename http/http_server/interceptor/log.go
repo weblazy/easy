@@ -49,10 +49,10 @@ func (w BodyLogWriter) WriteString(s string) (int, error) {
 func Log(ctx context.Context, cfg *http_server_config.Config) gin.HandlerFunc {
 	once.Do(cfg.InitLogger)
 	return func(c *gin.Context) {
-		if c.ContentType() == gin.MIMEJSON {
-			LogJson(c, cfg)
-		} else if c.ContentType() == gin.MIMEMultipartPOSTForm {
+		if c.ContentType() == gin.MIMEMultipartPOSTForm {
 
+		} else {
+			LogJson(c, cfg)
 		}
 
 	}
