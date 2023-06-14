@@ -11,7 +11,6 @@ import (
 	"emperror.dev/errors"
 	"github.com/cenkalti/backoff/v4"
 	"github.com/weblazy/easy/elog"
-	"github.com/weblazy/easy/etrace"
 	"github.com/weblazy/easy/run"
 
 	"github.com/weblazy/easy/retry"
@@ -131,9 +130,9 @@ func (s *ConsumerGroup) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 		labels := make([]zap.Field, 10)
 		labels = append(labels, zap.String("topic", message.Topic))
 
-		if tid := etrace.ExtractTraceID(ctx); tid != "" {
-			labels = append(labels, elog.FieldTrace(tid))
-		}
+		// if tid := etrace.ExtractTraceID(ctx); tid != "" {
+		// 	labels = append(labels, elog.FieldTrace(tid))
+		// }
 
 		if s.config.EnableAccessInterceptorRes {
 			labels = append(labels, zap.Any("res", ConsumerMessageToMap(message)))

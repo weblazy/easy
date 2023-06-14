@@ -8,8 +8,6 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/weblazy/easy/elog"
-
-	"github.com/weblazy/easy/etrace"
 )
 
 const (
@@ -55,9 +53,9 @@ func (c *Producer) SendMessage(ctx context.Context, msg *Message) error {
 		labels = append(labels, zap.Any("req", msg.ToMap()))
 	}
 
-	if tid := etrace.ExtractTraceID(ctx); tid != "" {
-		labels = append(labels, elog.FieldTrace(tid))
-	}
+	// if tid := etrace.ExtractTraceID(ctx); tid != "" {
+	// 	labels = append(labels, elog.FieldTrace(tid))
+	// }
 
 	if err != nil {
 		labels = append(labels, elog.FieldError(err))

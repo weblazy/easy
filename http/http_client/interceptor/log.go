@@ -6,7 +6,6 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/weblazy/easy/elog"
-	"github.com/weblazy/easy/etrace"
 	"github.com/weblazy/easy/http/http_client/http_client_config"
 	"go.uber.org/zap"
 )
@@ -57,9 +56,9 @@ func logAccess(cfg *http_client_config.Config, req *resty.Request, res *resty.Re
 	)
 
 	// 开启了链路，那么就记录链路id
-	if cfg.EnableTraceInterceptor {
-		fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(req.Context())))
-	}
+	// if cfg.EnableTraceInterceptor {
+	// fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(req.Context())))
+	// }
 
 	if cfg.EnableAccessInterceptorReq {
 		if cfg.EnableAccessInterceptorReqHeader {

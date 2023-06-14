@@ -145,6 +145,6 @@ func MergeCtxFields(ctx context.Context, fields ...zap.Field) []zap.Field {
 	}
 	newFields := make([]zap.Field, flen)
 	copy(newFields, fields)
-	newFields = append(newFields, FieldTrace(traceId), skipField, skipField)
+	newFields = append(newFields, FieldTrace(traceId), skipField)
 	return newFields
 }

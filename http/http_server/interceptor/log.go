@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/weblazy/easy/code_err"
-	"github.com/weblazy/easy/etrace"
 	"github.com/weblazy/easy/timex"
 
 	"github.com/weblazy/easy/http/http_server/http_server_config"
@@ -93,9 +92,9 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 		}
 		fields = append(fields, elog.FieldSlow(isSlow))
 		// 开启了链路，那么就记录链路id
-		if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-			fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
-		}
+		// if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
+		// 	fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
+		// }
 		if err != nil {
 			fields = append(fields, zap.String("event", "error"), zap.Error(err))
 			elog.ErrorCtx(ctx, http_server_config.PkgName, fields...)

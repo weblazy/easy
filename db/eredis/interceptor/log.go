@@ -9,7 +9,6 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/weblazy/easy/db/eredis/eredis_config"
 	"github.com/weblazy/easy/elog"
-	"github.com/weblazy/easy/etrace"
 	"go.uber.org/zap"
 )
 
@@ -31,9 +30,9 @@ func LogHook(config *eredis_config.Config) redis.Hook {
 			}
 
 			// 开启了链路，那么就记录链路id
-			if config.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-				fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
-			}
+			// if config.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
+			// 	fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
+			// }
 			var isSlow bool
 			if config.SlowLogThreshold > time.Duration(0) && duration > config.SlowLogThreshold {
 				isSlow = true

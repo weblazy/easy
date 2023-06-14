@@ -8,7 +8,6 @@ import (
 	"github.com/weblazy/easy/db/emysql/emysql_config"
 	"github.com/weblazy/easy/db/emysql/manager"
 	"github.com/weblazy/easy/elog"
-	"github.com/weblazy/easy/etrace"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -88,9 +87,9 @@ func (e *LogPlugin) LogEnd(method string) func(db *gorm.DB) {
 		}
 
 		// 开启了链路，那么就记录链路id
-		if e.config.EnableTraceInterceptor {
-			fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(db.Statement.Context)))
-		}
+		// if e.config.EnableTraceInterceptor {
+		// 	fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(db.Statement.Context)))
+		// }
 
 		// 支持自定义log
 		for _, key := range loggerKeys {

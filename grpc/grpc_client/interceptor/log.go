@@ -7,7 +7,6 @@ import (
 
 	"github.com/weblazy/easy/ecodes"
 	"github.com/weblazy/easy/elog"
-	"github.com/weblazy/easy/etrace"
 	"github.com/weblazy/easy/transport"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -65,9 +64,9 @@ func LoggerUnaryClientInterceptor(config *LogConf) grpc.UnaryClientInterceptor {
 		}
 
 		// 开启了链路，那么就记录链路id
-		if config.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
-			fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
-		}
+		// if config.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
+		// 	fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
+		// }
 
 		if config.EnableAccessInterceptorReq {
 			fields = append(fields, elog.FieldReq(req))
