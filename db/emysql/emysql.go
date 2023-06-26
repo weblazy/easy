@@ -12,7 +12,6 @@ import (
 	"github.com/weblazy/easy/elog"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
 var emptyCtx = context.Background()
@@ -32,7 +31,7 @@ func NewMysqlClient(config *emysql_config.Config, options ...Option) (*MysqlClie
 	gormCfg := gorm.Config{}
 	// 不开启 raw debug 时, 关闭 gorm 原生日志
 	if !config.RawDebug {
-		gormCfg.Logger = logger.Discard
+		// gormCfg.Logger = logger.Discard
 	}
 
 	// todo 设置补齐超时时间, 解析重写 config.DSN 参数
