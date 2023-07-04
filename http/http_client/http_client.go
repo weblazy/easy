@@ -77,7 +77,7 @@ func createTransport(c *http_client_config.Config) http.RoundTripper {
 	return t
 }
 
-func (h *HttpClient) EnableMetricInterceptor(metricPathRewriter interceptor.MetricPathRewriter) {
+func (h *HttpClient) EnableMetricInterceptor(metricPathRewriter http_client_config.MetricPathRewriter) {
 	onBefore, onAfter, onErr := interceptor.MetricInterceptor(h.config.Name, h.config.Addr, metricPathRewriter)
 	AddInterceptors(h.Client, onBefore, onAfter, onErr)
 }
