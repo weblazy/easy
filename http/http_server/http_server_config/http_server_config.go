@@ -23,8 +23,9 @@ type Config struct {
 	EnableLogInterceptor    bool
 	EnableAccessInterceptor bool // 是否开启记录请求数据，默认开启
 
-	EnableFielLogger bool // 将日志输出到文件
-	FielLoggerPath   string
+	EnableFielLogger   bool // 将日志输出到文件
+	FielLoggerPath     string
+	MetricPathRewriter MetricPathRewriter
 }
 
 // DefaultConfig default config ...
@@ -39,7 +40,14 @@ func DefaultConfig() *Config {
 		EnableLogInterceptor:    true,
 		EnableAccessInterceptor: true,
 		FielLoggerPath:          PkgName,
+		MetricPathRewriter:      DefaultMetricPathRewriter,
 	}
+}
+
+type MetricPathRewriter func(origin string) string
+
+func DefaultMetricPathRewriter(origin string) string {
+	return origin
 }
 
 func GetViperConfig(key string, cfg *viper.Viper) (*Config, error) {

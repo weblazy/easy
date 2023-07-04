@@ -7,6 +7,7 @@ import (
 
 	"github.com/go-resty/resty/v2"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/weblazy/easy/http/http_client/http_client_config"
 )
 
 var (
@@ -30,16 +31,9 @@ func init() {
 	prometheus.MustRegister(ClientHandleHistogram)
 }
 
-type MetricPathRewriter func(origin string) string
-
-func NoopMetricPathRewriter(origin string) string {
-	return origin
-}
-
-func MetricInterceptor(name, addr string, r MetricPathRewriter) (resty.RequestMiddleware, resty.ResponseMiddleware, resty.ErrorHook) {
-	rewriter := NoopMetricPathRewriter
-	if r != nil {
-		rewriter = r
+func MetricInterceptor(name, addr string, rewriter http_client_config.MetricPathRewriter) (resty.RequestMiddleware, resty.ResponseMiddleware, resty.ErrorHook) {
+	if rewriter == nil {
+		rewriter = http_client_config.DefaultMetricPathRewriter
 	}
 
 	afterFn := func(cli *resty.Client, res *resty.Response) error {

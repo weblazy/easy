@@ -22,8 +22,8 @@ type Config struct {
 	EnableKeepAlives    bool          // 是否开启长连接，默认打开
 	Proxy               string        // 支持配置显示传递代理，如：http://
 
-	EnableMetricInterceptor bool // 是否开启 metric, 默认关闭
-	// MetricPathRewriter      MetricPathRewriter // 指标监控 path 重写方法, 防止 metrics label 不可控
+	EnableMetricInterceptor bool               // 是否开启 metric, 默认关闭
+	MetricPathRewriter      MetricPathRewriter // 指标监控 path 重写方法, 防止 metrics label 不可控
 
 	EnableTraceInterceptor           bool // 是否开启链路追踪，默认开启
 	EnableAccessInterceptor          bool // 是否开启记录请求数据，默认开启
@@ -46,6 +46,12 @@ func DefaultConfig() *Config {
 		EnableAccessInterceptor:    true,
 		EnableAccessInterceptorReq: true,
 		EnableAccessInterceptorRes: true,
-		// MetricPathRewriter:         NoopMetricPathRewriter,
+		MetricPathRewriter:         DefaultMetricPathRewriter,
 	}
+}
+
+type MetricPathRewriter func(origin string) string
+
+func DefaultMetricPathRewriter(origin string) string {
+	return origin
 }
