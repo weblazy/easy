@@ -31,10 +31,11 @@ func init() {
 }
 func MetricInterceptor(cfg *http_server_config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		c.Next()
 		if cfg.MetricPathRewriter == nil {
 			cfg.MetricPathRewriter = http_server_config.DefaultMetricPathRewriter
 		}
-		ServerHandleCounter.WithLabelValues(cfg.Name, c.Request.Method, cfg.MetricPathRewriter(c.Request.RequestURI), c.Request.URL.Host, strconv.Itoa(c.Writer.Status())).Inc()
-		ServerHandleHistogram.WithLabelValues(cfg.Name, c.Request.Method, cfg.MetricPathRewriter(c.Request.RequestURI), c.Request.URL.Host).Observe(time.Since(GetStartTime(c.Request.Context())).Seconds())
+		ServerHandleCounter.WithLabelValues(cfg.Name, c.Request.Method, cfg.MetricPathRewriter(c.Request.URL.Path), c.Request.URL.Host, strconv.Itoa(c.Writer.Status())).Inc()
+		ServerHandleHistogram.WithLabelValues(cfg.Name, c.Request.Method, cfg.MetricPathRewriter(c.Request.URL.Path), c.Request.URL.Host).Observe(time.Since(GetStartTime(c.Request.Context())).Seconds())
 	}
 }
