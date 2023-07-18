@@ -1,6 +1,7 @@
 package interceptor
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 
@@ -34,6 +35,8 @@ func Sign(validateToken func(token string) (uid string, err error)) gin.HandlerF
 			Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
 			return
 		}
+		// 新建缓冲区并替换原有Request.body
+		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(bodyBytes)))
 		if env.GetRunTime() == "onl" || debugKey != "test" {
 			sign := header.Get(SignHeader)
 			token := header.Get(TokenHeader)
