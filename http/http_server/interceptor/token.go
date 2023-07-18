@@ -24,7 +24,7 @@ func Token(c *gin.Context) {
 }
 
 // Sign
-func Sign(validateToken func(token string) (uid string, err error)) gin.HandlerFunc {
+func Sign(userIdHeader string, validateToken func(token string) (uid string, err error)) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := c.Request
 		header := req.Header
@@ -50,7 +50,7 @@ func Sign(validateToken func(token string) (uid string, err error)) gin.HandlerF
 					Error(c, code_err.TokenErr, err)
 					return
 				}
-				header.Set(UidHeader, uid)
+				header.Set(userIdHeader, uid)
 			}
 			err = ValidateSign(sign, token, []byte(string(bodyBytes)+timestamp+nonce))
 			if err != nil {

@@ -24,6 +24,7 @@ import (
 
 const (
 	UidHeader       = "X-Uid"
+	AdminIdHeader   = "X-AdminId"
 	DebugHeader     = "X-Debug"
 	TokenHeader     = "X-Token"
 	NonceHeader     = "X-Nonce"
