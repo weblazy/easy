@@ -50,7 +50,7 @@ func (m *MysqlDSNParser) ParseDSN(dsn string) (cfg *manager.DSN, err error) {
 				// [username[:password]@][protocol[(address)]]
 				// Find the last '@' in dsn[:i]
 				for j = i; j >= 0; j-- {
-					if dsn[j] == '@' {
+					if dsn[j] == '@' && dsn[j:j+5] == "@tcp(" {
 						parseUsernamePassword(cfg, dsn[:j])
 						break
 					}
