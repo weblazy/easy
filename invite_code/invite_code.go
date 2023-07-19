@@ -51,7 +51,8 @@ func (c *InviteCodeHandler) IdToCode(id int) string {
 	length := len(result)
 	if length < int(c.CodeLength) {
 		result = append(result, c.SuffixByte)
-		rand.Seed(time.Now().UnixNano())
+		now := time.Now().UnixNano()
+		rand.Seed(now)
 		// 去除SuffixByte本身占位之后需要补齐的位数
 		for i := 0; i < c.CodeLength-length-1; i++ {
 			randomNum := rand.Intn(c.baseLength)
