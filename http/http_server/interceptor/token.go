@@ -13,7 +13,7 @@ import (
 // Token
 func Token(c *gin.Context) {
 	debugKey := c.Request.Header.Get(DebugHeader)
-	if !econfig.GlobalViper.GetBool("BaseConfig.Debug") || debugKey == econfig.GlobalViper.GetString("BaseConfig.XDebugKey") {
+	if !econfig.GlobalViper.GetBool("BaseConfig.Debug") || debugKey != econfig.GlobalViper.GetString("BaseConfig.XDebugKey") {
 		token := c.Request.Header.Get(TokenHeader)
 		if token == "" {
 			Error(c, code_err.TokenErr, fmt.Errorf("token 不存在"))
@@ -37,7 +37,7 @@ func Sign(userIdHeader string, validateToken func(token string) (uid string, err
 		}
 		// 新建缓冲区并替换原有Request.body
 		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(bodyBytes)))
-		if !econfig.GlobalViper.GetBool("BaseConfig.Debug") || debugKey == econfig.GlobalViper.GetString("BaseConfig.XDebugKey") {
+		if !econfig.GlobalViper.GetBool("BaseConfig.Debug") || debugKey != econfig.GlobalViper.GetString("BaseConfig.XDebugKey") {
 			sign := header.Get(SignHeader)
 			token := header.Get(TokenHeader)
 			timestamp := header.Get(TimestampHeader)
