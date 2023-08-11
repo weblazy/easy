@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"runtime"
 	"sync"
@@ -64,7 +65,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 	blw := &BodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 	c.Writer = blw
 	var bodyBytes []byte
-	bodyBytes, err := ioutil.ReadAll(c.Request.Body)
+	bodyBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
 		return
