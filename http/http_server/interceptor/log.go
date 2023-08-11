@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"runtime"
 	"sync"
 	"time"
@@ -109,7 +108,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 	}()
 
 	// 新建缓冲区并替换原有Request.body
-	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(logData.RequestBody)))
+	c.Request.Body = io.NopCloser(bytes.NewBuffer([]byte(logData.RequestBody)))
 	c.Next()
 }
 
