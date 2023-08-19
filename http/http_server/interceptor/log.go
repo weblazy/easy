@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"runtime"
 	"sync"
 	"time"
@@ -49,7 +49,7 @@ func Log(ctx context.Context, cfg *http_server_config.Config) gin.HandlerFunc {
 	once.Do(cfg.InitLogger)
 	return func(c *gin.Context) {
 		if c.ContentType() == gin.MIMEMultipartPOSTForm {
-
+			LogFile(c, cfg)
 		} else {
 			LogJson(c, cfg)
 		}
@@ -64,7 +64,7 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 	blw := &BodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 	c.Writer = blw
 	var bodyBytes []byte
-	bodyBytes, err := ioutil.ReadAll(c.Request.Body)
+	bodyBytes, err := io.ReadAll(c.Request.Body)
 	if err != nil {
 		Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
 		return
@@ -108,7 +108,63 @@ func LogJson(c *gin.Context, cfg *http_server_config.Config) {
 	}()
 
 	// 新建缓冲区并替换原有Request.body
-	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(logData.RequestBody)))
+	c.Request.Body = io.NopCloser(bytes.NewBuffer([]byte(logData.RequestBody)))
+	c.Next()
+}
+
+func LogFile(c *gin.Context, cfg *http_server_config.Config) {
+	req := c.Request
+	ctx := elog.SetLogerName(req.Context(), http_server_config.PkgName)
+	logData := &LogData{}
+	blw := &BodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
+	c.Writer = blw
+	// var bodyBytes []byte
+	// bodyBytes, err := ioutil.ReadAll(c.Request.Body)
+	// if err != nil {
+	// 	Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
+	// 	return
+	// }
+	// logData.RequestBody = string(bodyBytes)
+	defer func() {
+		duration := time.Since(GetStartTime(ctx))
+		fields := []zap.Field{
+			zap.String("url", req.URL.String()),
+			zap.String("host", req.Host),
+			zap.String("path", req.URL.Path),
+			elog.FieldMethod(req.Method),
+			zap.Any("req_header", req.Header),
+			zap.String("req_body", logData.RequestBody),
+			zap.Any("res_header", c.Writer.Header()),
+			zap.String("res_body", blw.body.String()),
+			zap.String("client_ip", c.ClientIP()),
+			zap.String("start_time", GetStartTime(ctx).Format(timex.TimeLayout)),
+			elog.FieldDuration(duration),
+		}
+		fields = append(fields, zap.Int("status_code", c.Writer.Status()))
+		var isSlow bool
+		if cfg.SlowLogThreshold > time.Duration(0) && duration > cfg.SlowLogThreshold {
+			isSlow = true
+		}
+		fields = append(fields, elog.FieldSlow(isSlow))
+		// 开启了链路，那么就记录链路id
+		// if cfg.EnableTraceInterceptor && etrace.IsGlobalTracerRegistered() {
+		// 	fields = append(fields, elog.FieldTrace(etrace.ExtractTraceID(ctx)))
+		// }
+		// if err != nil {
+		// 	fields = append(fields, zap.String("event", "error"), zap.Error(err))
+		// 	elog.ErrorCtx(ctx, http_server_config.PkgName, fields...)
+		// 	return
+		// }
+		if isSlow {
+			elog.WarnCtx(ctx, http_server_config.PkgName, fields...)
+		} else if cfg.EnableAccessInterceptor {
+			fields = append(fields, zap.String("event", "normal"))
+			elog.InfoCtx(ctx, http_server_config.PkgName, fields...)
+		}
+	}()
+
+	// 新建缓冲区并替换原有Request.body
+	// c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(logData.RequestBody)))
 	c.Next()
 }
 

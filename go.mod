@@ -43,6 +43,7 @@ require (
 	google.golang.org/protobuf v1.28.1
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/gorm v1.23.5
+	gotest.tools v2.2.0+incompatible
 )
 
 require (
@@ -73,6 +74,7 @@ require (
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
