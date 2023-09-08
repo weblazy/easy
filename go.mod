@@ -9,6 +9,7 @@ require (
 	github.com/SkyAPM/go2sky v1.4.1
 	github.com/aliyun/aliyun-log-go-sdk v0.1.22
 	github.com/cenkalti/backoff/v4 v4.1.3
+	github.com/common-nighthawk/go-figure v0.0.0-20210622060536-734e95fb86be
 	github.com/fvbock/endless v0.0.0-20170109170031-447134032cb6
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/extra/rediscmd/v8 v8.11.5
