@@ -34,7 +34,7 @@ func Token(userIdHeader string, validateToken func(token string) (uid string, er
 }
 
 // Sign
-func Sign(userIdHeader string, validateToken func(token string) (uid string, err error)) gin.HandlerFunc {
+func Sign() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := c.Request
 		header := req.Header
