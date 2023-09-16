@@ -3,7 +3,7 @@ package interceptor
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weblazy/easy/code_err"
@@ -40,13 +40,13 @@ func Sign() gin.HandlerFunc {
 		header := req.Header
 		debugKey := header.Get(DebugHeader)
 		var bodyBytes []byte
-		bodyBytes, err := ioutil.ReadAll(c.Request.Body)
+		bodyBytes, err := io.ReadAll(c.Request.Body)
 		if err != nil {
 			Error(c, code_err.ParamsErr, fmt.Errorf("Invalid request body"))
 			return
 		}
 		// 新建缓冲区并替换原有Request.body
-		c.Request.Body = ioutil.NopCloser(bytes.NewBuffer([]byte(bodyBytes)))
+		c.Request.Body = io.NopCloser(bytes.NewBuffer([]byte(bodyBytes)))
 		if !econfig.GlobalViper.GetBool("BaseConfig.Debug") || debugKey != econfig.GlobalViper.GetString("BaseConfig.XDebugKey") {
 			sign := header.Get(SignHeader)
 			token := header.Get(TokenHeader)
