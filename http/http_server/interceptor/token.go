@@ -11,16 +11,26 @@ import (
 )
 
 // Token
-func Token(c *gin.Context) {
-	debugKey := c.Request.Header.Get(DebugHeader)
-	if !econfig.GlobalViper.GetBool("BaseConfig.Debug") || debugKey != econfig.GlobalViper.GetString("BaseConfig.XDebugKey") {
-		token := c.Request.Header.Get(TokenHeader)
-		if token == "" {
-			Error(c, code_err.TokenErr, fmt.Errorf("token 不存在"))
-			return
+func Token(userIdHeader string, validateToken func(token string) (uid string, err error)) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		req := c.Request
+		header := req.Header
+		debugKey := header.Get(DebugHeader)
+		if !econfig.GlobalViper.GetBool("BaseConfig.Debug") || debugKey != econfig.GlobalViper.GetString("BaseConfig.XDebugKey") {
+			token := c.Request.Header.Get(TokenHeader)
+			if token == "" {
+				Error(c, code_err.TokenErr, fmt.Errorf("token 不存在"))
+				return
+			}
+			uid, err := validateToken(token)
+			if err != nil {
+				Error(c, code_err.TokenErr, err)
+				return
+			}
+			header.Set(userIdHeader, uid)
 		}
+		c.Next()
 	}
-	c.Next()
 }
 
 // Sign
@@ -44,13 +54,6 @@ func Sign(userIdHeader string, validateToken func(token string) (uid string, err
 			nonce := header.Get(NonceHeader)
 			if token == "" {
 				token = nonce + timestamp
-			} else {
-				uid, err := validateToken(token)
-				if err != nil {
-					Error(c, code_err.TokenErr, err)
-					return
-				}
-				header.Set(userIdHeader, uid)
 			}
 			err = ValidateSign(sign, token, []byte(string(bodyBytes)+timestamp+nonce))
 			if err != nil {
