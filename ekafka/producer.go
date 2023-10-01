@@ -3,8 +3,7 @@ package fkafka
 import (
 	"context"
 
-	"github.com/Shopify/sarama"
-	"go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama"
+	"github.com/IBM/sarama"
 	"go.uber.org/zap"
 
 	"github.com/weblazy/easy/elog"
@@ -99,5 +98,5 @@ func getSyncProducer(config *Config, sc sarama.Config) (sarama.SyncProducer, err
 	}
 
 	// wrap tracing
-	return otelsarama.WrapSyncProducer(&sc, producer), nil
+	return producer, nil
 }

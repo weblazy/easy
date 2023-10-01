@@ -5,7 +5,7 @@ import (
 
 	"errors"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 )
 
 const (

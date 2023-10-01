@@ -15,10 +15,7 @@ import (
 
 	"github.com/weblazy/easy/retry"
 
-	"go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama"
-	"go.opentelemetry.io/otel"
-
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 )
 
 type Handler func(ctx context.Context, message *sarama.ConsumerMessage) error
@@ -81,7 +78,8 @@ func (s *ConsumerGroup) Start() {
 			bo := backoff.WithContext(backoff.NewConstantBackOff(s.consumeRetryInterval), ctx)
 
 			innerErr := retry.RetryWithLog(ctx, func() error {
-				return s.cg.Consume(ctx, s.consumerGroupConfig.Topics, otelsarama.WrapConsumerGroupHandler(s))
+				return s.cg.Consume(ctx, s.consumerGroupConfig.Topics, s)
+				// return s.cg.Consume(ctx, s.consumerGroupConfig.Topics, otelsarama.WrapConsumerGroupHandler(s))
 			}, bo, "fkafka consumeRetry")
 
 			if innerErr != nil && !errors.Is(innerErr, context.Canceled) {
@@ -123,8 +121,8 @@ func (s *ConsumerGroup) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 	for message := range claim.Messages() {
 		start := time.Now()
 
-		ctx := otel.GetTextMapPropagator().Extract(context.Background(), otelsarama.NewConsumerMessageCarrier(message))
-
+		// ctx := otel.GetTextMapPropagator().Extract(context.Background(), otelsarama.NewConsumerMessageCarrier(message))
+		ctx := context.Background()
 		b := s.backOffConfig.NewBackOffWithContext(session.Context())
 
 		labels := make([]zap.Field, 10)

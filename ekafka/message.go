@@ -1,6 +1,6 @@
 package fkafka
 
-import "github.com/Shopify/sarama"
+import "github.com/IBM/sarama"
 
 // Message sarama.ProducerMessage for kafka publish
 type Message struct {
