@@ -19,6 +19,15 @@ func ZeroTimeWithLocation(d time.Time, loc *time.Location) time.Time {
 	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, loc)
 }
 
+func UTCZeroTime(d time.Time) time.Time {
+	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, time.UTC)
+}
+
+func ShanghaiZeroTime(d time.Time) time.Time {
+	t, _ := time.LoadLocation("Asia/Shanghai")
+	return time.Date(d.Year(), d.Month(), d.Day(), 0, 0, 0, 0, t)
+}
+
 // @desc 返回一个月的开始时间和结束时间
 // @auth liuguoqiang 2020-04-27
 // @param
