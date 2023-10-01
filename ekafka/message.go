@@ -1,4 +1,4 @@
-package fkafka
+package ekafka
 
 import "github.com/IBM/sarama"
 

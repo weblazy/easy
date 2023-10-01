@@ -1,4 +1,4 @@
-package fkafka
+package ekafka
 
 import (
 	"context"
@@ -80,7 +80,7 @@ func (s *ConsumerGroup) Start() {
 			innerErr := retry.RetryWithLog(ctx, func() error {
 				return s.cg.Consume(ctx, s.consumerGroupConfig.Topics, s)
 				// return s.cg.Consume(ctx, s.consumerGroupConfig.Topics, otelsarama.WrapConsumerGroupHandler(s))
-			}, bo, "fkafka consumeRetry")
+			}, bo, "ekafka consumeRetry")
 
 			if innerErr != nil && !errors.Is(innerErr, context.Canceled) {
 				elog.ErrorCtx(ctx, fmt.Sprintf("Permanent error consuming %v", s.consumerGroupConfig.Topics), elog.FieldError(innerErr))
@@ -140,7 +140,7 @@ func (s *ConsumerGroup) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 			return run.RunSafeWrap(ctx, func() error {
 				return s.handler(ctx, message)
 			})
-		}, b, fmt.Sprintf("fkafka message handler retry, topic %s partition %d offset %d", message.Topic, message.Partition, message.Offset))
+		}, b, fmt.Sprintf("ekafka message handler retry, topic %s partition %d offset %d", message.Topic, message.Partition, message.Offset))
 
 		duration := time.Since(start)
 		labels = append(labels, elog.FieldCost(duration))

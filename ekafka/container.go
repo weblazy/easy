@@ -1,8 +1,8 @@
-package fkafka
+package ekafka
 
 const (
-	PackageNameProducer      = "fkafka.producer"
-	PackageNameConsumerGroup = "fkafka.consumerGroup"
+	PackageNameProducer      = "ekafka.producer"
+	PackageNameConsumerGroup = "ekafka.consumerGroup"
 )
 
 func NewProducer(name string, config *Config) (*Producer, error) {
