@@ -6,7 +6,6 @@ require (
 	emperror.dev/errors v0.8.1
 	github.com/BurntSushi/toml v1.2.0
 	github.com/IBM/sarama v1.41.2
-	github.com/Shopify/sarama v1.35.0
 	github.com/SkyAPM/go2sky v1.4.1
 	github.com/aliyun/aliyun-log-go-sdk v0.1.22
 	github.com/cenkalti/backoff/v4 v4.1.3
@@ -29,7 +28,6 @@ require (
 	github.com/tidwall/gjson v1.14.3
 	github.com/weblazy/crypto v1.0.2
 	github.com/weblazy/goutil v1.1.2
-	go.opentelemetry.io/contrib/instrumentation/github.com/Shopify/sarama/otelsarama v0.34.0
 	go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin v0.36.4
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.33.0
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.33.0
