@@ -125,7 +125,7 @@ func (s *ConsumerGroup) ConsumeClaim(session sarama.ConsumerGroupSession, claim 
 		ctx := context.Background()
 		b := s.backOffConfig.NewBackOffWithContext(session.Context())
 
-		labels := make([]zap.Field, 10)
+		labels := make([]zap.Field, 0)
 		labels = append(labels, zap.String("topic", message.Topic))
 
 		// if tid := etrace.ExtractTraceID(ctx); tid != "" {

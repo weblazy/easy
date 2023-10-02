@@ -45,7 +45,7 @@ func (c *Producer) SendMessage(ctx context.Context, msg *Message) error {
 
 	partition, offset, err := c.producer.SendMessage(smsg)
 
-	labels := make([]zap.Field, 10)
+	labels := make([]zap.Field, 0)
 	labels = append(labels, zap.String("topic", smsg.Topic))
 
 	if c.config.EnableAccessInterceptorReq {
