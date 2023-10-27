@@ -78,6 +78,7 @@ func (s *ConsumerGroup) Start() {
 			bo := backoff.WithContext(backoff.NewConstantBackOff(s.consumeRetryInterval), ctx)
 
 			innerErr := retry.RetryWithLog(ctx, func() error {
+				elog.InfoCtx(ctx, "ekafkaConsume", zap.Any("consumerGroupConfig", s.consumerGroupConfig))
 				return s.cg.Consume(ctx, s.consumerGroupConfig.Topics, s)
 				// return s.cg.Consume(ctx, s.consumerGroupConfig.Topics, otelsarama.WrapConsumerGroupHandler(s))
 			}, bo, "ekafka consumeRetry")
