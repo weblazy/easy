@@ -6,8 +6,15 @@ import (
 	"github.com/weblazy/easy/elog"
 	"github.com/weblazy/easy/http/http_client"
 	"github.com/weblazy/easy/http/http_client/http_client_config"
+	"github.com/weblazy/easy/monitor"
 	"go.uber.org/zap"
 )
+
+type Larkbot struct {
+	monitor.Handler
+	Url    string `json:"url"`
+	Header string `json:"header"`
+}
 
 // card "github.com/larksuite/oapi-sdk-go/v3/card"
 type MessageCardPlainText struct {
@@ -133,6 +140,46 @@ func SendMsg(header string, content string) {
 		"card":     messageCard,
 	})
 	resp, err := request.Post("https://api.weixin.qq.com/sns/oauth2/access_token")
+	if err != nil {
+		elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())), zap.Error(err))
+
+	}
+	elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())))
+}
+
+func (l *Larkbot) SendTextMsg(content string) {
+	ctx := context.Background()
+	// 卡片消息体
+	messageCard := MessageCard{
+		Config: &MessageCardConfig{
+			WideScreenMode: true,
+		},
+		Header: &MessageCardHeader{
+			Template: "turquoise",
+			Title: &MessageCardPlainText{
+				Tag:     "plain_text",
+				Content: l.Header,
+			},
+		},
+		Elements: []interface{}{
+			MessageCardDiv{
+				Tag: "div",
+				Text: &MessageCardText{
+					Tag:  "plain_text",
+					Text: content,
+				},
+			},
+		},
+	}
+
+	request := http_client.NewHttpClient(http_client_config.DefaultConfig()).
+		Request.SetContext(ctx).
+		SetBody(map[string]interface{}{
+			"chat_id":  "oc_1234abcd",
+			"msg_type": "interactive",
+			"card":     messageCard,
+		})
+	resp, err := request.Post(l.Url)
 	if err != nil {
 		elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())), zap.Error(err))
 
