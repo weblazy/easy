@@ -1,4 +1,4 @@
-package monitor
+package dingtalk
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 
 	"github.com/weblazy/easy/http/http_client"
 	"github.com/weblazy/easy/http/http_client/http_client_config"
+	"github.com/weblazy/easy/monitor"
 )
 
 type (
 	DingTalk struct {
-		Handler
+		monitor.Handler
 		Url       string `json:"url"`
 		atMobiles []string
 		isAtAll   bool
