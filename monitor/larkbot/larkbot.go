@@ -105,8 +105,8 @@ type MessageCard struct {
 }
 
 type MessageCardText struct {
-	Tag  string `json:"tag,omitempty"`
-	Text string `json:"text,omitempty"`
+	Tag     string `json:"tag,omitempty"`
+	Content string `json:"content,omitempty"`
 }
 type MessageCardURL struct {
 	URL        string `json:"url,omitempty"`
@@ -133,8 +133,8 @@ func (l *Larkbot) SendTextMsg(content string) {
 			MessageCardDiv{
 				Tag: "div",
 				Text: &MessageCardText{
-					Tag:  "plain_text",
-					Text: content,
+					Tag:     "plain_text",
+					Content: content,
 				},
 			},
 		},
