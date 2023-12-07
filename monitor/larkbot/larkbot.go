@@ -153,3 +153,39 @@ func (l *Larkbot) SendTextMsg(content string) {
 	}
 	elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())))
 }
+
+func (l *Larkbot) SendCardMsg(fields []*MessageCardField) {
+	ctx := context.Background()
+	// 卡片消息体
+	messageCard := MessageCard{
+		Config: &MessageCardConfig{
+			WideScreenMode: true,
+		},
+		Header: &MessageCardHeader{
+			Template: "turquoise",
+			Title: &MessageCardPlainText{
+				Tag:     "plain_text",
+				Content: l.Header,
+			},
+		},
+		Elements: []interface{}{
+			MessageCardDiv{
+				Tag:    "div",
+				Fields: fields,
+			},
+		},
+	}
+
+	request := http_client.NewHttpClient(http_client_config.DefaultConfig()).
+		Request.SetContext(ctx).
+		SetBody(&Message{
+			MsgType: "interactive",
+			Card:    &messageCard,
+		})
+	resp, err := request.Post(l.Url)
+	if err != nil {
+		elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())), zap.Error(err))
+
+	}
+	elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())))
+}
