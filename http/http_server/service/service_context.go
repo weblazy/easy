@@ -44,11 +44,9 @@ func (c *ServiceContext) Success(data interface{}) {
 
 // Error 返回异常信息，自动识别Code码
 func (c *ServiceContext) Error(err error) {
+	c.R.Code = defaultErrCode
 	if e, ok := err.(*code_err.CodeErr); ok {
 		c.R.Code = e.Code
-	}
-	if c.R.Code == 0 {
-		c.R.Code = defaultErrCode
 	}
 	c.R.Msg = err.Error()
 	c.JSON(http.StatusOK, c.R)
