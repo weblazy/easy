@@ -1,6 +1,7 @@
 package http_client_config
 
 import (
+	"crypto/tls"
 	"runtime"
 	"time"
 )
@@ -30,6 +31,7 @@ type Config struct {
 	EnableAccessInterceptorReq       bool // 是否开启记录请求参数，默认开启
 	EnableAccessInterceptorReqHeader bool // 是否开启记录请求 header 参数，默认关闭
 	EnableAccessInterceptorRes       bool // 是否开启记录响应参数，默认开启
+	TLSClientConfig                  *tls.Config
 }
 
 // DefaultConfig ...
