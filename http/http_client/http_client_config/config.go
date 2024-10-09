@@ -32,6 +32,7 @@ type Config struct {
 	EnableAccessInterceptorReqHeader bool // 是否开启记录请求 header 参数，默认关闭
 	EnableAccessInterceptorRes       bool // 是否开启记录响应参数，默认开启
 	TLSClientConfig                  *tls.Config
+	DisableCompression               bool
 }
 
 // DefaultConfig ...

@@ -69,6 +69,7 @@ func createTransport(c *http_client_config.Config) http.RoundTripper {
 		DisableKeepAlives:     !c.EnableKeepAlives,
 		MaxIdleConnsPerHost:   c.MaxIdleConnsPerHost,
 		TLSClientConfig:       c.TLSClientConfig,
+		DisableCompression:    c.DisableCompression,
 	}
 
 	if c.EnableTraceInterceptor {
