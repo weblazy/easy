@@ -13,7 +13,7 @@ type xmlMapEntry struct {
 }
 
 func (m Map) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	//构建xml 输出头部
+	//构建xml输出头部
 	var err error
 	for key, value := range m {
 		name := xml.Name{Space: "", Local: key}
