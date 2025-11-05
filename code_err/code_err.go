@@ -56,13 +56,13 @@ func (codeErr *CodeErr) LogErr(ctx context.Context, msg string, err error) *Code
 	if v, ok := err.(*CodeErr); ok {
 		return v
 	}
-	elog.ErrorCtx(elog.AddCtxSkip(ctx, 2), msg, elog.FieldError(err))
+	elog.ErrorCtx(elog.AddCtxSkip(ctx, 1), msg, elog.FieldError(err))
 	return codeErr.WithDebugMsg(err.Error())
 }
 
 // 打印field
 func (codeErr *CodeErr) LogField(ctx context.Context, msg string, fields ...zap.Field) *CodeErr {
-	elog.ErrorCtx(elog.AddCtxSkip(ctx, 2), msg, fields...)
+	elog.ErrorCtx(elog.AddCtxSkip(ctx, 1), msg, fields...)
 	return codeErr
 }
 
