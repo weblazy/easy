@@ -16,10 +16,10 @@ func NewLog(ctx context.Context) *Log {
 
 // 打印log
 func (c *Log) LogErr(codeErr *CodeErr, msg string, err error) *CodeErr {
-	return LogErr(c.Ctx, codeErr, msg, err)
+	return codeErr.LogErr(c.Ctx, msg, err)
 }
 
 // 打印log
 func (c *Log) LogField(codeErr *CodeErr, msg string, fields ...zap.Field) *CodeErr {
-	return LogField(c.Ctx, codeErr, msg, fields...)
+	return codeErr.LogField(c.Ctx, msg, fields...)
 }
