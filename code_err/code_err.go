@@ -57,7 +57,7 @@ func (codeErr *CodeErr) LogErr(ctx context.Context, msg string, err error) *Code
 		return v
 	}
 	elog.ErrorCtx(elog.AddCtxSkip(ctx, 2), msg, elog.FieldError(err))
-	return codeErr
+	return codeErr.WithDebugMsg(err.Error())
 }
 
 // 打印field
