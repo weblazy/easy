@@ -1,18 +1,20 @@
 package service
 
 type Response struct {
-	Code int64       `json:"code"`
-	Data interface{} `json:"data"`
-	Msg  string      `json:"msg"`
+	Data     interface{} `json:"data"`
+	Code     int64       `json:"code"`
+	Msg      string      `json:"msg"`
+	DebugMsg string      `json:"debug_msg"`
 }
 
 var defaultResponse Response
 
 func init() {
 	defaultResponse = Response{
-		Code: 1,
-		Data: nil,
-		Msg:  "",
+		Data:     nil,
+		Code:     1,
+		Msg:      "",
+		DebugMsg: "",
 	}
 }
 
