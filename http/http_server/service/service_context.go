@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/weblazy/easy/code_err"
 	"github.com/weblazy/easy/ectx"
-	"github.com/weblazy/easy/env"
 )
 
 type ServiceContext struct {
@@ -47,6 +46,7 @@ func (c *ServiceContext) Error(err error) {
 	c.R.Code = defaultErrCode
 	if e, ok := err.(*code_err.CodeErr); ok {
 		c.R.Code = e.Code
+		c.R.DebugMsg = e.DebugMsg
 	}
 	c.R.Msg = err.Error()
 	c.JSON(http.StatusOK, c.R)
@@ -66,10 +66,12 @@ func (c *ServiceContext) Response(code int64, msg string, data interface{}) {
 	c.R.Data = data
 	c.JSON(http.StatusOK, c.R)
 }
+
 func (c *ServiceContext) Return(err *code_err.CodeErr) {
 	if err != nil {
 		c.R.Code = err.Code
 		c.R.Msg = err.Msg
+		c.R.DebugMsg = err.DebugMsg
 	}
 	c.JSON(http.StatusOK, c.R)
 }
@@ -84,10 +86,7 @@ func (c *ServiceContext) SetData(data interface{}) *code_err.CodeErr {
 func (c *ServiceContext) BindValidator(obj interface{}) error {
 	err := c.ShouldBind(obj)
 	if err != nil {
-		if env.IsRelease() {
-			return ErrorBind
-		}
-		return err
+		return code_err.ParamsErr.WithDebugMsg(err.Error())
 	}
 	return nil
 }
