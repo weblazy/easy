@@ -3,11 +3,9 @@ package larkbot
 import (
 	"context"
 
-	"github.com/weblazy/easy/elog"
 	"github.com/weblazy/easy/http/http_client"
 	"github.com/weblazy/easy/http/http_client/http_client_config"
 	"github.com/weblazy/easy/monitor"
-	"go.uber.org/zap"
 )
 
 type Larkbot struct {
@@ -115,8 +113,7 @@ type MessageCardURL struct {
 	PCURL      string `json:"pc_url,omitempty"`
 }
 
-func (l *Larkbot) SendTextMsg(content string) {
-	ctx := context.Background()
+func (l *Larkbot) SendTextMsg(ctx context.Context, content string) error {
 	// 卡片消息体
 	messageCard := MessageCard{
 		Config: &MessageCardConfig{
@@ -146,15 +143,14 @@ func (l *Larkbot) SendTextMsg(content string) {
 			MsgType: "interactive",
 			Card:    &messageCard,
 		})
-	resp, err := request.Post(l.Url)
+	_, err := request.Post(l.Url)
 	if err != nil {
-		elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())), zap.Error(err))
-
+		return err
 	}
-	elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())))
+	return nil
 }
 
-func (l *Larkbot) SendCardMsg(fields []*MessageCardField) {
+func (l *Larkbot) SendCardMsg(fields []*MessageCardField) error {
 	ctx := context.Background()
 	// 卡片消息体
 	messageCard := MessageCard{
@@ -182,10 +178,9 @@ func (l *Larkbot) SendCardMsg(fields []*MessageCardField) {
 			MsgType: "interactive",
 			Card:    &messageCard,
 		})
-	resp, err := request.Post(l.Url)
+	_, err := request.Post(l.Url)
 	if err != nil {
-		elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())), zap.Error(err))
-
+		return err
 	}
-	elog.ErrorCtx(ctx, "SendLarkMsg", zap.String("resp", string(resp.Body())))
+	return nil
 }
