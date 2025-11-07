@@ -14,7 +14,7 @@ type Monitor struct {
 }
 
 type Handler interface {
-	SendTextMsg(content string) error
+	SendTextMsg(ctx context.Context, content string) error
 }
 
 // @desc
@@ -33,7 +33,7 @@ func NewMonitor(handlerList ...Handler) *Monitor {
 // @auth liuguoqiang 2020-12-07
 // @param
 // @return
-func (monitor *Monitor) SendTextMsg(content string) error {
+func (monitor *Monitor) SendTextMsg(ctx context.Context, content string) error {
 	if monitor.closed {
 		return fmt.Errorf("monitor closed")
 	}
@@ -46,7 +46,7 @@ func (monitor *Monitor) SendTextMsg(content string) error {
 			monitor.closeWaitGroup.Done()
 		}()
 		for k1 := range monitor.handlerList {
-			err := monitor.handlerList[k1].SendTextMsg(content)
+			err := monitor.handlerList[k1].SendTextMsg(ctx, content)
 			if err != nil {
 				fmt.Printf("%#v\n", err)
 			}
