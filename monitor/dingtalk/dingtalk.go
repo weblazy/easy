@@ -77,7 +77,7 @@ func (dingTalk *DingTalk) SendMsg(body interface{}) ([]byte, error) {
 // @auth liuguoqiang 2020-12-07
 // @param
 // @return
-func (dingTalk *DingTalk) SendTextMsg(content string) error {
+func (dingTalk *DingTalk) SendTextMsg(ctx context.Context, content string) error {
 	if dingTalk.Url == "" {
 		return fmt.Errorf("报警地址为空")
 	}
