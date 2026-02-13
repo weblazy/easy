@@ -13,6 +13,7 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/spf13/viper"
 	"github.com/weblazy/crypto/aes"
+	"github.com/weblazy/crypto/mode"
 )
 
 type Viper struct {
@@ -87,7 +88,7 @@ func GetPath() string {
 // aesDecrypt AES解密函数
 func aesDecrypt(encryptedText string, key []byte) (string, error) {
 	// 使用 weblazy/crypto 库进行解密
-	aesInstance := aes.NewAes(key)
+	aesInstance := aes.NewAes(key).WithMode(&mode.ECBMode{})
 	decrypted, err := aesInstance.Decrypt(encryptedText)
 	if err != nil {
 		return "", err
@@ -124,15 +125,21 @@ func processMap(m map[string]interface{}, re *regexp.Regexp, key []byte) {
 	for k, v := range m {
 		switch value := v.(type) {
 		case string:
-			// 检查是否匹配 ${xxx} 格式
-			if matches := re.FindStringSubmatch(value); len(matches) > 1 {
-				encryptedValue := matches[1]
-				// 尝试解密
-				if decrypted, err := aesDecrypt(encryptedValue, key); err == nil {
-					m[k] = decrypted
-				} else {
-					log.Printf("Failed to decrypt value for key %s: %v", k, err)
-				}
+			// 检查是否包含 ${xxx} 格式
+			if re.MatchString(value) {
+				// 替换所有 ${xxx} 为解密后的值
+				decryptedValue := re.ReplaceAllStringFunc(value, func(match string) string {
+					// 提取 xxx 部分（去掉 ${ 和 }）
+					encryptedText := match[2 : len(match)-1]
+					// 尝试解密
+					if decrypted, err := aesDecrypt(encryptedText, key); err == nil {
+						return decrypted
+					} else {
+						log.Printf("Failed to decrypt value for key %s: %v", k, err)
+						return match // 解密失败则保留原值
+					}
+				})
+				m[k] = decryptedValue
 			}
 		case map[string]interface{}:
 			// 递归处理嵌套的map
@@ -149,13 +156,21 @@ func processSlice(s []interface{}, re *regexp.Regexp, key []byte) {
 	for i, v := range s {
 		switch value := v.(type) {
 		case string:
-			if matches := re.FindStringSubmatch(value); len(matches) > 1 {
-				encryptedValue := matches[1]
-				if decrypted, err := aesDecrypt(encryptedValue, key); err == nil {
-					s[i] = decrypted
-				} else {
-					log.Printf("Failed to decrypt array value: %v", err)
-				}
+			// 检查是否包含 ${xxx} 格式
+			if re.MatchString(value) {
+				// 替换所有 ${xxx} 为解密后的值
+				decryptedValue := re.ReplaceAllStringFunc(value, func(match string) string {
+					// 提取 xxx 部分（去掉 ${ 和 }）
+					encryptedText := match[2 : len(match)-1]
+					// 尝试解密
+					if decrypted, err := aesDecrypt(encryptedText, key); err == nil {
+						return decrypted
+					} else {
+						log.Printf("Failed to decrypt array value: %v", err)
+						return match // 解密失败则保留原值
+					}
+				})
+				s[i] = decryptedValue
 			}
 		case map[string]interface{}:
 			processMap(value, re, key)
